@@ -32,10 +32,12 @@ export async function POST(request: NextRequest) {
     const speechResult = formData.get('SpeechResult') as string;
     const callSid = formData.get('CallSid') as string;
     
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://excelprowashers.com';
+    
     if (!speechResult) {
       const twiml = new VoiceResponse();
       twiml.say("I didn't catch that. Could you please repeat?");
-      twiml.redirect('/api/voice/incoming');
+      twiml.redirect(`${baseUrl}/api/voice/incoming`);
       
       return new NextResponse(twiml.toString(), {
         headers: { 'Content-Type': 'text/xml' },
@@ -72,7 +74,7 @@ export async function POST(request: NextRequest) {
     
     const gather = twiml.gather({
       input: ['speech'],
-      action: '/api/voice/respond',
+      action: `${baseUrl}/api/voice/respond`,
       method: 'POST',
       speechTimeout: 'auto',
       language: 'en-US'
