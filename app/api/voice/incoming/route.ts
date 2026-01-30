@@ -18,9 +18,10 @@ export async function POST(request: NextRequest) {
       language: 'en-US'
     });
     
-    gather.say({
-      voice: 'Polly.Joanna'
-    }, 'Hello! Thank you for calling ExcelPro Washers. How can I help you today?');
+    // Use ElevenLabs voice instead of robotic Polly
+    const greeting = 'Hello! Thank you for calling ExcelPro Washers. How can I help you today?';
+    const audioUrl = `${baseUrl}/api/voice/elevenlabs-audio?text=${encodeURIComponent(greeting)}`;
+    gather.play(audioUrl);
     
     // If no input, redirect
     twiml.redirect(`${baseUrl}/api/voice/incoming`);

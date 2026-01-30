@@ -36,7 +36,9 @@ export async function POST(request: NextRequest) {
     
     if (!speechResult) {
       const twiml = new VoiceResponse();
-      twiml.say("I didn't catch that. Could you please repeat?");
+      const retryMsg = "I didn't catch that. Could you please repeat?";
+      const retryUrl = `${baseUrl}/api/voice/elevenlabs-audio?text=${encodeURIComponent(retryMsg)}`;
+      twiml.play(retryUrl);
       twiml.redirect(`${baseUrl}/api/voice/incoming`);
       
       return new NextResponse(twiml.toString(), {
@@ -69,8 +71,10 @@ export async function POST(request: NextRequest) {
     console.log(`[Call ${callSid}] Caller: ${speechResult}`);
     console.log(`[Call ${callSid}] AI: ${aiResponse}`);
 
-    // Create TwiML response
+    // Create TwiML response with ElevenLabs audio
     const twiml = new VoiceResponse();
+    
+    const audioUrl = `${baseUrl}/api/voice/elevenlabs-audio?text=${encodeURIComponent(aiResponse)}`;
     
     const gather = twiml.gather({
       input: ['speech'],
@@ -80,12 +84,11 @@ export async function POST(request: NextRequest) {
       language: 'en-US'
     });
     
-    gather.say({
-      voice: 'Polly.Joanna'
-    }, aiResponse);
+    gather.play(audioUrl);
     
     // If no response, end gracefully
-    twiml.say('Thank you for calling ExcelPro Washers. Have a great day!');
+    const goodbyeUrl = `${baseUrl}/api/voice/elevenlabs-audio?text=${encodeURIComponent('Thank you for calling ExcelPro Washers. Have a great day!')}`;
+    twiml.play(goodbyeUrl);
     twiml.hangup();
 
     return new NextResponse(twiml.toString(), {
@@ -95,8 +98,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Voice response error:', error);
     
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://excelprowashers.com';
     const twiml = new VoiceResponse();
-    twiml.say("I apologize, but I'm experiencing technical difficulties. Please try calling back in a few moments.");
+    const errorMsg = "I apologize, but I'm experiencing technical difficulties. Please try calling back in a few moments.";
+    const errorUrl = `${baseUrl}/api/voice/elevenlabs-audio?text=${encodeURIComponent(errorMsg)}`;
+    twiml.play(errorUrl);
     twiml.hangup();
     
     return new NextResponse(twiml.toString(), {
