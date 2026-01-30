@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { isRateLimited, getClientIp, rateLimitResponse } from '@/lib/rateLimit';
 
+// Force dynamic rendering for this route
+export const dynamic = 'force-dynamic';
+
 /**
  * Cron Job: Check for Stale Leads
  * Runs daily at 6 PM

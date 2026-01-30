@@ -4,6 +4,9 @@ import { WarmLeadSequence } from '@/lib/ai/WarmLeadSequence';
 import { ColdLeadSequence } from '@/lib/ai/ColdLeadSequence';
 import { isRateLimited, getClientIp, rateLimitResponse } from '@/lib/rateLimit';
 
+// Force dynamic rendering for this route
+export const dynamic = 'force-dynamic';
+
 /**
  * Cron Job: Execute Pending Follow-ups
  * Runs daily at 9 AM

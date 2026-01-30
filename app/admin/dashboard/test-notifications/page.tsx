@@ -10,7 +10,8 @@ export default function TestNotificationsPage() {
 
   const checkConfig = async () => {
     try {
-      const response = await fetch('/api/test-notification');
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL || '';
+      const response = await fetch(`${baseUrl}/api/test-notification`);
       const data = await response.json();
       setConfig(data);
     } catch (error) {
@@ -23,7 +24,8 @@ export default function TestNotificationsPage() {
     setResult(null);
 
     try {
-      const response = await fetch('/api/test-notification', {
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL || '';
+      const response = await fetch(`${baseUrl}/api/test-notification`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ testType: 'all' })
