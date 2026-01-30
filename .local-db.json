@@ -1,0 +1,54 @@
+{
+    "clients": [],
+    "jobs": [],
+    "quotes": [],
+    "invoices": [],
+    "requests": [],
+    "users": [
+        {
+            "id": "user_sales_1",
+            "name": "Sales Rep 1",
+            "email": "sales@excelpro.com",
+            "pin": "1234",
+            "role": "SALES",
+            "active": true
+        },
+        {
+            "id": "user_contractor_1",
+            "name": "Mike Johnson",
+            "email": "mike@excelprowashers.ca",
+            "pin": "2001",
+            "role": "CONTRACTOR",
+            "active": true,
+            "phone": "+16135551001",
+            "skills": ["windows", "driveways", "gutters"],
+            "completedJobs": 0,
+            "totalEarnings": 0
+        },
+        {
+            "id": "user_contractor_2",
+            "name": "Sarah Chen",
+            "email": "sarah@excelprowashers.ca",
+            "pin": "2002",
+            "role": "CONTRACTOR",
+            "active": true,
+            "phone": "+16135551002",
+            "skills": ["windows", "roofs", "siding"],
+            "completedJobs": 0,
+            "totalEarnings": 0
+        },
+        {
+            "id": "user_contractor_3",
+            "name": "David Martinez",
+            "email": "david@excelprowashers.ca",
+            "pin": "2003",
+            "role": "CONTRACTOR",
+            "active": true,
+            "phone": "+16135551003",
+            "skills": ["driveways", "decks", "fences"],
+            "completedJobs": 0,
+            "totalEarnings": 0
+        }
+    ],
+    "aiFeedback": []
+}
