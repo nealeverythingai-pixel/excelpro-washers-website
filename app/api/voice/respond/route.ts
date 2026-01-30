@@ -4,27 +4,15 @@ import Anthropic from '@anthropic-ai/sdk';
 
 const VoiceResponse = twilio.twiml.VoiceResponse;
 
-// AI Receptionist system prompt
-const RECEPTIONIST_PROMPT = `You are a friendly and professional receptionist for ExcelPro Washers, a window and pressure washing company. 
+// AI Receptionist system prompt - keep it concise for faster responses
+const RECEPTIONIST_PROMPT = `You are ExcelPro Washers receptionist. Be brief and natural.
 
-Your role:
-- Greet callers warmly and professionally
-- Answer questions about our services (window cleaning, pressure washing, gutter cleaning)
-- Help schedule appointments
-- Provide pricing information (residential from $150, commercial quotes available)
-- Take messages for callbacks
-- Handle emergency requests
+Services: window cleaning, pressure washing, gutter cleaning, commercial washing
+Pricing: residential from $150, commercial by quote
+Hours: Mon-Sat, 8 AM - 6 PM
+Area: Greater Seattle
 
-Keep responses brief (1-2 sentences), conversational, and helpful. Always be polite and professional.
-
-Services we offer:
-- Window Cleaning (interior & exterior)
-- Pressure Washing (driveways, patios, decks)
-- Gutter Cleaning
-- Commercial Building Washing
-
-Business hours: Monday-Saturday, 8 AM - 6 PM
-Service areas: Greater Seattle area`;
+Keep responses under 20 words. Be conversational and helpful.`;
 
 export async function POST(request: NextRequest) {
   try {
@@ -53,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     const message = await anthropic.messages.create({
       model: 'claude-3-haiku-20240307',
-      max_tokens: 150,
+      max_tokens: 50,
       system: RECEPTIONIST_PROMPT,
       messages: [
         {
@@ -80,14 +68,15 @@ export async function POST(request: NextRequest) {
       input: ['speech'],
       action: `${baseUrl}/api/voice/respond`,
       method: 'POST',
-      speechTimeout: 'auto',
-      language: 'en-US'
+      speechTimeout: '1',
+      language: 'en-US',
+      hints: 'window cleaning, pressure washing, gutter cleaning, appointment, pricing, schedule, yes, no'
     });
     
     gather.play(audioUrl);
     
-    // If no response, end gracefully
-    const goodbyeUrl = `${baseUrl}/api/voice/elevenlabs-audio?text=${encodeURIComponent('Thank you for calling ExcelPro Washers. Have a great day!')}`;
+    // If no response, end gracefully with shorter message
+    const goodbyeUrl = `${baseUrl}/api/voice/elevenlabs-audio?text=${encodeURIComponent('Thanks for calling!')}`;
     twiml.play(goodbyeUrl);
     twiml.hangup();
 

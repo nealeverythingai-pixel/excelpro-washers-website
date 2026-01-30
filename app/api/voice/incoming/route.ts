@@ -9,17 +9,18 @@ export async function POST(request: NextRequest) {
     
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://excelprowashers.com';
     
-    // Gather speech input from caller
+    // Use shorter speech timeout for more responsive conversation
     const gather = twiml.gather({
       input: ['speech'],
       action: `${baseUrl}/api/voice/respond`,
       method: 'POST',
-      speechTimeout: 'auto',
-      language: 'en-US'
+      speechTimeout: '1',
+      language: 'en-US',
+      hints: 'window cleaning, pressure washing, gutter cleaning, appointment, pricing, schedule'
     });
     
-    // Use ElevenLabs voice instead of robotic Polly
-    const greeting = 'Hello! Thank you for calling ExcelPro Washers. How can I help you today?';
+    // Use ElevenLabs voice with shorter greeting for faster interaction
+    const greeting = 'Hi! ExcelPro Washers. How can I help?';
     const audioUrl = `${baseUrl}/api/voice/elevenlabs-audio?text=${encodeURIComponent(greeting)}`;
     gather.play(audioUrl);
     
