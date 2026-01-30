@@ -1,0 +1,27 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="180" height="180" fill="#ffffff"/>
+  
+  <!-- Squeegee handle -->
+  <path d="M63 99 L72 72 L76.5 74.25 L67.5 101.25 Z" fill="#1e7eb7" stroke="#0d5d8c" stroke-width="1"/>
+  
+  <!-- Squeegee blade -->
+  <path d="M54 108 L90 90 L92.25 94.5 L56.25 112.5 Z" fill="#2196f3" stroke="#1e7eb7" stroke-width="1"/>
+  <rect x="54" y="108" width="38.25" height="6.75" rx="1" fill="#1e7eb7"/>
+  
+  <!-- Water droplets -->
+  <circle cx="108" cy="78.75" r="13.5" fill="#1e7eb7"/>
+  <circle cx="110.25" cy="78.75" r="9" fill="#4db8ff" opacity="0.6"/>
+  <circle cx="119.25" cy="74.25" r="8.1" fill="#2196f3"/>
+  <circle cx="120.6" cy="74.25" r="5.4" fill="#4db8ff" opacity="0.6"/>
+  
+  <!-- Sparkles -->
+  <path d="M97.65 70.65 L99 76.5 L100.35 70.65 L99 64.8 Z" fill="#2196f3"/>
+  <path d="M94.5 73.8 L100.35 75.15 L94.5 76.5 L88.65 75.15 Z" fill="#2196f3"/>
+  <path d="M114.3 65.25 L115.2 69.3 L116.1 65.25 L115.2 61.2 Z" fill="#2196f3"/>
+  <path d="M112.05 67.5 L116.1 68.4 L112.05 69.3 L108 68.4 Z" fill="#2196f3"/>
+  
+  <!-- Text -->
+  <text x="90" y="144" font-family="Arial, sans-serif" font-size="21.6" font-weight="bold" fill="#1e7eb7" text-anchor="middle">EXCELPRO</text>
+  <text x="90" y="157.5" font-family="Arial, sans-serif" font-size="8.1" fill="#5e5e5e" text-anchor="middle" letter-spacing="1.8">WASHERS</text>
+</svg>

@@ -16,7 +16,9 @@ export const siteConfig = {
     "Winter Window Cleaning",
   ],
   url: "https://excelprowashers.com",
-  ogImage: "https://excelprowashers.com/og.png",
+  ogImage: "https://excelprowashers.com/logo.svg",
+  logo: "/logo.svg",
+  logoHorizontal: "/logo-horizontal.svg",
   links: {
     twitter: "https://twitter.com/excelprowashers",
     github: "https://github.com/excelprowashers",

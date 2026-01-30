@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { Menu, X, Phone } from "lucide-react";
 import { siteConfig } from "@/lib/site";
@@ -19,10 +20,14 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
-            <Link href="/" className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-bold text-primary-600">
-                {siteConfig.name}
-              </span>
+            <Link href="/" className="flex-shrink-0 flex items-center gap-2">
+              <Image 
+                src="/logo-horizontal.svg" 
+                alt="ExcelPro Washers" 
+                width={120} 
+                height={40}
+                className="h-8 w-auto text-primary-600 dark:text-primary-400"
+              />
             </Link>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
