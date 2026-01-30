@@ -26,20 +26,20 @@ export class WarmLeadSequence {
     const followUpType = this.getFollowUpType(daysFromNow);
 
     // Store in database for cron job to process
-    const followUp: ScheduledFollowUp = {
+    const followUp = {
       id: `followup_${lead.id}_day${daysFromNow}_${Date.now()}`,
       leadId: lead.id,
-      scheduledFor: scheduledDate,
+      category: 'warm' as const,
       type: followUpType,
+      scheduledFor: scheduledDate.toISOString(),
       completed: false,
+      createdAt: new Date().toISOString()
     };
 
-    // In a real system, save to database
-    // For now, we'll just log it
-    console.log(`  📅 Scheduled ${followUpType} for ${lead.name} on ${scheduledDate.toLocaleDateString()}`);
+    // Save to database
+    await db.scheduledFollowUps.create(followUp);
     
-    // TODO: Implement database storage
-    // await db.followUps.create(followUp);
+    console.log(`  📅 Scheduled ${followUpType} for ${lead.name} on ${scheduledDate.toLocaleDateString()}`);
   }
 
   /**

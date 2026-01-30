@@ -52,10 +52,14 @@ export function Navbar() {
             </Link>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
+            <div className="hidden lg:flex items-center text-gray-700 dark:text-gray-300 mr-2">
+              <Phone className="h-4 w-4 mr-1" />
+              <span className="text-sm font-medium">{siteConfig.business.phone}</span>
+            </div>
             <ThemeToggle />
             <a
               href={`tel:${siteConfig.business.phone}`}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all hover:scale-105"
             >
               <Phone className="h-4 w-4 mr-2" />
               Call Now

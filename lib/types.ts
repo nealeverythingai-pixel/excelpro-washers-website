@@ -100,6 +100,17 @@ export interface AIFeedback {
   metadata?: Record<string, any>;
 }
 
+export interface ScheduledFollowUp {
+  id: string;
+  leadId: string;
+  category: 'warm' | 'cold';
+  type: 'follow-up' | 'special-offer' | 'final-check' | 'educational' | 'seasonal' | 're-engagement';
+  scheduledFor: string; // ISO date string
+  completed: boolean;
+  completedAt?: string;
+  createdAt: string;
+}
+
 export interface DbSchema {
   clients: Client[]
   jobs: Job[]
@@ -108,4 +119,5 @@ export interface DbSchema {
   requests: Request[]
   users: User[]
   aiFeedback?: AIFeedback[]
+  scheduledFollowUps?: ScheduledFollowUp[]
 }

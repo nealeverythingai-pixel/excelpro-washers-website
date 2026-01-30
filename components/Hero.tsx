@@ -19,20 +19,26 @@ export function Hero() {
           <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
             <div className="sm:text-center lg:text-left">
               <FadeIn delay={0.1}>
+                <div className="mb-4">
+                  <span className="inline-flex items-center px-4 py-1 rounded-full text-sm font-medium bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
+                    ⭐ 4.9/5 Stars • 500+ Jobs Completed
+                  </span>
+                </div>
                 <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl">
-                  <span className="block xl:inline">Premium Exterior Cleaning</span>{" "}
+                  <span className="block xl:inline">Ottawa's #1 Rated</span>{" "}
                   <span className="block text-primary-600 dark:text-primary-400 xl:inline">
-                    <TextGenerateEffect words="in Ottawa" />
+                    <TextGenerateEffect words="Exterior Cleaning Experts" />
                   </span>
                 </h1>
               </FadeIn>
               <FadeIn delay={0.2}>
                 <p className="mt-3 text-base text-gray-500 dark:text-gray-300 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                  Transform your property with our expert services including soft house washing, pressure washing, gutter cleaning, and streak-free window cleaning.
+                  Professional soft washing, pressure washing, and streak-free window cleaning. 
+                  <strong className="text-gray-900 dark:text-white"> Same-day response guaranteed.</strong> Fully insured with $2M liability coverage.
                 </p>
               </FadeIn>
               <FadeIn delay={0.3}>
-                <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start gap-3">
                   <div className="rounded-md shadow">
                     <motion.a
                       whileHover={{ scale: 1.05 }}
@@ -40,22 +46,25 @@ export function Hero() {
                       href={siteConfig.business.googleFormUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 md:py-4 md:text-lg md:px-10 shadow-lg shadow-primary-500/30"
+                      className="w-full flex items-center justify-center px-8 py-4 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 md:text-lg md:px-10 shadow-lg shadow-primary-500/30"
                     >
-                      Get a Quote
+                      📋 Get Instant Quote
                     </motion.a>
                   </div>
-                  <div className="mt-3 sm:mt-0 sm:ml-3">
+                  <div className="mt-3 sm:mt-0 rounded-md shadow">
                     <motion.a
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       href={`tel:${siteConfig.business.phone}`}
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-700 bg-primary-100 hover:bg-primary-200 md:py-4 md:text-lg md:px-10"
+                      className="w-full flex items-center justify-center px-8 py-4 border-2 border-primary-600 text-base font-medium rounded-md text-primary-700 dark:text-primary-400 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-gray-700 md:text-lg md:px-10"
                     >
-                      Call Now
+                      📞 {siteConfig.business.phone}
                     </motion.a>
                   </div>
                 </div>
+                <p className="mt-4 text-sm text-gray-500 dark:text-gray-400 sm:text-center lg:text-left">
+                  💬 <strong>Same-day quotes available</strong> • No commitment required • Free estimates
+                </p>
               </FadeIn>
             </div>
           </main>

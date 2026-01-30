@@ -25,18 +25,20 @@ export class ColdLeadSequence {
 
     const followUpType = this.getFollowUpType(daysFromNow);
 
-    const followUp: ScheduledFollowUp = {
+    const followUp = {
       id: `cold_followup_${lead.id}_day${daysFromNow}_${Date.now()}`,
       leadId: lead.id,
-      scheduledFor: scheduledDate,
+      category: 'cold' as const,
       type: followUpType,
+      scheduledFor: scheduledDate.toISOString(),
       completed: false,
+      createdAt: new Date().toISOString()
     };
 
-    console.log(`  📅 Scheduled ${followUpType} for ${lead.name} on ${scheduledDate.toLocaleDateString()}`);
+    // Save to database
+    await db.scheduledFollowUps.create(followUp);
     
-    // TODO: Save to database
-    // await db.followUps.create(followUp);
+    console.log(`  📅 Scheduled ${followUpType} for ${lead.name} on ${scheduledDate.toLocaleDateString()}`);
   }
 
   /**

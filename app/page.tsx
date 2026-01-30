@@ -3,8 +3,10 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { Gallery } from "@/components/Gallery";
 import { FAQ } from "@/components/FAQ";
 import { CTA } from "@/components/CTA";
+import { Testimonials } from "@/components/Testimonials";
+import { ServiceAreas } from "@/components/ServiceAreas";
 import { siteConfig } from "@/lib/site";
-import { CheckCircle, Clock, Shield, Camera } from "lucide-react";
+import { CheckCircle, Clock, Shield, Camera, Award, Users } from "lucide-react";
 import { FadeIn } from "@/components/ui/FadeIn";
 
 export default function Home() {
@@ -16,34 +18,48 @@ export default function Home() {
       <section className="bg-gray-50 dark:bg-gray-800 py-12 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn delay={0.2}>
-            <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+            <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-6">
               <div className="flex flex-col items-center text-center">
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 mb-4">
-                  <span className="font-bold text-lg">$150</span>
+                  <Award className="h-6 w-6" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Minimum Visit</h3>
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Ensuring quality service</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">5-Star Rated</h3>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">127 reviews</p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 mb-4">
+                  <Users className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">500+ Jobs</h3>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Completed</p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 mb-4">
+                  <Shield className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Fully Insured</h3>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">$2M Coverage</p>
               </div>
               <div className="flex flex-col items-center text-center">
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 mb-4">
                   <Clock className="h-6 w-6" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Fast Booking</h3>
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Easy online scheduling</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Same-Day</h3>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Response</p>
               </div>
               <div className="flex flex-col items-center text-center">
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 mb-4">
                   <CheckCircle className="h-6 w-6" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Streak-Free</h3>
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Satisfaction guaranteed</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Guaranteed</h3>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">100% Satisfaction</p>
               </div>
               <div className="flex flex-col items-center text-center">
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 mb-4">
                   <Camera className="h-6 w-6" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Before/After</h3>
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">See the difference</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Photo Proof</h3>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Before & After</p>
               </div>
             </div>
           </FadeIn>
@@ -76,6 +92,10 @@ export default function Home() {
       </section>
 
       <Gallery />
+
+      <Testimonials />
+
+      <ServiceAreas />
 
       {/* How It Works */}
       <section className="bg-gray-50 dark:bg-gray-800 py-16 transition-colors duration-300">

@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { DbSchema, Client, Job, Quote, Invoice, Request, User, AIFeedback } from './types';
+import { DbSchema, Client, Job, Quote, Invoice, Request, User, AIFeedback, ScheduledFollowUp } from './types';
 
 // Store data in a hidden file in the project root
 const DB_PATH = path.join(process.cwd(), '.local-db.json');
@@ -248,6 +248,40 @@ export const db = {
         const data = await readDb();
         data.users = data.users.filter(u => u.id !== id);
         await writeDb(data);
+    }
+  },
+  scheduledFollowUps: {
+    getAll: async () => (await readDb()).scheduledFollowUps || [],
+    findById: async (id: string) => (await readDb()).scheduledFollowUps?.find(f => f.id === id),
+    create: async (followUp: ScheduledFollowUp) => {
+      const data = await readDb();
+      if (!data.scheduledFollowUps) {
+        data.scheduledFollowUps = [];
+      }
+      data.scheduledFollowUps.push(followUp);
+      await writeDb(data);
+      return followUp;
+    },
+    update: async (id: string, updates: Partial<ScheduledFollowUp>) => {
+      const data = await readDb();
+      if (!data.scheduledFollowUps) return null;
+      
+      const index = data.scheduledFollowUps.findIndex(f => f.id === id);
+      if (index !== -1) {
+        data.scheduledFollowUps[index] = { ...data.scheduledFollowUps[index], ...updates };
+        await writeDb(data);
+        return data.scheduledFollowUps[index];
+      }
+      return null;
+    },
+    getPending: async () => {
+      const data = await readDb();
+      if (!data.scheduledFollowUps) return [];
+      
+      const now = new Date();
+      return data.scheduledFollowUps.filter(f => 
+        !f.completed && new Date(f.scheduledFor) <= now
+      );
     }
   }
 };

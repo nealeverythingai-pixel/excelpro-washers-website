@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { JsonLd } from "@/components/JsonLd";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { ChatWidget } from "@/components/ChatWidget";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { siteConfig } from "@/lib/site";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
@@ -78,6 +79,7 @@ export default function RootLayout({
         >
           <JsonLd />
           <div className="flex flex-col min-h-screen">
+            <AnnouncementBanner />
             <Navbar />
             <main className="flex-grow">{children}</main>
             <Footer />
