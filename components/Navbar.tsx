@@ -20,14 +20,17 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
-            <Link href="/" className="flex-shrink-0 flex items-center gap-2">
+            <Link href="/" className="flex-shrink-0 flex items-center gap-3">
               <Image 
-                src="/logo-horizontal.svg" 
-                alt="ExcelPro Washers" 
-                width={120} 
+                src="/navbar-logo.jpg" 
+                alt="ExcelPro Washers Logo" 
+                width={40} 
                 height={40}
-                className="h-8 w-auto text-primary-600 dark:text-primary-400"
+                className="h-10 w-10 rounded-lg object-cover"
               />
+              <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
+                ExcelPro Washers
+              </span>
             </Link>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
