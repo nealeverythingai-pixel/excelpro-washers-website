@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { WarmLeadSequence } from '@/lib/ai/WarmLeadSequence';
 import { ColdLeadSequence } from '@/lib/ai/ColdLeadSequence';
+import { isRateLimited, getClientIp, rateLimitResponse } from '@/lib/rateLimit';
 
 /**
  * Cron Job: Execute Pending Follow-ups
@@ -10,6 +11,12 @@ import { ColdLeadSequence } from '@/lib/ai/ColdLeadSequence';
  */
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting: Max 5 requests per minute per IP
+    const clientIp = getClientIp(request);
+    if (isRateLimited(`cron-followups-${clientIp}`, 5, 60 * 1000)) {
+      return rateLimitResponse(60);
+    }
+
     // Verify this is from Vercel Cron (security)
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {

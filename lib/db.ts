@@ -21,7 +21,8 @@ const INITIAL_DB: DbSchema = {
   quotes: [],
   invoices: [],
   requests: [],
-  users: []
+  users: [],
+  scheduledFollowUps: []
 };
 
 async function readDb(): Promise<DbSchema> {

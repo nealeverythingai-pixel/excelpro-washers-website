@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { isRateLimited, getClientIp, rateLimitResponse } from '@/lib/rateLimit';
 
 /**
  * Cron Job: Check for Stale Leads
  * Runs daily at 6 PM
- * Identifies leads that haven't been contacted in 30+ days
+ * Finds leads older than 30 days that haven't been contacted
  */
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting: Max 5 requests per minute per IP
+    const clientIp = getClientIp(request);
+    if (isRateLimited(`cron-stale-${clientIp}`, 5, 60 * 1000)) {
+      return rateLimitResponse(60);
+    }
+
     // Verify this is from Vercel Cron (security)
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
