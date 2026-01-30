@@ -287,3 +287,6 @@ export const db = {
     }
   }
 };
+
+// Export readDb and writeDb for direct database access
+export { readDb, writeDb };

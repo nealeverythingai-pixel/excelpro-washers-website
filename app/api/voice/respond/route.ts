@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     
     if (!speechResult) {
       const twiml = new VoiceResponse();
-      twiml.say('I didn\\'t catch that. Could you please repeat?');
+      twiml.say("I didn't catch that. Could you please repeat?");
       twiml.redirect('/api/voice/incoming');
       
       return new NextResponse(twiml.toString(), {
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     const aiResponse = message.content[0].type === 'text' 
       ? message.content[0].text 
-      : 'I apologize, I didn\\'t understand that. Could you rephrase?';
+      : "I apologize, I didn't understand that. Could you rephrase?";
 
     // Log the conversation
     console.log(`[Call ${callSid}] Caller: ${speechResult}`);
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
     console.error('Voice response error:', error);
     
     const twiml = new VoiceResponse();
-    twiml.say('I apologize, but I\\'m experiencing technical difficulties. Please try calling back in a few moments.');
+    twiml.say("I apologize, but I'm experiencing technical difficulties. Please try calling back in a few moments.");
     twiml.hangup();
     
     return new NextResponse(twiml.toString(), {
