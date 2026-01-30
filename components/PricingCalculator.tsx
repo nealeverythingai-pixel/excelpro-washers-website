@@ -100,9 +100,9 @@ export function PricingCalculator() {
     let finalTotal = calculatedTotal;
     let minimumApplied = false;
 
-    // Apply Global Minimum of $150
-    if (calculatedTotal > 0 && calculatedTotal < 150) {
-        finalTotal = 150;
+    // Apply Global Minimum of $200
+    if (calculatedTotal > 0 && calculatedTotal < 200) {
+        finalTotal = 200;
         minimumApplied = true;
     }
 
@@ -140,7 +140,7 @@ export function PricingCalculator() {
     let msg = `I calculated an estimate of $${costs.total} for: ${parts.join(', ')}. Property Type: ${homeType}.`;
     
     if (costs.minimumApplied) {
-        msg += ` Note: A minimum service charge of $150 has been applied (original total: $${costs.total}).`;
+        msg += ` Note: A minimum service charge of $200 has been applied (original total: $${costs.total}).`;
     }
 
     return msg;
@@ -464,7 +464,7 @@ export function PricingCalculator() {
                                 <span className="font-medium text-gray-500">${costs.total}</span>
                             </div>
                             <div className="mt-2 text-xs text-amber-600 font-medium bg-amber-50 p-2 rounded border border-amber-200">
-                                Minimum Service Charge Applied: $150 CAD
+                                Minimum Service Charge Applied: $200 CAD
                             </div>
                         </>
                     )}

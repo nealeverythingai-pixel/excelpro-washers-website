@@ -35,8 +35,8 @@ export const siteConfig = {
     email: "info@excelprowashers.com",
     hours: "Mon–Sat 8am–6pm",
     areaServed: "Ottawa, ON",
-    priceRange: "$150+",
-    googleFormUrl: "https://forms.gle/REPLACE_ME", // Placeholder
+    priceRange: "$200+",
+    googleFormUrl: "/contact",
   },
   services: [
     {

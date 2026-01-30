@@ -79,8 +79,8 @@ export function SalesQuoteForm() {
     let finalTotal = calculatedTotal;
     let minimumApplied = false;
 
-    if (calculatedTotal > 0 && calculatedTotal < 150) {
-        finalTotal = 150;
+    if (calculatedTotal > 0 && calculatedTotal < 200) {
+        finalTotal = 200;
         minimumApplied = true;
     }
 
@@ -106,7 +106,7 @@ export function SalesQuoteForm() {
       if (activeServices.gutterCleaning) items.push({ description: 'Gutter Cleaning', quantity: 1, unitPrice: costs.gutter });
       if (activeServices.roofCleaning) items.push({ description: 'Roof Cleaning', quantity: 1, unitPrice: costs.roof });
       if (activeServices.pressureWashing && costs.pressure > 0) items.push({ description: 'Pressure Washing', quantity: 1, unitPrice: costs.pressure });
-      if (costs.minimumApplied) items.push({ description: 'Minimum Service Charge Adjustment', quantity: 1, unitPrice: 150 - costs.total });
+      if (costs.minimumApplied) items.push({ description: 'Minimum Service Charge Adjustment', quantity: 1, unitPrice: 200 - costs.total });
       return JSON.stringify(items);
   }
 
@@ -260,7 +260,7 @@ export function SalesQuoteForm() {
              
              {costs.minimumApplied && (
                  <div className="mb-4 text-xs text-amber-700 font-medium bg-amber-50 p-2 rounded border border-amber-200">
-                    ⚠ Minimum Service Charge of $150 Applied
+                    ⚠ Minimum Service Charge of $200 Applied
                  </div>
              )}
 

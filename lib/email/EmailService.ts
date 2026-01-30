@@ -286,7 +286,7 @@ export class EmailService {
           </tr>
           <tr>
             <td><strong>Gutter Cleaning</strong></td>
-            <td style="text-align: right;"><strong>$150</strong></td>
+            <td style="text-align: right;"><strong>$200</strong></td>
           </tr>
           <tr>
             <td><strong>Soft Washing</strong></td>
