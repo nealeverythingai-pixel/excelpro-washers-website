@@ -111,6 +111,17 @@ export interface ScheduledFollowUp {
   createdAt: string;
 }
 
+export interface CallLog {
+  id: string;
+  callSid: string;
+  from: string;
+  to: string;
+  status: string;
+  duration: number;
+  recordingUrl?: string | null;
+  timestamp: string;
+}
+
 export interface DbSchema {
   clients: Client[]
   jobs: Job[]
@@ -120,4 +131,5 @@ export interface DbSchema {
   users: User[]
   aiFeedback?: AIFeedback[]
   scheduledFollowUps?: ScheduledFollowUp[]
+  callLogs?: CallLog[]
 }
