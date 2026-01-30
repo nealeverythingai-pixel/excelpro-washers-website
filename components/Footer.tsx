@@ -15,14 +15,15 @@ export function Footer() {
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-3 mb-4">
               <Image 
-                src="/logo-horizontal.svg" 
-                alt="ExcelPro Washers" 
-                width={120} 
+                src="/navbar-logo.jpg" 
+                alt="ExcelPro Washers Logo" 
+                width={40} 
                 height={40}
-                className="h-8 w-auto brightness-0 invert"
+                className="h-10 w-10 rounded-lg object-cover"
               />
+              <span className="text-xl font-bold">ExcelPro Washers</span>
             </div>
             <p className="text-gray-400 text-sm">
               {siteConfig.description}
