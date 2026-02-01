@@ -233,11 +233,12 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = posts[params.slug]
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = posts[slug]
   if (!post) return { title: 'Post Not Found' }
 
-  const url = `${siteConfig.url}/blog/${params.slug}`;
+  const url = `${siteConfig.url}/blog/${slug}`;
   const imageUrl = post.image || siteConfig.ogImage;
 
   return {
@@ -246,7 +247,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     keywords: post.keywords,
     authors: [{ name: siteConfig.name }],
     alternates: {
-      canonical: `/blog/${params.slug}`,
+      canonical: `/blog/${slug}`,
     },
     openGraph: {
       type: 'article',
@@ -274,17 +275,18 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default function BlogPost({ params }: { params: { slug: string } }) {
-  const post = posts[params.slug]
+export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = posts[slug]
 
   if (!post) {
     notFound()
   }
 
-  const postUrl = `${siteConfig.url}/blog/${params.slug}`;
+  const postUrl = `${siteConfig.url}/blog/${slug}`;
   const breadcrumbItems = [
     { name: 'Blog', url: '/blog' },
-    { name: post.title, url: `/blog/${params.slug}` },
+    { name: post.title, url: `/blog/${slug}` },
   ];
 
   return (
