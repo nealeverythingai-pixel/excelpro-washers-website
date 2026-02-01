@@ -126,7 +126,6 @@ export default function ServicesPage() {
               From your roof down to your driveway, we have the specialized equipment and training to clean every inch of your property safely.
             </p>
           </header>
-
         <div className="mt-16 grid grid-cols-1 gap-y-10 gap-x-8 lg:grid-cols-3">
           {services.map((service) => (
             <ServiceCard key={service.title} {...service} />
@@ -156,6 +155,7 @@ export default function ServicesPage() {
               </div>
             </div>
           </div>
+        </div>
         </div>
       </main>
       <CTA />
