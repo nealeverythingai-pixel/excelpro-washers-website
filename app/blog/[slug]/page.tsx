@@ -226,6 +226,13 @@ const posts: Record<string, {
   }
 }
 
+// Generate static paths for all blog posts
+export async function generateStaticParams() {
+  return Object.keys(posts).map((slug) => ({
+    slug: slug,
+  }));
+}
+
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const post = posts[params.slug]
   if (!post) return { title: 'Post Not Found' }
