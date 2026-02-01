@@ -104,7 +104,7 @@ export interface ScheduledFollowUp {
   id: string;
   leadId: string;
   category: 'warm' | 'cold';
-  type: 'follow-up' | 'special-offer' | 'final-check' | 'educational' | 'seasonal' | 're-engagement';
+  type: 'follow-up' | 'special-offer' | 'final-check' | 'educational' | 'seasonal' | 're-engagement' | 'case-study';
   scheduledFor: string; // ISO date string
   completed: boolean;
   completedAt?: string;

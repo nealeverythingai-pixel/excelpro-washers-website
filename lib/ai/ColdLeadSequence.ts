@@ -6,14 +6,7 @@
 import { db } from '../db';
 import { EmailService } from '../email/EmailService';
 import { LeadData } from './LeadRouter';
-
-export interface ScheduledFollowUp {
-  id: string;
-  leadId: string;
-  scheduledFor: Date;
-  type: 'educational' | 'case-study' | 'seasonal' | 're-engagement';
-  completed: boolean;
-}
+import { ScheduledFollowUp } from '../types';
 
 export class ColdLeadSequence {
   /**
