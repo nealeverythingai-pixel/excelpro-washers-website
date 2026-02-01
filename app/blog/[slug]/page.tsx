@@ -1,6 +1,9 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Metadata } from 'next'
+import { ArticleSchema, BreadcrumbSchema } from '@/components/StructuredData'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
+import { siteConfig } from '@/lib/site'
 
 // We'll define the content directly here for simplicity and SEO control
 // In a larger app, this would come from a CMS or markdown files
@@ -11,6 +14,7 @@ const posts: Record<string, {
   content: React.ReactNode;
   keywords: string[];
   description: string;
+  image?: string;
 }> = {
   'best-window-cleaners-ottawa': {
     title: 'Why We Are The Best Window Cleaners in Ottawa (And Near You!)',
@@ -137,10 +141,40 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const post = posts[params.slug]
   if (!post) return { title: 'Post Not Found' }
 
+  const url = `${siteConfig.url}/blog/${params.slug}`;
+  const imageUrl = post.image || siteConfig.ogImage;
+
   return {
     title: `${post.title} | ExcelPro Washers Ottawa`,
     description: post.description,
     keywords: post.keywords,
+    authors: [{ name: siteConfig.name }],
+    alternates: {
+      canonical: `/blog/${params.slug}`,
+    },
+    openGraph: {
+      type: 'article',
+      url: url,
+      title: post.title,
+      description: post.description,
+      publishedTime: post.date,
+      authors: [siteConfig.name],
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.description,
+      images: [imageUrl],
+      creator: '@excelprowashers',
+    },
   }
 }
 
@@ -151,32 +185,69 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
     notFound()
   }
 
-  return (
-    <div className="bg-white py-24 sm:py-32">
-      <div className="mx-auto max-w-3xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center mb-16">
-            <div className="flex items-center justify-center gap-x-4 text-xs mb-4">
-                <time dateTime={post.date} className="text-gray-500">
-                  {new Date(post.date).toLocaleDateString()}
-                </time>
-                <span className="rounded-full bg-green-50 px-3 py-1.5 font-medium text-green-600">
-                  {post.category}
-                </span>
-            </div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{post.title}</h1>
-        </div>
-        
-        <div className="prose prose-lg prose-green mx-auto text-gray-600">
-            {post.content}
-        </div>
+  const postUrl = `${siteConfig.url}/blog/${params.slug}`;
+  const breadcrumbItems = [
+    { name: 'Blog', url: '/blog' },
+    { name: post.title, url: `/blog/${params.slug}` },
+  ];
 
-        <div className="mt-16 border-t border-gray-200 pt-8 text-center">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Need help with your property?</h3>
-            <Link href="/contact" className="text-base font-semibold text-green-600 hover:text-green-500">
-                Contact ExcelPro Washers today <span aria-hidden="true">→</span>
+  return (
+    <>
+      <ArticleSchema
+        title={post.title}
+        description={post.description}
+        datePublished={post.date}
+        url={postUrl}
+        image={post.image || siteConfig.ogImage}
+      />
+      <BreadcrumbSchema 
+        items={[
+          { name: 'Home', url: siteConfig.url },
+          { name: 'Blog', url: `${siteConfig.url}/blog` },
+          { name: post.title, url: postUrl },
+        ]} 
+      />
+      
+      <div className="bg-white dark:bg-gray-900 py-24 sm:py-32">
+        <article className="mx-auto max-w-3xl px-6 lg:px-8">
+          <Breadcrumbs items={breadcrumbItems} />
+          
+          <header className="mx-auto max-w-2xl text-center mb-16">
+            <div className="flex items-center justify-center gap-x-4 text-xs mb-4">
+              <time dateTime={post.date} className="text-gray-500 dark:text-gray-400">
+                {new Date(post.date).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </time>
+              <span className="rounded-full bg-green-50 dark:bg-green-900 px-3 py-1.5 font-medium text-green-600 dark:text-green-400">
+                {post.category}
+              </span>
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl mb-4">{post.title}</h1>
+            <p className="text-lg text-gray-600 dark:text-gray-300">{post.description}</p>
+          </header>
+          
+          <div className="prose prose-lg prose-green dark:prose-invert mx-auto text-gray-600 dark:text-gray-300">
+            {post.content}
+          </div>
+
+          <footer className="mt-16 border-t border-gray-200 dark:border-gray-700 pt-8 text-center">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Need Professional Cleaning Services?</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">Get a free quote from Ottawa's top-rated exterior cleaning experts.</p>
+            <Link 
+              href="/contact" 
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            >
+              Get Free Quote <span aria-hidden="true" className="ml-2">→</span>
             </Link>
-        </div>
+          </footer>
+        </article>
       </div>
+    </>
+  );
+}
     </div>
   )
 }

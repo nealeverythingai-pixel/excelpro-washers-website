@@ -11,37 +11,37 @@ import { FadeIn } from "@/components/ui/FadeIn";
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-16 pb-16">
+    <main className="flex flex-col gap-16 pb-16">
       <Hero />
 
       {/* Trust Bar */}
-      <section className="bg-gray-50 dark:bg-gray-800 py-12 transition-colors duration-300">
+      <section className="bg-gray-50 dark:bg-gray-800 py-12 transition-colors duration-300" aria-label="Company credentials and achievements">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn delay={0.2}>
             <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-6">
               <div className="flex flex-col items-center text-center">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 mb-4">
+                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 mb-4" aria-hidden="true">
                   <Award className="h-6 w-6" />
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">5-Star Rated</h3>
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">127 reviews</p>
               </div>
               <div className="flex flex-col items-center text-center">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 mb-4">
+                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 mb-4" aria-hidden="true">
                   <Users className="h-6 w-6" />
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">500+ Jobs</h3>
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Completed</p>
               </div>
               <div className="flex flex-col items-center text-center">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 mb-4">
+                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 mb-4" aria-hidden="true">
                   <Shield className="h-6 w-6" />
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">Fully Insured</h3>
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">$2M Coverage</p>
               </div>
               <div className="flex flex-col items-center text-center">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 mb-4">
+                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 mb-4" aria-hidden="true">
                   <Clock className="h-6 w-6" />
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">Same-Day</h3>
@@ -67,14 +67,14 @@ export default function Home() {
       </section>
 
       {/* Services Preview */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full" aria-labelledby="services-heading">
         <FadeIn>
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
-              Professional Exterior Cleaning
+            <h2 id="services-heading" className="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
+              Professional Exterior Cleaning Services in Ottawa
             </h2>
             <p className="mt-4 max-w-2xl text-xl text-gray-500 dark:text-gray-400 mx-auto">
-              Comprehensive cleaning solutions to restore and protect your Ottawa property.
+              Comprehensive window cleaning, pressure washing, and soft wash solutions to restore and protect your Ottawa property.
             </p>
           </div>
         </FadeIn>
@@ -176,6 +176,6 @@ export default function Home() {
 
       <FAQ />
       <CTA />
-    </div>
+    </main>
   );
 }

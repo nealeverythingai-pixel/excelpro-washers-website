@@ -4,30 +4,42 @@ import { siteConfig } from "@/lib/site";
 import ContactForm from "@/components/ContactForm";
 
 export const metadata: Metadata = {
-  title: "Contact Us",
-  description: "Get in touch with ExcelPro Washers for a free quote. Serving Ottawa and surrounding areas.",
+  title: "Contact Us | Get Free Quote - ExcelPro Washers Ottawa",
+  description: "Contact ExcelPro Washers for professional window cleaning, pressure washing, and soft wash services in Ottawa. Free quotes, same-day response. Call (343) 321-5300.",
+  keywords: [
+    "contact window cleaners Ottawa",
+    "free cleaning quote Ottawa",
+    "window cleaning estimate",
+    "pressure washing quote",
+  ],
   alternates: {
     canonical: "/contact",
+  },
+  openGraph: {
+    title: "Contact ExcelPro Washers | Free Quote",
+    description: "Get a free quote for professional cleaning services in Ottawa. Same-day response guaranteed.",
+    type: "website",
+    url: `${siteConfig.url}/contact`,
   },
 };
 
 export default function ContactPage() {
   return (
-    <div className="bg-white dark:bg-gray-900 transition-colors duration-300">
+    <main className="bg-white dark:bg-gray-900 transition-colors duration-300">
       <div className="max-w-7xl mx-auto py-16 px-4 sm:py-16 sm:px-6 lg:px-8">
         <div className="max-w-lg mx-auto md:max-w-none md:grid md:grid-cols-2 md:gap-8">
           <div>
-            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white sm:text-3xl">
-              Get in Touch
-            </h2>
+            <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white sm:text-3xl">
+              Contact ExcelPro Washers Ottawa
+            </h1>
             <div className="mt-3">
               <p className="text-lg text-gray-500 dark:text-gray-400">
-                Ready to schedule your window cleaning? Have questions about our services? We&apos;re here to help.
+                Ready to schedule your window cleaning or pressure washing? Have questions about our services? We're here to help with free quotes and expert advice.
               </p>
             </div>
             <div className="mt-9">
               <div className="flex">
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0" aria-hidden="true">
                   <Phone className="h-6 w-6 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                 </div>
                 <div className="ml-3 text-base text-gray-500 dark:text-gray-400">
@@ -85,7 +97,7 @@ export default function ContactPage() {
           </div>
           <div className="mt-12 sm:mt-16 md:mt-0">
             <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white sm:text-3xl mb-6">
-              Request a Quote
+              Get Your Free Quote
             </h2>
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 transition-colors duration-300">
               <ContactForm />
@@ -93,6 +105,6 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
