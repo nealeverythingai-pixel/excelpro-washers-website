@@ -22,6 +22,7 @@ import {
   quoteToText,
   syncAllEmbeddings,
 } from '@/lib/ai/embeddings';
+import { EmailService } from '@/lib/email/EmailService';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  Tool definitions (Anthropic tool_use format)
@@ -398,6 +399,65 @@ export const toolDefinitions: Anthropic.Messages.Tool[] = [
       required: [],
     },
   },
+
+  // ── Email Actions ──────────────────────────────────────────────
+  {
+    name: 'send_email',
+    description: 'Send a custom email to any email address via Resend. Use for individual outreach, promos, follow-ups, or campaign emails. The body should be well-formatted HTML. ALWAYS confirm with the admin before calling this tool.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        to: { type: 'string', description: 'Recipient email address' },
+        subject: { type: 'string', description: 'Email subject line' },
+        bodyHtml: { type: 'string', description: 'Email body as HTML. Use professional styling, headings, bullet points, CTA buttons. Include ExcelPro Washers branding.' },
+      },
+      required: ['to', 'subject', 'bodyHtml'],
+    },
+  },
+  {
+    name: 'send_quote_email',
+    description: 'Send a professional instant quote email to a client/lead with service pricing, timeline, and CTA. Use when the user asks to email a quote to someone.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        name: { type: 'string', description: 'Recipient name' },
+        email: { type: 'string', description: 'Recipient email' },
+        service: { type: 'string', description: 'Services requested (comma-separated: "Window Cleaning, Pressure Washing")' },
+        estimatedValue: { type: 'number', description: 'Estimated price in dollars' },
+        details: { type: 'string', description: 'Optional extra details about the job' },
+        leadCategory: { type: 'string', description: 'Lead priority: hot, warm, or cold' },
+      },
+      required: ['name', 'email', 'service', 'estimatedValue'],
+    },
+  },
+  {
+    name: 'send_follow_up_email',
+    description: 'Send a follow-up email to a lead/client who received a quote but has not booked yet.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        name: { type: 'string', description: 'Recipient name' },
+        email: { type: 'string', description: 'Recipient email' },
+        service: { type: 'string', description: 'Service they were quoted on' },
+        daysSince: { type: 'number', description: 'Days since the original quote was sent' },
+      },
+      required: ['name', 'email', 'service', 'daysSince'],
+    },
+  },
+  {
+    name: 'send_special_offer_email',
+    description: 'Send a special discount offer email (15% off) to a lead/client. Good for re-engaging cold leads or filling schedule gaps.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        name: { type: 'string', description: 'Recipient name' },
+        email: { type: 'string', description: 'Recipient email' },
+        service: { type: 'string', description: 'Service to discount' },
+        originalPrice: { type: 'number', description: 'Original price before discount' },
+      },
+      required: ['name', 'email', 'service', 'originalPrice'],
+    },
+  },
 ];
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -723,6 +783,73 @@ export async function executeTool(
             message: `Re-indexed ${counts.clients} clients, ${counts.jobs} jobs, ${counts.leads} leads, ${counts.quotes} quotes.`,
             counts,
           },
+        };
+      }
+
+      // ── Email Actions ────────────────────────────────────────
+      case 'send_email': {
+        const result = await EmailService.send({
+          to: input.to,
+          subject: input.subject,
+          html: input.bodyHtml,
+        });
+        if (!result.success) {
+          return { success: false, error: result.error || 'Email send failed' };
+        }
+        return {
+          success: true,
+          data: {
+            message: `Email sent to ${input.to}`,
+            subject: input.subject,
+            messageId: result.messageId,
+          },
+        };
+      }
+      case 'send_quote_email': {
+        const sent = await EmailService.sendInstantQuote({
+          name: input.name,
+          email: input.email,
+          service: input.service,
+          estimatedValue: input.estimatedValue,
+          details: input.details,
+          leadCategory: input.leadCategory as 'hot' | 'warm' | 'cold' | undefined,
+        });
+        return {
+          success: sent,
+          data: sent
+            ? { message: `Quote email sent to ${input.name} (${input.email}) for ${input.service} at ~$${input.estimatedValue}` }
+            : undefined,
+          error: sent ? undefined : 'Failed to send quote email — check RESEND_API_KEY',
+        };
+      }
+      case 'send_follow_up_email': {
+        const sent = await EmailService.sendFollowUp({
+          name: input.name,
+          email: input.email,
+          service: input.service,
+          daysSince: input.daysSince,
+        });
+        return {
+          success: sent,
+          data: sent
+            ? { message: `Follow-up email sent to ${input.name} (${input.email}) about their ${input.service} quote` }
+            : undefined,
+          error: sent ? undefined : 'Failed to send follow-up email — check RESEND_API_KEY',
+        };
+      }
+      case 'send_special_offer_email': {
+        const sent = await EmailService.sendSpecialOffer({
+          name: input.name,
+          email: input.email,
+          service: input.service,
+          originalPrice: input.originalPrice,
+        });
+        return {
+          success: sent,
+          data: sent
+            ? { message: `Special offer email (15% off) sent to ${input.name} (${input.email}) — $${input.originalPrice} → $${Math.round(input.originalPrice * 0.85)}` }
+            : undefined,
+          error: sent ? undefined : 'Failed to send offer email — check RESEND_API_KEY',
         };
       }
 

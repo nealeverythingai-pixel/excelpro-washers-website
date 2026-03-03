@@ -15,11 +15,11 @@ const SUGGESTED_QUESTIONS = [
   "Show me today's pipeline overview",
   "List all my hot leads",
   "How's my revenue this month?",
-  "Create a new client for John Smith",
-  "What jobs are scheduled this week?",
+  "Email a spring cleaning promo to my top clients",
+  "Send a follow-up to leads who haven't booked",
   "Convert my top lead to a client",
   "Show me unpaid invoices",
-  "How are my contractors performing?"
+  "Send a 15% off offer to cold leads"
 ];
 
 // ── Simple markdown → HTML renderer ─────────────────────────────────
