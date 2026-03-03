@@ -1,204 +1,70 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { db } from '@/lib/db';
-import { leadRequests, leadFollowUps } from '@/lib/db/leads';
-import { subscribers } from '@/lib/db/subscribers';
-import { voiceCallLogs, voiceBookings } from '@/lib/db/voice';
+import { toolDefinitions, executeTool } from '@/lib/ai/mcp-tools';
 import { isRateLimited, getClientIp, rateLimitResponse } from '@/lib/rateLimit';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+// ── System prompt ───────────────────────────────────────────────────
+const SYSTEM_PROMPT = `You are an expert AI Business Advisor for ExcelPro Washers, a window cleaning and pressure washing company in Ottawa, ON.
+
+You have FULL ACCESS to the company's CRM system through tools. You can:
+- Look up clients, jobs, quotes, invoices, leads, requests, contractors
+- Create new clients, jobs, quotes, and invoices
+- Update statuses on jobs, quotes, invoices, and leads
+- Get revenue analytics and pipeline overviews
+- Convert leads to clients
+- View call logs and voice bookings
+- Check email subscriber stats
+
+IMPORTANT RULES:
+1. USE TOOLS to answer data questions — don't guess. Call list_clients, list_jobs, get_revenue_summary, etc. to get real data.
+2. ALWAYS CONFIRM before creating/modifying records. Show the user what you plan to do and ask "Should I go ahead?"
+3. After making changes, summarize what was done with the record ID.
+4. When a user asks about something vague, search for it (use search_clients, list_leads, etc.).
+5. For complex operations (e.g., "convert this lead and schedule a job"), break into steps and confirm each.
+
+BUSINESS CONTEXT:
+- Ottawa-based window cleaning & pressure washing company
+- Services: Window Cleaning, Pressure Washing, Soft Washing, Gutter Cleaning, Roof Cleaning
+- Uses AI lead qualification (hot/warm/cold scoring)
+- Has contractor portal for job assignment
+- Stripe for payments, Resend for email, Twilio for voice
+
+YOUR PERSONALITY:
+- Conversational, friendly, and strategic
+- Reference real numbers from the tools
+- Use **bold** for key figures and actions
+- Use bullet lists and numbered steps
+- Occasional emojis for engagement
+- Aim for 200-400 words unless more detail is needed
+- End with a clear next step or question
+
+CURRENT DATE: ${new Date().toISOString().split('T')[0]}`;
+
 export async function POST(request: NextRequest) {
   try {
-    // ── Auth: verify admin session ──────────────────────────────────
+    // ── Auth ──────────────────────────────────────────────────────
     const adminSession = request.cookies.get('admin_session');
     if (!adminSession) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // ── Rate limiting: 10 req/min per IP ────────────────────────────
+    // ── Rate limit: 10 req/min ───────────────────────────────────
     const clientIp = getClientIp(request);
     if (isRateLimited(`advisor-${clientIp}`, 10, 60_000)) {
       return rateLimitResponse(60);
     }
 
     const { message, conversationHistory } = await request.json();
-
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    // ── Gather metrics from BOTH data sources ───────────────────────
-    // JSON DB (clients, jobs, quotes, invoices — not yet migrated)
-    const [clients, jobs, quotes, invoices, users] = await Promise.all([
-      db.clients.getAll(),
-      db.jobs.getAll(),
-      db.quotes.getAll(),
-      db.invoices.getAll(),
-      db.users.getAll(),
-    ]);
-
-    // Supabase (leads, follow-ups, voice, subscribers)
-    const [allLeads, pendingFollowUps, leadStats, subscriberStats, callLogs, bookings] =
-      await Promise.all([
-        leadRequests.getAll(),
-        leadFollowUps.getPending(),
-        leadRequests.getStats(),
-        subscribers.getStats(),
-        voiceCallLogs.getAll(100),
-        voiceBookings.getAll(100),
-      ]);
-
-    // ── Compute metrics ─────────────────────────────────────────────
-    const now = new Date();
-    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-
-    const completedJobs = jobs.filter(j => j.status === 'Completed').length;
-
-    const totalRevenue = invoices
-      .filter(i => i.status === 'Paid')
-      .reduce((sum, i) => sum + i.total, 0);
-
-    const recentRevenue = invoices
-      .filter(i => i.status === 'Paid' && new Date(i.createdAt) > thirtyDaysAgo)
-      .reduce((sum, i) => sum + i.total, 0);
-
-    const pendingRevenue = invoices
-      .filter(i => i.status === 'Sent' || i.status === 'Unpaid')
-      .reduce((sum, i) => sum + i.total, 0);
-
-    const avgJobValue = completedJobs > 0 ? Math.round(totalRevenue / completedJobs) : 0;
-
-    const leadConversionRate = allLeads.length > 0
-      ? ((clients.length / allLeads.length) * 100).toFixed(1)
-      : '0';
-
-    const quoteAcceptanceRate = quotes.length > 0
-      ? ((quotes.filter(q => q.status === 'Accepted').length / quotes.length) * 100).toFixed(1)
-      : '0';
-
-    // Service breakdown
-    const serviceRevenue = invoices
-      .filter(i => i.status === 'Paid')
-      .reduce((acc, invoice) => {
-        const job = jobs.find(j => j.id === invoice.jobId);
-        if (job) {
-          const service = job.title.split('-')[0].trim() || 'Other';
-          acc[service] = (acc[service] || 0) + invoice.total;
-        }
-        return acc;
-      }, {} as Record<string, number>);
-
-    // Contractors
-    const contractors = users.filter(u => u.role === 'CONTRACTOR');
-    const contractorStats = contractors.map(c => ({
-      name: c.name,
-      completedJobs: c.completedJobs || 0,
-      earnings: (c as any).earnings || 0,
-      skills: c.skills || [],
-    }));
-
-    // AI Lead pipeline (Supabase)
-    const recentLeads = allLeads.filter(r => new Date(r.created_at) > thirtyDaysAgo);
-
-    const businessMetrics = {
-      overview: {
-        totalClients: clients.length,
-        totalJobs: jobs.length,
-        completedJobs,
-        totalRevenue,
-        pendingRevenue,
-        avgJobValue,
-        contractors: contractors.length,
-      },
-      recent: {
-        leadsLast30Days: recentLeads.length,
-        jobsLast30Days: jobs.filter(j => new Date(j.createdAt) > thirtyDaysAgo).length,
-        revenueLast30Days: recentRevenue,
-      },
-      performance: {
-        leadConversionRate: `${leadConversionRate}%`,
-        quoteAcceptanceRate: `${quoteAcceptanceRate}%`,
-      },
-      services: serviceRevenue,
-      contractors: contractorStats,
-      aiLeadPipeline: {
-        totalLeads: leadStats.total,
-        hot: leadStats.hot,
-        warm: leadStats.warm,
-        cold: leadStats.cold,
-        converted: leadStats.converted,
-        averageAIScore: leadStats.avgScore,
-        pendingFollowUps: pendingFollowUps.length,
-      },
-      voiceCalls: {
-        totalCalls: callLogs.length,
-        bookingsFromCalls: bookings.length,
-      },
-      emailMarketing: {
-        totalSubscribers: subscriberStats.total,
-        activeSubscribers: subscriberStats.active,
-        unsubscribed: subscriberStats.unsubscribed,
-        sources: subscriberStats.sources,
-      },
-      currentDate: now.toISOString().split('T')[0],
-    };
-
-    // ── System prompt ───────────────────────────────────────────────
-    const systemPrompt = `You are an expert AI Business Advisor for ExcelPro Washers, a window cleaning and pressure washing company in Ottawa, ON.
-
-CURRENT INFRASTRUCTURE (as of March 2026):
-- Next.js app deployed on Vercel with multi-portal system (Customer, Sales, Contractor, Admin)
-- Supabase PostgreSQL for leads, AI follow-ups, voice call logs, bookings, and newsletter subscribers
-- Legacy JSON file DB for clients, jobs, quotes, invoices (migration to Supabase planned)
-- 10 AI Agents live: Lead Qualifier (Claude 3.5 Haiku), Lead Router, Warm/Cold Lead Sequences, AI Phone Receptionist (Twilio + ElevenLabs), Business Advisor (you), Business Insights, Contractor Analytics, Customer Comm Assistant, Quote Optimizer
-- Email via Resend (CAN-SPAM compliant with unsubscribe links)
-- SMS/Voice via Twilio, TTS via ElevenLabs
-- Stripe payment processing + PDF invoice generation
-- Full email marketing system with campaign composer, subscriber management
-- Automated follow-up cron jobs (9 AM daily)
-
-DEVELOPMENT ROADMAP:
-Phase 2 (Next):
-- Migrate clients/jobs/quotes/invoices from JSON DB to Supabase
-- Customer-facing portal improvements
-- AI feedback loops for learning from outcomes
-
-Phase 3 (Future):
-- Vector database + RAG for historical context (trigger: 500+ jobs)
-- Predictive analytics and dynamic pricing
-- Advanced contractor scheduling
-- Mobile app
-
-INFRASTRUCTURE UPGRADE TRIGGERS:
-- 100+ clients → Ensure full Supabase migration is complete
-- 500+ jobs → Implement vector database for RAG
-- 10+ contractors → Advanced AI scheduling
-- $50k+ monthly revenue → Custom infrastructure
-- Multiple locations → Geographic routing system
-
-CURRENT BUSINESS METRICS (real-time):
-${JSON.stringify(businessMetrics, null, 2)}
-
-YOUR ROLE:
-- Provide specific, actionable advice based on ACTUAL business data above
-- Reference real numbers from the metrics
-- Recommend upgrades ONLY when triggers are met
-- Be conversational, friendly, and strategic
-- If data is missing, ask clarifying questions
-- Focus on ROI and practical next steps
-- Use emojis occasionally to be engaging
-
-RESPONSE FORMAT:
-- Use **bold** for important numbers, actions, and insights
-- Use bullet lists and numbered steps for actionable advice
-- Keep responses concise but thorough (aim for 200-400 words)
-- End with a clear next step or question`;
-
-    // ── Build proper multi-turn messages ─────────────────────────────
-    const messages: { role: 'user' | 'assistant'; content: string }[] = [];
+    // ── Build multi-turn messages ────────────────────────────────
+    const messages: Anthropic.Messages.MessageParam[] = [];
 
     if (Array.isArray(conversationHistory)) {
       for (const msg of conversationHistory.slice(-8)) {
@@ -209,44 +75,128 @@ RESPONSE FORMAT:
     }
     messages.push({ role: 'user', content: message });
 
-    // Ensure messages alternate roles (Anthropic requirement)
-    const cleanMessages: typeof messages = [];
+    // Ensure alternating roles (Anthropic requirement)
+    const cleanMessages: Anthropic.Messages.MessageParam[] = [];
     for (const msg of messages) {
       if (cleanMessages.length === 0 || cleanMessages[cleanMessages.length - 1].role !== msg.role) {
         cleanMessages.push(msg);
       } else {
-        // Merge consecutive same-role messages
-        cleanMessages[cleanMessages.length - 1].content += '\n\n' + msg.content;
+        const last = cleanMessages[cleanMessages.length - 1];
+        if (typeof last.content === 'string' && typeof msg.content === 'string') {
+          last.content = last.content + '\n\n' + msg.content;
+        }
       }
     }
 
-    // ── Stream response from Claude ─────────────────────────────────
-    const stream = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 2048,
-      system: systemPrompt,
-      messages: cleanMessages,
-      stream: true,
-    });
+    // ── Agentic tool-use loop ────────────────────────────────────
+    // The AI may call tools multiple times before producing a final
+    // text response. We loop until stop_reason is "end_turn".
+    let currentMessages = [...cleanMessages];
+    let finalText = '';
+    const toolActions: { tool: string; input: any; result: string }[] = [];
+    const MAX_ITERATIONS = 8;
 
-    const encoder = new TextEncoder();
+    for (let i = 0; i < MAX_ITERATIONS; i++) {
+      const response = await anthropic.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 4096,
+        system: SYSTEM_PROMPT,
+        messages: currentMessages,
+        tools: toolDefinitions,
+      });
 
-    const readableStream = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const event of stream) {
-            if (
-              event.type === 'content_block_delta' &&
-              event.delta.type === 'text_delta'
-            ) {
-              controller.enqueue(encoder.encode(event.delta.text));
-            }
-          }
-        } catch (err) {
-          console.error('Stream error:', err);
-        } finally {
-          controller.close();
+      // Collect text and tool_use blocks
+      const textParts: string[] = [];
+      const toolUseBlocks: Anthropic.Messages.ToolUseBlock[] = [];
+
+      for (const block of response.content) {
+        if (block.type === 'text') {
+          textParts.push(block.text);
+        } else if (block.type === 'tool_use') {
+          toolUseBlocks.push(block);
         }
+      }
+
+      if (textParts.length > 0) {
+        finalText += textParts.join('\n');
+      }
+
+      // If no tool calls or end_turn, we're done
+      if (toolUseBlocks.length === 0 || response.stop_reason === 'end_turn') {
+        break;
+      }
+
+      // Execute tool calls
+      const toolResults: Anthropic.Messages.ToolResultBlockParam[] = [];
+
+      for (const toolCall of toolUseBlocks) {
+        console.log(`[MCP] Executing: ${toolCall.name}`, toolCall.input);
+        const result = await executeTool(
+          toolCall.name,
+          toolCall.input as Record<string, any>
+        );
+
+        toolActions.push({
+          tool: toolCall.name,
+          input: toolCall.input,
+          result: result.success ? '✅' : `❌ ${result.error}`,
+        });
+
+        // Truncate large results to avoid context overflow
+        let resultContent = JSON.stringify(result);
+        if (resultContent.length > 8000) {
+          if (result.data && Array.isArray(result.data)) {
+            const summary = {
+              success: true,
+              totalCount: result.data.length,
+              first5: result.data.slice(0, 5),
+              note: `Showing 5 of ${result.data.length} results. Ask to narrow down if needed.`,
+            };
+            resultContent = JSON.stringify(summary);
+          }
+        }
+
+        toolResults.push({
+          type: 'tool_result',
+          tool_use_id: toolCall.id,
+          content: resultContent,
+        });
+      }
+
+      // Append assistant response + tool results for next iteration
+      currentMessages.push({
+        role: 'assistant',
+        content: response.content,
+      });
+      currentMessages.push({
+        role: 'user',
+        content: toolResults,
+      });
+    }
+
+    // ── Append write-action summary ──────────────────────────────
+    let responseText = finalText;
+
+    if (toolActions.length > 0) {
+      const writeActions = toolActions.filter(a =>
+        a.tool.startsWith('create_') ||
+        a.tool.startsWith('update_') ||
+        a.tool.startsWith('convert_')
+      );
+      if (writeActions.length > 0) {
+        responseText += '\n\n---\n*Actions taken:*\n';
+        for (const action of writeActions) {
+          responseText += `- **${action.tool}** ${action.result}\n`;
+        }
+      }
+    }
+
+    // Return as readable stream (frontend expects streaming response)
+    const encoder = new TextEncoder();
+    const readableStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(responseText));
+        controller.close();
       },
     });
 

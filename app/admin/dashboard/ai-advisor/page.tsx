@@ -12,14 +12,14 @@ interface Message {
 }
 
 const SUGGESTED_QUESTIONS = [
-  "What should I focus on this week?",
-  "Should I hire another contractor?",
-  "How's my lead pipeline performing?",
-  "How's my revenue trending?",
-  "What's my biggest bottleneck?",
-  "Am I ready to scale?",
-  "How are my AI agents doing?",
-  "How do I improve my conversion rate?"
+  "Show me today's pipeline overview",
+  "List all my hot leads",
+  "How's my revenue this month?",
+  "Create a new client for John Smith",
+  "What jobs are scheduled this week?",
+  "Convert my top lead to a client",
+  "Show me unpaid invoices",
+  "How are my contractors performing?"
 ];
 
 // ── Simple markdown → HTML renderer ─────────────────────────────────
@@ -83,7 +83,7 @@ export default function AIAdvisorPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "👋 Hi! I'm your AI Business Advisor. I have access to all your business metrics, AI agent performance, lead pipeline, and development roadmap. Ask me anything about growing your business!",
+      content: "👋 Hi! I'm your AI Business Advisor — now with **full CRM access**. I can look up clients, jobs, quotes, invoices, and leads in real time. I can also **take actions** for you: create clients, schedule jobs, generate quotes, update statuses, and convert leads. Just tell me what you need!",
       timestamp: new Date()
     }
   ]);
@@ -198,7 +198,7 @@ export default function AIAdvisorPage() {
           <div>
             <h1 className="text-2xl font-bold">AI Business Advisor</h1>
             <p className="text-sm text-muted-foreground">
-              Chat with your AI-powered strategic advisor
+              AI advisor with full CRM access — ask questions or give commands
             </p>
           </div>
         </div>
@@ -285,8 +285,9 @@ export default function AIAdvisorPage() {
               <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
                 <Bot className="h-4 w-4 text-white" />
               </div>
-              <div className="bg-muted p-3 rounded-lg">
+              <div className="bg-muted p-3 rounded-lg flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-xs text-muted-foreground">Querying CRM & thinking...</span>
               </div>
             </div>
           )}
