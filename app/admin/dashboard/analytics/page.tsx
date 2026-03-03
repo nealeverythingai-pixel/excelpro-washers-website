@@ -121,7 +121,8 @@ export default function AnalyticsPage() {
         throw new Error('Too many requests. Please wait a moment and try again.');
       }
       if (!response.ok) {
-        throw new Error('Failed to fetch business insights');
+        const errBody = await response.json().catch(() => ({}));
+        throw new Error(errBody.error || `Server error (${response.status})`);
       }
 
       const data = await response.json();
