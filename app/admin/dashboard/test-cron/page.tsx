@@ -12,9 +12,11 @@ export default function CronTestPage() {
 
     try {
       const response = await fetch(endpoint, {
+        method: 'POST',
         headers: {
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_CRON_SECRET || 'test-secret-123'}`
-        }
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ testMode: true })
       });
 
       const data = await response.json();

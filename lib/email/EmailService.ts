@@ -7,6 +7,9 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://excelprowashers.com';
+const PHYSICAL_ADDRESS = '123 Main St, Ottawa, ON K1A 0B1, Canada';
+
 export interface EmailOptions {
   to: string;
   subject: string;
@@ -19,18 +22,38 @@ export class EmailService {
   private static readonly DEFAULT_FROM = 'ExcelPro Washers <onboarding@resend.dev>';
 
   /**
+   * Generate CAN-SPAM compliant footer with unsubscribe link
+   */
+  private static complianceFooter(recipientEmail: string, isTransactional = false): string {
+    const unsubscribeUrl = `${SITE_URL}/api/newsletter/unsubscribe?email=${encodeURIComponent(recipientEmail)}`;
+    
+    return `
+      <hr style="margin: 32px 0; border: none; border-top: 1px solid #e5e7eb;" />
+      <div style="text-align: center; color: #9ca3af; font-size: 12px; line-height: 1.8; padding: 0 20px;">
+        <p style="margin: 0;">ExcelPro Washers &bull; ${PHYSICAL_ADDRESS}</p>
+        <p style="margin: 4px 0 0 0;">
+          ${isTransactional 
+            ? 'This is a transactional email related to your service request.' 
+            : `You received this because you subscribed or requested a quote.`}
+          <br />
+          <a href="${unsubscribeUrl}" style="color: #6b7280; text-decoration: underline;">Unsubscribe from marketing emails</a>
+        </p>
+      </div>
+    `;
+  }
+
+  /**
    * Send an email using Resend
    */
   static async send(options: EmailOptions): Promise<{ success: boolean; error?: string; messageId?: string }> {
     try {
       if (!process.env.RESEND_API_KEY) {
-        console.log('⚠️  RESEND_API_KEY not configured - email simulation mode');
-        console.log('📧 Would send email:', {
+        console.warn('⚠️  RESEND_API_KEY not configured - email NOT sent');
+        console.log('📧 Would have sent email:', {
           to: options.to,
           subject: options.subject,
-          preview: options.html.substring(0, 200)
         });
-        return { success: true, messageId: 'simulated-' + Date.now() };
+        return { success: false, error: 'RESEND_API_KEY not configured' };
       }
 
       const { data, error } = await resend.emails.send({
@@ -38,6 +61,10 @@ export class EmailService {
         to: options.to,
         subject: options.subject,
         html: options.html,
+        headers: {
+          'List-Unsubscribe': `<${SITE_URL}/api/newsletter/unsubscribe?email=${encodeURIComponent(options.to)}>`,
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        },
       });
 
       if (error) {
@@ -204,6 +231,7 @@ export class EmailService {
         <p>Reference #: ${requestNumber}</p>
         <p>Questions? Reply to this email or call us at ${process.env.OWNER_PHONE_NUMBER}</p>
       </div>
+      ${this.complianceFooter(params.email, true)}
     </div>
   </div>
 </body>
@@ -334,6 +362,7 @@ export class EmailService {
       <div class="footer">
         <p>Questions? Just reply to this email or call ${process.env.OWNER_PHONE_NUMBER}</p>
       </div>
+      ${this.complianceFooter(params.email)}
     </div>
   </div>
 </body>
@@ -395,6 +424,7 @@ export class EmailService {
       
       <p>Best,<br>
       <strong>ExcelPro Washers</strong></p>
+      ${this.complianceFooter(params.email)}
     </div>
   </div>
 </body>
@@ -456,6 +486,7 @@ export class EmailService {
       <p>Talk soon,<br>
       <strong>ExcelPro Washers</strong><br>
       📱 ${process.env.OWNER_PHONE_NUMBER}</p>
+      ${this.complianceFooter(params.email)}
     </div>
   </div>
 </body>

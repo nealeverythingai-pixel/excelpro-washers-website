@@ -78,21 +78,38 @@ View details: ${process.env.NEXT_PUBLIC_SITE_URL}/admin/dashboard/leads/${notifi
 }
 
 /**
- * Send email notification
+ * Send email notification via Resend
  */
 export async function sendHotLeadEmail(notification: HotLeadNotification): Promise<boolean> {
   try {
-    // For now, just log. You can integrate SendGrid, Resend, or other email service
-    console.log('📧 Hot Lead Email Notification:');
-    console.log(`   To: ${process.env.OWNER_EMAIL}`);
-    console.log(`   Subject: 🔥 HOT LEAD ALERT - ${notification.name} (${notification.score}/100)`);
-    console.log(`   Lead: ${notification.name} - ${notification.phone}`);
-    console.log(`   Service: ${notification.service} - $${notification.estimatedValue}`);
-    console.log(`   AI Analysis: ${notification.reasoning}`);
-    
-    // TODO: Implement email service (SendGrid, Resend, etc.)
-    // const response = await fetch('https://api.sendgrid.com/v3/mail/send', { ... });
-    
+    if (!process.env.RESEND_API_KEY || !process.env.NOTIFICATION_EMAIL) {
+      console.warn('⚠️  Resend not configured (RESEND_API_KEY + NOTIFICATION_EMAIL needed). Skipping email.');
+      return false;
+    }
+
+    const { Resend } = await import('resend');
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    const html = `
+      <h2>🔥 HOT LEAD ALERT!</h2>
+      <p><strong>Score:</strong> ${notification.score}/100</p>
+      <p><strong>Name:</strong> ${notification.name}</p>
+      <p><strong>Phone:</strong> ${notification.phone}</p>
+      <p><strong>Email:</strong> ${notification.email}</p>
+      <p><strong>Service:</strong> ${notification.service}</p>
+      <p><strong>Value:</strong> $${notification.estimatedValue}</p>
+      <p><strong>AI Says:</strong> ${notification.reasoning}</p>
+      <p><strong>📞 CALL THEM NOW for highest conversion rate!</strong></p>
+    `;
+
+    await resend.emails.send({
+      from: process.env.EMAIL_FROM || 'ExcelPro CRM <onboarding@resend.dev>',
+      to: process.env.NOTIFICATION_EMAIL,
+      subject: `🔥 HOT LEAD: ${notification.name} (${notification.score}/100)`,
+      html,
+    });
+
+    console.log('✅ Hot lead email sent to:', process.env.NOTIFICATION_EMAIL);
     return true;
 
   } catch (error) {
@@ -210,18 +227,3 @@ export async function notifyHotLead(notification: HotLeadNotification): Promise<
   }
 }
 
-/**
- * Send follow-up reminder notification
- */
-export async function notifyFollowUpDue(lead: {
-  name: string
-  phone: string
-  service: string
-  category: 'warm' | 'cold'
-  lastContact: string
-}): Promise<void> {
-  console.log(`\n⏰ Follow-up reminder for ${lead.category} lead: ${lead.name}`);
-  
-  // For now just log, can expand to send reminders via Discord/Email
-  // This would be called by a cron job or background worker
-}

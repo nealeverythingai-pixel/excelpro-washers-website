@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { db } from '@/lib/db';
+import { leadRequests, leadFollowUps } from '@/lib/db/leads';
+import { subscribers } from '@/lib/db/subscribers';
+import { voiceCallLogs, voiceBookings } from '@/lib/db/voice';
+import { isRateLimited, getClientIp, rateLimitResponse } from '@/lib/rateLimit';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -8,36 +12,55 @@ const anthropic = new Anthropic({
 
 export async function POST(request: NextRequest) {
   try {
+    // ── Auth: verify admin session ──────────────────────────────────
+    const adminSession = request.cookies.get('admin_session');
+    if (!adminSession) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // ── Rate limiting: 10 req/min per IP ────────────────────────────
+    const clientIp = getClientIp(request);
+    if (isRateLimited(`advisor-${clientIp}`, 10, 60_000)) {
+      return rateLimitResponse(60);
+    }
+
     const { message, conversationHistory } = await request.json();
 
     if (!message) {
-      return NextResponse.json(
-        { error: 'Message is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    // Gather comprehensive business metrics
-    const clients = await db.clients.getAll();
-    const jobs = await db.jobs.getAll();
-    const quotes = await db.quotes.getAll();
-    const invoices = await db.invoices.getAll();
-    const requests = await db.requests.getAll();
-    const users = await db.users.getAll();
+    // ── Gather metrics from BOTH data sources ───────────────────────
+    // JSON DB (clients, jobs, quotes, invoices — not yet migrated)
+    const [clients, jobs, quotes, invoices, users] = await Promise.all([
+      db.clients.getAll(),
+      db.jobs.getAll(),
+      db.quotes.getAll(),
+      db.invoices.getAll(),
+      db.users.getAll(),
+    ]);
 
-    // Calculate key metrics
+    // Supabase (leads, follow-ups, voice, subscribers)
+    const [allLeads, pendingFollowUps, leadStats, subscriberStats, callLogs, bookings] =
+      await Promise.all([
+        leadRequests.getAll(),
+        leadFollowUps.getPending(),
+        leadRequests.getStats(),
+        subscribers.getStats(),
+        voiceCallLogs.getAll(100),
+        voiceBookings.getAll(100),
+      ]);
+
+    // ── Compute metrics ─────────────────────────────────────────────
     const now = new Date();
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-    const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
 
-    const recentLeads = requests.filter(r => new Date(r.createdAt) > thirtyDaysAgo).length;
-    const recentJobs = jobs.filter(j => new Date(j.createdAt) > thirtyDaysAgo).length;
     const completedJobs = jobs.filter(j => j.status === 'Completed').length;
-    
+
     const totalRevenue = invoices
       .filter(i => i.status === 'Paid')
       .reduce((sum, i) => sum + i.total, 0);
-    
+
     const recentRevenue = invoices
       .filter(i => i.status === 'Paid' && new Date(i.createdAt) > thirtyDaysAgo)
       .reduce((sum, i) => sum + i.total, 0);
@@ -46,12 +69,12 @@ export async function POST(request: NextRequest) {
       .filter(i => i.status === 'Sent' || i.status === 'Unpaid')
       .reduce((sum, i) => sum + i.total, 0);
 
-    const avgJobValue = completedJobs > 0 ? totalRevenue / completedJobs : 0;
-    
-    const leadConversionRate = requests.length > 0 
-      ? ((clients.length / requests.length) * 100).toFixed(1)
+    const avgJobValue = completedJobs > 0 ? Math.round(totalRevenue / completedJobs) : 0;
+
+    const leadConversionRate = allLeads.length > 0
+      ? ((clients.length / allLeads.length) * 100).toFixed(1)
       : '0';
-    
+
     const quoteAcceptanceRate = quotes.length > 0
       ? ((quotes.filter(q => q.status === 'Accepted').length / quotes.length) * 100).toFixed(1)
       : '0';
@@ -68,14 +91,17 @@ export async function POST(request: NextRequest) {
         return acc;
       }, {} as Record<string, number>);
 
-    // Contractor utilization
+    // Contractors
     const contractors = users.filter(u => u.role === 'CONTRACTOR');
     const contractorStats = contractors.map(c => ({
       name: c.name,
       completedJobs: c.completedJobs || 0,
       earnings: (c as any).earnings || 0,
-      skills: c.skills || []
+      skills: c.skills || [],
     }));
+
+    // AI Lead pipeline (Supabase)
+    const recentLeads = allLeads.filter(r => new Date(r.created_at) > thirtyDaysAgo);
 
     const businessMetrics = {
       overview: {
@@ -84,163 +110,159 @@ export async function POST(request: NextRequest) {
         completedJobs,
         totalRevenue,
         pendingRevenue,
-        avgJobValue: Math.round(avgJobValue),
-        contractors: contractors.length
+        avgJobValue,
+        contractors: contractors.length,
       },
       recent: {
-        leadsLast30Days: recentLeads,
-        jobsLast30Days: recentJobs,
-        revenueLast30Days: recentRevenue
+        leadsLast30Days: recentLeads.length,
+        jobsLast30Days: jobs.filter(j => new Date(j.createdAt) > thirtyDaysAgo).length,
+        revenueLast30Days: recentRevenue,
       },
       performance: {
         leadConversionRate: `${leadConversionRate}%`,
-        quoteAcceptanceRate: `${quoteAcceptanceRate}%`
+        quoteAcceptanceRate: `${quoteAcceptanceRate}%`,
       },
       services: serviceRevenue,
       contractors: contractorStats,
-      currentDate: now.toISOString().split('T')[0]
+      aiLeadPipeline: {
+        totalLeads: leadStats.total,
+        hot: leadStats.hot,
+        warm: leadStats.warm,
+        cold: leadStats.cold,
+        converted: leadStats.converted,
+        averageAIScore: leadStats.avgScore,
+        pendingFollowUps: pendingFollowUps.length,
+      },
+      voiceCalls: {
+        totalCalls: callLogs.length,
+        bookingsFromCalls: bookings.length,
+      },
+      emailMarketing: {
+        totalSubscribers: subscriberStats.total,
+        activeSubscribers: subscriberStats.active,
+        unsubscribed: subscriberStats.unsubscribed,
+        sources: subscriberStats.sources,
+      },
+      currentDate: now.toISOString().split('T')[0],
     };
 
-    // Development roadmap context
-    const developmentContext = `
-CURRENT INFRASTRUCTURE (Phase 1 - LIVE):
-- Next.js 14 multi-portal system (Customer, Sales, Contractor, Admin)
-- JSON file database (.local-db.json)
-- 7 AI Agents: Lead Qualification, Quote Optimizer, Contractor Analytics, Business Insights, Customer Assistant, Email/SMS automation
-- Stripe payment processing
-- PDF invoice generation
-- Real-time contractor job distribution
+    // ── System prompt ───────────────────────────────────────────────
+    const systemPrompt = `You are an expert AI Business Advisor for ExcelPro Washers, a window cleaning and pressure washing company in Ottawa, ON.
+
+CURRENT INFRASTRUCTURE (as of March 2026):
+- Next.js app deployed on Vercel with multi-portal system (Customer, Sales, Contractor, Admin)
+- Supabase PostgreSQL for leads, AI follow-ups, voice call logs, bookings, and newsletter subscribers
+- Legacy JSON file DB for clients, jobs, quotes, invoices (migration to Supabase planned)
+- 10 AI Agents live: Lead Qualifier (Claude 3.5 Haiku), Lead Router, Warm/Cold Lead Sequences, AI Phone Receptionist (Twilio + ElevenLabs), Business Advisor (you), Business Insights, Contractor Analytics, Customer Comm Assistant, Quote Optimizer
+- Email via Resend (CAN-SPAM compliant with unsubscribe links)
+- SMS/Voice via Twilio, TTS via ElevenLabs
+- Stripe payment processing + PDF invoice generation
+- Full email marketing system with campaign composer, subscriber management
+- Automated follow-up cron jobs (9 AM daily)
 
 DEVELOPMENT ROADMAP:
-Phase 2 (Month 2-3): 
-- Vercel production deployment
-- Supabase PostgreSQL migration (trigger: 50-100 clients)
-- AI feedback loops for learning
-- Customer feedback system
+Phase 2 (Next):
+- Migrate clients/jobs/quotes/invoices from JSON DB to Supabase
+- Customer-facing portal improvements
+- AI feedback loops for learning from outcomes
 
-Phase 3 (Month 4-6):
-- Vector database + RAG (trigger: 500+ jobs history)
+Phase 3 (Future):
+- Vector database + RAG for historical context (trigger: 500+ jobs)
 - Predictive analytics and dynamic pricing
 - Advanced contractor scheduling
-- Mobile app development starts
-
-Phase 4 (Month 6-12):
-- Real-time features (WebSockets)
-- Mobile app launch
-- Multi-location support
-- MCP servers (maybe - if needed)
+- Mobile app
 
 INFRASTRUCTURE UPGRADE TRIGGERS:
-- 100+ clients → Migrate to PostgreSQL
+- 100+ clients → Ensure full Supabase migration is complete
 - 500+ jobs → Implement vector database for RAG
 - 10+ contractors → Advanced AI scheduling
 - $50k+ monthly revenue → Custom infrastructure
 - Multiple locations → Geographic routing system
-`;
 
-    // Build conversation context
-    const conversationContext = conversationHistory
-      ?.slice(-5)
-      .map((msg: any) => `${msg.role === 'user' ? 'Business Owner' : 'AI Advisor'}: ${msg.content}`)
-      .join('\n\n') || '';
-
-    const prompt = `You are an expert AI Business Advisor for ExcelPro Washers, a window cleaning and pressure washing company.
-
-${developmentContext}
-
-CURRENT BUSINESS METRICS (Real-time data):
+CURRENT BUSINESS METRICS (real-time):
 ${JSON.stringify(businessMetrics, null, 2)}
 
-CONVERSATION HISTORY:
-${conversationContext}
-
-CURRENT QUESTION FROM BUSINESS OWNER:
-"${message}"
-
 YOUR ROLE:
-- Provide specific, actionable advice based on ACTUAL business data
-- Reference real numbers from the metrics above
-- Recommend tools/infrastructure ONLY when triggers are met
+- Provide specific, actionable advice based on ACTUAL business data above
+- Reference real numbers from the metrics
+- Recommend upgrades ONLY when triggers are met
 - Be conversational, friendly, and strategic
 - If data is missing, ask clarifying questions
 - Focus on ROI and practical next steps
 - Use emojis occasionally to be engaging
 
-RESPONSE FORMAT REQUIREMENTS:
-1. **Use markdown formatting** - Bold important text with **bold text**
-2. **Provide step-by-step instructions** when recommending actions:
-   - Step 1: [Action]
-   - Step 2: [Action]
-   - Step 3: [Action]
-3. **Highlight key metrics** and important numbers in bold
-4. **Structure your response clearly**:
-   - Start with a brief summary (1-2 lines)
-   - Break down into numbered steps or bullet points
-   - End with expected outcome or next milestone
-5. Use **bold** for:
-   - Important metrics (e.g., **$1,200 revenue**, **5 active clients**)
-   - Action items and deadlines (e.g., **Deploy by Week 2**, **Hire contractor now**)
-   - Key insights (e.g., **Critical bottleneck**, **High priority**)
-   - Tool recommendations (e.g., **Supabase PostgreSQL**, **Stripe payments**)
+RESPONSE FORMAT:
+- Use **bold** for important numbers, actions, and insights
+- Use bullet lists and numbered steps for actionable advice
+- Keep responses concise but thorough (aim for 200-400 words)
+- End with a clear next step or question`;
 
-GUIDELINES:
-1. Answer directly with step-by-step actionable advice
-2. Use actual data: "You have **X clients**" not "You might have..."
-3. Match recommendations to growth stage:
-   - Startup (0-20 clients): Focus on getting customers, testing processes
-   - Growth (20-100 clients): Optimize operations, quality control
-   - Scale-Up (100-500 clients): Automate, hire, infrastructure upgrades
-   - Enterprise (500+ clients): Advanced systems, multiple locations
-4. Be honest: "You're not ready for that yet" or "**Perfect timing for this**"
-5. Explain the "why" behind recommendations
+    // ── Build proper multi-turn messages ─────────────────────────────
+    const messages: { role: 'user' | 'assistant'; content: string }[] = [];
 
-Example response format:
-"Right now you have **2 clients** and **$2,050 in revenue** 📊
-
-**Here's your action plan for this week:**
-
-**Step 1: Deploy to Production** (Priority: Critical)
-- Set up Vercel account
-- Connect your GitHub repository
-- Deploy in 15 minutes
-- **Why:** Get real customers testing your system
-
-**Step 2: Generate Your First Lead**
-- Share website with 5 local businesses
-- Post on Facebook community groups
-- **Target:** 3 leads by end of week
-
-**Expected Outcome:** By next Friday, you'll have **3-5 new leads** and real feedback on your automation."
-
-Respond to the business owner's question now using this format:`;
-
-
-    const response = await anthropic.messages.create({
-      model: 'claude-3-haiku-20240307',
-      max_tokens: 1024,
-      messages: [
-        {
-          role: 'user',
-          content: prompt
+    if (Array.isArray(conversationHistory)) {
+      for (const msg of conversationHistory.slice(-8)) {
+        if (msg.role === 'user' || msg.role === 'assistant') {
+          messages.push({ role: msg.role, content: msg.content });
         }
-      ]
+      }
+    }
+    messages.push({ role: 'user', content: message });
+
+    // Ensure messages alternate roles (Anthropic requirement)
+    const cleanMessages: typeof messages = [];
+    for (const msg of messages) {
+      if (cleanMessages.length === 0 || cleanMessages[cleanMessages.length - 1].role !== msg.role) {
+        cleanMessages.push(msg);
+      } else {
+        // Merge consecutive same-role messages
+        cleanMessages[cleanMessages.length - 1].content += '\n\n' + msg.content;
+      }
+    }
+
+    // ── Stream response from Claude ─────────────────────────────────
+    const stream = await anthropic.messages.create({
+      model: 'claude-3-5-haiku-20241022',
+      max_tokens: 2048,
+      system: systemPrompt,
+      messages: cleanMessages,
+      stream: true,
     });
 
-    const advisorResponse = response.content[0].type === 'text' 
-      ? response.content[0].text 
-      : 'I apologize, but I had trouble processing that. Could you rephrase your question?';
+    const encoder = new TextEncoder();
 
-    return NextResponse.json({
-      response: advisorResponse,
-      metrics: businessMetrics
+    const readableStream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const event of stream) {
+            if (
+              event.type === 'content_block_delta' &&
+              event.delta.type === 'text_delta'
+            ) {
+              controller.enqueue(encoder.encode(event.delta.text));
+            }
+          }
+        } catch (err) {
+          console.error('Stream error:', err);
+        } finally {
+          controller.close();
+        }
+      },
     });
 
+    return new Response(readableStream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache',
+        'X-Content-Type-Options': 'nosniff',
+      },
+    });
   } catch (error) {
     console.error('Business Advisor Error:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to get advisor response',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

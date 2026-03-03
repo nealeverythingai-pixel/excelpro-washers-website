@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { leadFollowUps } from '@/lib/db/leads';
 import { WarmLeadSequence } from '@/lib/ai/WarmLeadSequence';
 import { ColdLeadSequence } from '@/lib/ai/ColdLeadSequence';
 import { isRateLimited, getClientIp, rateLimitResponse } from '@/lib/rateLimit';
@@ -29,23 +29,13 @@ export async function GET(request: NextRequest) {
 
     console.log('🕐 Starting daily follow-up check...');
 
-    // Get all pending follow-ups from database
-    const pendingFollowUps = await db.scheduledFollowUps?.getAll() || [];
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
+    // Get all pending follow-ups from Supabase
+    const pendingFollowUps = await leadFollowUps.getPending();
     let processed = 0;
     let succeeded = 0;
     let failed = 0;
 
     for (const followUp of pendingFollowUps) {
-      // Skip if not due yet
-      const scheduledDate = new Date(followUp.scheduledFor);
-      if (scheduledDate > today) continue;
-
-      // Skip if already completed
-      if (followUp.completed) continue;
-
       processed++;
 
       try {
@@ -59,11 +49,8 @@ export async function GET(request: NextRequest) {
         }
 
         if (success) {
-          // Mark as completed
-          await db.scheduledFollowUps?.update(followUp.id, { 
-            completed: true,
-            completedAt: new Date().toISOString()
-          });
+          // Mark as completed in Supabase
+          await leadFollowUps.markCompleted(followUp.id);
           succeeded++;
           console.log(`  ✅ Executed follow-up ${followUp.id}`);
         } else {

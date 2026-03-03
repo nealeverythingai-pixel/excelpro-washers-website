@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { siteConfig } from "@/lib/site";
 import { usePathname } from "next/navigation";
+import NewsletterSignup from "@/components/NewsletterSignup";
 
 export function Footer() {
   const pathname = usePathname();
@@ -13,7 +14,7 @@ export function Footer() {
   return (
     <footer className="bg-gray-900 dark:bg-black text-white transition-colors duration-300">
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-3 mb-4">
               <Image 
@@ -61,6 +62,9 @@ export function Footer() {
                  </Link>
               </li>
             </ul>
+          </div>
+          <div>
+            <NewsletterSignup source="footer" compact />
           </div>
         </div>
         <div className="mt-8 border-t border-gray-800 pt-8 text-center text-sm text-gray-400 flex flex-col items-center gap-2">

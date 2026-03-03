@@ -143,7 +143,7 @@ Return ONLY a JSON object with this structure:
           'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
-          model: 'claude-3-haiku-20240307',
+          model: 'claude-3-5-haiku-20241022',
           max_tokens: 1024,
           messages: [{
             role: 'user',
@@ -172,59 +172,6 @@ Return ONLY a JSON object with this structure:
       console.error('AI analysis failed:', error);
       throw error;
     }
-  }
-
-  /**
-   * DEPRECATED: Old Sintra backend integration (removed)
-   */
-  private async analyzeWithAI_OLD(lead: LeadData): Promise<any> {
-    const prompt = `Analyze this lead for a home services business:
-
-Name: ${lead.name}
-Service Requested: ${lead.service}
-Message: "${lead.message}"
-Property: ${lead.propertyType || 'unknown'}
-
-Score each category 0-100:
-
-1. URGENCY - Looking for keywords like:
-   - High (90-100): "ASAP", "emergency", "today", "tomorrow", "urgent"
-   - Medium (50-89): "this week", "soon", "quickly", "as soon as possible"
-   - Low (0-49): "sometime", "eventually", "when you can", "no rush"
-
-2. BUDGET - Analyze financial signals:
-   - High (90-100): No price mention, asks about premium options, "best quality"
-   - Medium (50-89): Neutral, asks for quote without objections
-   - Low (0-49): "cheapest", "budget", "tight on money", mentions competitors' lower prices
-
-3. DECISION AUTHORITY - Who's deciding:
-   - High (90-100): "I need", "I want", "I'm looking to hire"
-   - Medium (50-89): "We need", "looking into", "considering"
-   - Low (0-49): "My wife/husband wants", "getting quotes for someone", "just browsing"
-
-4. PROPERTY VALUE - Estimate job size:
-   - High (90-100): Commercial property, large home (3+ stories), multiple services
-   - Medium (50-89): Standard 2-story residential, single service
-   - Low (0-49): Small property, basic service, price-sensitive indicators
-
-Return ONLY a JSON object with this structure:
-{
-  "urgency": <score>,
-  "budget": <score>,
-  "authority": <score>,
-  "value": <score>,
-  "reasoning": "<2-3 sentence explanation>",
-  "keySignals": ["signal1", "signal2"],
-  "recommendedAction": "<what to do next>",
-  "estimatedJobValue": <dollar amount>
-}`;
-    
-    // Future AI integration examples:
-    // const response = await fetch('http://localhost:11434/api/generate', { ... }); // Ollama
-    // const response = await openai.chat.completions.create({ ... }); // OpenAI
-    // const response = await anthropic.messages.create({ ... }); // Claude
-    
-    throw new Error('AI integration not configured');
   }
 
   /**
@@ -315,23 +262,24 @@ Return ONLY a JSON object with this structure:
    * Create follow-up schedule based on lead temperature
    */
   private createFollowUpSchedule(score: LeadScore) {
+    const serviceName = this.formatServiceName(score.nextAction ? '' : '');
     if (score.category === 'hot') {
       return {
-        day3: "Quick check-in: I wanted to follow up on your quote. Any questions I can answer?",
-        day7: "Special offer: Book this week and save 10% on your ${service}. Limited availability!",
-        day14: "Last call: We have one opening left for next week. Would you like to secure it?"
+        day3: `Quick check-in: I wanted to follow up on your quote. Any questions I can answer?`,
+        day7: `Special offer: Book this week and save 10% on your service. Limited availability!`,
+        day14: `Last call: We have one opening left for next week. Would you like to secure it?`
       };
     } else if (score.category === 'warm') {
       return {
-        day3: "Thanks for your interest in ExcelPro. Have you had a chance to review the quote?",
-        day7: "Friendly reminder: Your quote is ready. We'd love to help with your ${service} needs.",
-        day14: "Still interested? I can adjust the quote or answer any questions you have."
+        day3: `Thanks for your interest in ExcelPro. Have you had a chance to review the quote?`,
+        day7: `Friendly reminder: Your quote is ready. We'd love to help with your service needs.`,
+        day14: `Still interested? I can adjust the quote or answer any questions you have.`
       };
     } else {
       return {
-        day3: "Hi ${name}, just checking if you received our quote for ${service}?",
-        day7: "We're here when you're ready. Your quote is valid for 30 days.",
-        day14: "No pressure! We're here if you have questions about ${service}."
+        day3: `Hi there, just checking if you received our quote?`,
+        day7: `We're here when you're ready. Your quote is valid for 30 days.`,
+        day14: `No pressure! We're here if you have questions about our services.`
       };
     }
   }
@@ -396,6 +344,7 @@ Return ONLY a JSON object with this structure:
     const servicePricing: Record<string, number> = {
       'window-cleaning': 199,
       'soft-wash': 299,
+      'soft-washing': 299,
       'pressure-washing': 199,
       'gutter-cleaning': 149,
       'roof-cleaning': 399
@@ -443,6 +392,7 @@ Return ONLY a JSON object with this structure:
     const descriptions: Record<string, string> = {
       'window-cleaning': 'Professional streak-free window cleaning for your home',
       'soft-wash': 'Gentle yet effective house washing that protects your siding',
+      'soft-washing': 'Gentle yet effective house washing that protects your siding',
       'pressure-washing': 'High-powered cleaning for driveways, decks, and patios',
       'gutter-cleaning': 'Thorough gutter cleaning and debris removal',
       'roof-cleaning': 'Safe roof cleaning to remove moss, algae, and stains'

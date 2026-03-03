@@ -10,6 +10,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Text parameter required' }, { status: 400 });
     }
 
+    // Check for API key before attempting call
+    if (!process.env.ELEVENLABS_API_KEY) {
+      console.warn('ElevenLabs API key not configured — TTS will not work');
+      return NextResponse.json({ error: 'ElevenLabs not configured' }, { status: 503 });
+    }
+
     const elevenlabs = new ElevenLabsClient({
       apiKey: process.env.ELEVENLABS_API_KEY,
     });
@@ -34,14 +40,25 @@ export async function GET(request: NextRequest) {
     }
     const buffer = Buffer.concat(chunks);
 
+    if (buffer.length === 0) {
+      console.error('ElevenLabs returned empty audio buffer');
+      return NextResponse.json({ error: 'Empty audio response' }, { status: 502 });
+    }
+
     return new NextResponse(buffer, {
       headers: {
         'Content-Type': 'audio/mpeg',
         'Content-Length': buffer.length.toString(),
+        'Cache-Control': 'public, max-age=3600', // Cache common phrases
       },
     });
-  } catch (error) {
-    console.error('ElevenLabs audio generation error:', error);
-    return NextResponse.json({ error: 'Failed to generate audio' }, { status: 500 });
+  } catch (error: any) {
+    console.error('ElevenLabs audio generation error:', error?.message || error);
+    
+    // Return a clear error so callers know to fall back to Twilio TTS
+    return NextResponse.json(
+      { error: 'Failed to generate audio', detail: error?.message },
+      { status: 502 }
+    );
   }
 }

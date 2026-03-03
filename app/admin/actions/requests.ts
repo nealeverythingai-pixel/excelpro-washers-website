@@ -24,6 +24,6 @@ export async function createRequest(formData: FormData) {
     status: 'New',
   })
 
-  revalidatePath('/admin/dashboard/requests')
-  redirect('/admin/dashboard/requests')
+  revalidatePath('/admin/dashboard/leads')
+  redirect('/admin/dashboard/leads')
 }

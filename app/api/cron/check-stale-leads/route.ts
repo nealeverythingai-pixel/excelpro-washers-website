@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { leadRequests } from '@/lib/db/leads';
 import { isRateLimited, getClientIp, rateLimitResponse } from '@/lib/rateLimit';
 
 // Force dynamic rendering for this route
@@ -27,14 +27,8 @@ export async function GET(request: NextRequest) {
 
     console.log('🕐 Checking for stale leads...');
 
-    const requests = await db.requests.getAll();
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const staleLeads = requests.filter(req => {
-      const createdDate = new Date(req.createdAt);
-      return createdDate < thirtyDaysAgo && req.status === 'New';
-    });
+    // Supabase query finds leads older than 30 days with status 'new'
+    const staleLeads = await leadRequests.getStale(30);
 
     if (staleLeads.length > 0) {
       console.log(`⚠️ Found ${staleLeads.length} stale leads:`);
@@ -55,7 +49,7 @@ export async function GET(request: NextRequest) {
         id: l.id,
         name: l.name,
         email: l.email,
-        createdAt: l.createdAt
+        createdAt: l.created_at
       })),
       timestamp: new Date().toISOString()
     });

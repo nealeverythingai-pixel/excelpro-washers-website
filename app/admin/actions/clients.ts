@@ -29,6 +29,31 @@ export async function createClient(formData: FormData) {
   redirect('/admin/dashboard/clients')
 }
 
+export async function updateClient(id: string, formData: FormData) {
+  const firstName = formData.get('firstName') as string
+  const lastName = formData.get('lastName') as string
+  const email = formData.get('email') as string
+  const phone = formData.get('phone') as string
+  const address = formData.get('address') as string
+  const companyName = formData.get('companyName') as string
+
+  if (!firstName || !lastName || !email) {
+    return { error: 'Please fill in all required fields' }
+  }
+
+  await db.clients.update(id, {
+    firstName,
+    lastName,
+    email,
+    phone,
+    address,
+    companyName: companyName || undefined,
+  })
+
+  revalidatePath('/admin/dashboard/clients')
+  revalidatePath(`/admin/dashboard/clients/${id}`)
+}
+
 export async function deleteClient(id: string) {
     await db.clients.delete(id)
     revalidatePath('/admin/dashboard/clients')

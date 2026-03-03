@@ -3,6 +3,7 @@
 import { useFormState } from 'react-dom'
 import { login } from '../actions'
 import { HardHat } from 'lucide-react'
+import Link from 'next/link'
 
 const initialState = {
   message: '',
@@ -77,6 +78,15 @@ export default function ContractorLoginPage() {
               </button>
             </div>
           </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Want to become a service provider?{' '}
+              <Link href="/contractor/register" className="font-medium text-orange-600 hover:text-orange-500">
+                Apply here
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

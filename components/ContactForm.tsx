@@ -42,7 +42,8 @@ export default function ContactForm() {
     phone: '',
     services: [] as string[],
     address: '',
-    details: ''
+    details: '',
+    marketingConsent: false
   });
   
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -104,7 +105,8 @@ export default function ContactForm() {
           phone: '',
           services: [],
           address: '',
-          details: ''
+          details: '',
+          marketingConsent: false
         });
         setTouched({});
         
@@ -435,6 +437,20 @@ export default function ContactForm() {
             <strong>Pro Tip:</strong> Include urgency ("ASAP", "this week"), property details (sq ft, number of windows), and budget flexibility for the most accurate instant quotes.
           </p>
         </div>
+      </div>
+
+      {/* Marketing Consent */}
+      <div className="flex items-start gap-3">
+        <input
+          type="checkbox"
+          id="marketingConsent"
+          checked={formData.marketingConsent}
+          onChange={(e) => setFormData(prev => ({ ...prev, marketingConsent: e.target.checked }))}
+          className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+        />
+        <label htmlFor="marketingConsent" className="text-sm text-gray-600 dark:text-gray-400">
+          I&apos;d like to receive seasonal tips, exclusive offers, and cleaning insights from ExcelPro Washers. You can unsubscribe anytime.
+        </label>
       </div>
 
       {/* Submit Button */}

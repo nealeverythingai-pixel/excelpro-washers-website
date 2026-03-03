@@ -20,3 +20,8 @@ export async function createQuote(formData: FormData) {
   revalidatePath('/admin/dashboard/quotes')
   redirect('/admin/dashboard/quotes')
 }
+
+export async function deleteQuote(id: string) {
+  await db.quotes.delete(id)
+  revalidatePath('/admin/dashboard/quotes')
+}

@@ -1,317 +1,283 @@
-import { NextResponse } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
-import { db } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server';
+import Anthropic from '@anthropic-ai/sdk';
+import { db } from '@/lib/db';
+import { leadRequests, leadFollowUps } from '@/lib/db/leads';
+import { subscribers } from '@/lib/db/subscribers';
+import { voiceCallLogs, voiceBookings } from '@/lib/db/voice';
+import { isRateLimited, getClientIp, rateLimitResponse } from '@/lib/rateLimit';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
-})
+});
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { analysisType, timeframe } = await request.json()
+    // ── Auth: verify admin session ──────────────────────────────────
+    const adminSession = request.cookies.get('admin_session');
+    if (!adminSession) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-    // Gather comprehensive business data
-    const [requests, clients, quotes, jobs, invoices, users] = await Promise.all([
-      db.requests.getAll(),
+    // ── Rate limiting: 5 req/min per IP (dashboard page, not chat) ──
+    const clientIp = getClientIp(request);
+    if (isRateLimited(`insights-${clientIp}`, 5, 60_000)) {
+      return rateLimitResponse(60);
+    }
+
+    // ── Gather data from BOTH sources ───────────────────────────────
+    // JSON DB (clients, jobs, quotes, invoices — not yet migrated)
+    const [clients, quotes, jobs, invoices, users] = await Promise.all([
       db.clients.getAll(),
       db.quotes.getAll(),
       db.jobs.getAll(),
       db.invoices.getAll(),
       db.users.getAll(),
-    ])
+    ]);
 
-    // Calculate business metrics
-    const now = new Date()
-    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-    const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000)
+    // Supabase (leads, follow-ups, voice, subscribers)
+    const [allLeads, pendingFollowUps, leadStats, subscriberStats, callLogs, bookings] =
+      await Promise.all([
+        leadRequests.getAll(),
+        leadFollowUps.getPending(),
+        leadRequests.getStats(),
+        subscribers.getStats(),
+        voiceCallLogs.getAll(100),
+        voiceBookings.getAll(100),
+      ]);
 
-    const recentLeads = requests.filter(r => new Date(r.createdAt) > thirtyDaysAgo)
-    const previousLeads = requests.filter(r => 
-      new Date(r.createdAt) > sixtyDaysAgo && new Date(r.createdAt) <= thirtyDaysAgo
-    )
+    // ── Calculate metrics ───────────────────────────────────────────
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
 
-    const recentJobs = jobs.filter(j => new Date(j.createdAt) > thirtyDaysAgo)
-    const previousJobs = jobs.filter(j => 
+    const recentLeads = allLeads.filter(r => new Date(r.created_at) > thirtyDaysAgo);
+    const previousLeads = allLeads.filter(r =>
+      new Date(r.created_at) > sixtyDaysAgo && new Date(r.created_at) <= thirtyDaysAgo
+    );
+
+    const recentJobs = jobs.filter(j => new Date(j.createdAt) > thirtyDaysAgo);
+    const previousJobs = jobs.filter(j =>
       new Date(j.createdAt) > sixtyDaysAgo && new Date(j.createdAt) <= thirtyDaysAgo
-    )
+    );
 
-    const paidInvoices = invoices.filter(inv => inv.status === 'Paid')
-    const totalRevenue = paidInvoices.reduce((sum, inv) => sum + inv.total, 0)
+    const paidInvoices = invoices.filter(inv => inv.status === 'Paid');
+    const totalRevenue = paidInvoices.reduce((sum, inv) => sum + inv.total, 0);
     const recentRevenue = paidInvoices
       .filter(inv => new Date(inv.createdAt) > thirtyDaysAgo)
-      .reduce((sum, inv) => sum + inv.total, 0)
+      .reduce((sum, inv) => sum + inv.total, 0);
 
-    const contractors = users.filter(u => u.role === 'CONTRACTOR')
-    const activeContractors = contractors.filter(c => c.active)
+    const contractors = users.filter(u => u.role === 'CONTRACTOR');
+    const activeContractors = contractors.filter(c => c.active);
 
-    // Calculate conversion rates
-    const convertedLeads = requests.filter(r => r.status === 'Converted').length
-    const leadConversionRate = requests.length > 0 
-      ? Math.round((convertedLeads / requests.length) * 100)
-      : 0
-
-    const acceptedQuotes = quotes.filter(q => q.status === 'Approved' || q.status === 'Converted').length
+    const acceptedQuotes = quotes.filter(q => q.status === 'Approved' || q.status === 'Converted').length;
     const quoteAcceptanceRate = quotes.length > 0
       ? Math.round((acceptedQuotes / quotes.length) * 100)
-      : 0
+      : 0;
 
-    // Contractor utilization
-    const assignedJobs = jobs.filter(j => j.assignedContractorId).length
-    const totalJobs = jobs.length
-    const contractorUtilization = totalJobs > 0
-      ? Math.round((assignedJobs / totalJobs) * 100)
-      : 0
+    const assignedJobs = jobs.filter(j => j.assignedContractorId).length;
+    const contractorUtilization = jobs.length > 0
+      ? Math.round((assignedJobs / jobs.length) * 100)
+      : 0;
 
     // Service breakdown
-    const serviceRevenue: Record<string, number> = {}
+    const serviceRevenue: Record<string, number> = {};
     jobs.forEach(job => {
-      const service = job.title.split('-')[0].trim() || 'Other'
-      serviceRevenue[service] = (serviceRevenue[service] || 0) + job.total
-    })
+      const service = job.title.split('-')[0].trim() || 'Other';
+      serviceRevenue[service] = (serviceRevenue[service] || 0) + job.total;
+    });
 
     // Growth metrics
     const leadGrowth = previousLeads.length > 0
       ? Math.round(((recentLeads.length - previousLeads.length) / previousLeads.length) * 100)
-      : 0
+      : 0;
 
     const jobGrowth = previousJobs.length > 0
       ? Math.round(((recentJobs.length - previousJobs.length) / previousJobs.length) * 100)
-      : 0
+      : 0;
 
     const businessMetrics = {
-      // Current state
-      totalLeads: requests.length,
-      totalClients: clients.length,
-      totalJobs: jobs.length,
-      totalRevenue,
-      activeContractors: activeContractors.length,
-      
-      // Recent performance (30 days)
-      recentLeads: recentLeads.length,
-      recentJobs: recentJobs.length,
-      recentRevenue,
-      
-      // Conversion metrics
-      leadConversionRate,
-      quoteAcceptanceRate,
-      contractorUtilization,
-      
-      // Growth metrics
-      leadGrowth,
-      jobGrowth,
-      
-      // Service breakdown
-      serviceRevenue,
-      
-      // Average values
-      avgJobValue: totalJobs > 0 ? Math.round(totalRevenue / totalJobs) : 0,
-      avgLeadsPerMonth: Math.round(requests.length / Math.max(1, 
-        (now.getTime() - new Date(requests[0]?.createdAt || now).getTime()) / (30 * 24 * 60 * 60 * 1000)
-      )),
-      
-      // Contractor performance
+      overview: {
+        totalClients: clients.length,
+        totalJobs: jobs.length,
+        completedJobs: jobs.filter(j => j.status === 'Completed').length,
+        totalRevenue,
+        activeContractors: activeContractors.length,
+        totalContractors: contractors.length,
+      },
+      recent: {
+        leadsLast30Days: recentLeads.length,
+        jobsLast30Days: recentJobs.length,
+        revenueLast30Days: recentRevenue,
+      },
+      growth: {
+        leadGrowth: `${leadGrowth}%`,
+        jobGrowth: `${jobGrowth}%`,
+      },
+      performance: {
+        quoteAcceptanceRate: `${quoteAcceptanceRate}%`,
+        contractorUtilization: `${contractorUtilization}%`,
+        avgJobValue: jobs.length > 0 ? Math.round(totalRevenue / jobs.length) : 0,
+      },
+      services: serviceRevenue,
+      aiLeadPipeline: {
+        totalLeads: leadStats.total,
+        hot: leadStats.hot,
+        warm: leadStats.warm,
+        cold: leadStats.cold,
+        converted: leadStats.converted,
+        averageAIScore: leadStats.avgScore,
+        pendingFollowUps: pendingFollowUps.length,
+        leadConversionRate: allLeads.length > 0
+          ? `${((leadStats.converted / allLeads.length) * 100).toFixed(1)}%`
+          : '0%',
+      },
+      voiceCalls: {
+        totalCalls: callLogs.length,
+        bookingsFromCalls: bookings.length,
+      },
+      emailMarketing: {
+        totalSubscribers: subscriberStats.total,
+        activeSubscribers: subscriberStats.active,
+        unsubscribed: subscriberStats.unsubscribed,
+        sources: subscriberStats.sources,
+      },
       contractorStats: contractors.map(c => {
-        const contractorJobs = jobs.filter(j => j.assignedContractorId === c.id)
-        const completed = contractorJobs.filter(j => j.status === 'Completed').length
+        const contractorJobs = jobs.filter(j => j.assignedContractorId === c.id);
+        const completed = contractorJobs.filter(j => j.status === 'Completed').length;
         return {
           name: c.name,
           totalJobs: contractorJobs.length,
           completedJobs: completed,
-          completionRate: contractorJobs.length > 0 
+          completionRate: contractorJobs.length > 0
             ? Math.round((completed / contractorJobs.length) * 100)
             : 0,
           skills: c.skills || [],
           totalEarnings: c.totalEarnings || 0,
-        }
+        };
       }),
-    }
+      currentDate: now.toISOString().split('T')[0],
+    };
 
-    // Development roadmap context
-    const developmentContext = `
-EXCELPRO WASHERS DEVELOPMENT ROADMAP:
+    // ── System prompt ───────────────────────────────────────────────
+    const systemPrompt = `You are the Business Insights AI Agent for ExcelPro Washers, a window cleaning and pressure washing company in Ottawa, ON.
 
-CURRENT INFRASTRUCTURE:
-- Next.js 14 with App Router
-- JSON file database (.local-db.json)
-- Claude 3 Haiku for AI agents
-- Twilio for SMS notifications
-- Resend for email automation
-- Stripe for payments (test mode)
-- Deployed locally (dev mode)
+CURRENT INFRASTRUCTURE (as of March 2026):
+- Next.js app deployed on Vercel with multi-portal system (Customer, Sales, Contractor, Admin)
+- Supabase PostgreSQL for leads, AI follow-ups, voice call logs, bookings, and newsletter subscribers
+- Legacy JSON file DB for clients, jobs, quotes, invoices (migration to Supabase planned)
+- 10 AI Agents live: Lead Qualifier (Claude 3.5 Haiku), Lead Router, Warm/Cold Lead Sequences, AI Phone Receptionist (Twilio + ElevenLabs), Business Advisor, Business Insights (you), Contractor Analytics, Customer Comm Assistant, Quote Optimizer
+- Email via Resend (CAN-SPAM compliant with unsubscribe links)
+- SMS/Voice via Twilio, TTS via ElevenLabs
+- Stripe payment processing + PDF invoice generation
+- Full email marketing system with campaign composer, subscriber management
+- Automated follow-up cron jobs (9 AM daily)
 
-EXISTING AI AGENTS:
-1. Lead Qualification Agent (Claude)
-2. Email Automation (Resend - 6 triggers)
-3. SMS Notifications (Twilio - 3 triggers)
-4. Quote Optimizer (Claude)
-5. Contractor Analytics (Claude)
-6. Customer Communication Assistant (Claude)
-7. Business Insights Agent (YOU)
+DEVELOPMENT ROADMAP:
+Phase 2 (Next):
+- Migrate clients/jobs/quotes/invoices from JSON DB to Supabase
+- Customer-facing portal improvements
+- AI feedback loops for learning from outcomes
 
-PLANNED DEVELOPMENT PHASES:
-
-PHASE 1 (CURRENT - Month 1):
-- Multi-portal system (Admin, Sales, Contractor) ✓
-- Job distribution automation ✓
-- First-come-first-served contractor system ✓
-- Basic AI agents ✓
-- JSON file database ✓
-
-PHASE 2 (Month 2-3):
-- Deploy to production (Vercel + Cloudflare domain)
-- Migrate from JSON to Supabase PostgreSQL
-- Add AI feedback loop (learning from outcomes)
-- Enhanced business analytics dashboard
-- Automated weekly reports
-
-PHASE 3 (Month 4-6):
-- Vector database + RAG (pgvector in Supabase)
-- Semantic search over quotes/jobs/customers
-- Predictive analytics (revenue forecasting)
-- Dynamic pricing based on demand
-- Advanced contractor recommendation engine
-
-PHASE 4 (Month 6-12):
-- Real-time notifications (WebSockets)
-- Mobile app for contractors
-- Customer portal for tracking
-- Integration with accounting software
-- Consider MCP servers if needed
+Phase 3 (Future):
+- Vector database + RAG for historical context (trigger: 500+ jobs)
+- Predictive analytics and dynamic pricing
+- Advanced contractor scheduling
+- Mobile app
 
 INFRASTRUCTURE UPGRADE TRIGGERS:
-- 100+ clients → Migrate to PostgreSQL
-- 500+ jobs → Add vector database for RAG
-- 10+ contractors → Advanced scheduling AI
-- $50k+ monthly revenue → Consider custom infrastructure
+- 100+ clients → Ensure full Supabase migration is complete
+- 500+ jobs → Implement vector database for RAG
+- 10+ contractors → Advanced AI scheduling
+- $50k+ monthly revenue → Custom infrastructure
 - Multiple locations → Geographic routing system
-`
 
-    const prompt = `You are the Business Insights AI Agent for ExcelPro Washers. Your role is to analyze business performance, identify opportunities, and recommend the right tools/infrastructure based on growth stage.
-
-${developmentContext}
-
-CURRENT BUSINESS METRICS:
-${JSON.stringify(businessMetrics, null, 2)}
-
-BUSINESS STAGE ASSESSMENT CRITERIA:
+BUSINESS STAGE CRITERIA:
 - Startup (0-20 clients, <$10k revenue, 1-3 contractors)
 - Growth (20-100 clients, $10k-$50k revenue, 3-10 contractors)
 - Scale-Up (100-500 clients, $50k-$200k revenue, 10-30 contractors)
 - Enterprise (500+ clients, $200k+ revenue, 30+ contractors)
 
-YOUR TASK: Provide comprehensive business insights with THREE sections:
+IMPORTANT RULES:
+- Match recommendations to their ACTUAL growth stage. Don't recommend enterprise tools for a startup.
+- Be specific about triggers: "When you reach 100 jobs, implement X" or "At $50k monthly revenue, consider Y"
+- Use ACTUAL numbers from the metrics — never invent data
+- Be honest: "You're not ready for that yet" when applicable
+- Return ONLY valid JSON, no markdown fences, no explanations outside JSON`;
 
-1. CURRENT STATE ASSESSMENT:
-   - What stage is the business in?
-   - What's working well?
-   - What are the bottlenecks?
-   - Are they ready for next development phase?
+    const userPrompt = `Analyze these real-time business metrics and return comprehensive insights.
 
-2. STRATEGIC RECOMMENDATIONS:
-   - Top 3 priorities to focus on NOW
-   - Infrastructure/tools needed based on current scale
-   - When to upgrade (e.g., "Migrate to PostgreSQL when you hit 50 clients")
-   - Which AI agents need improvement
-   - Marketing/operational suggestions
+CURRENT BUSINESS METRICS:
+${JSON.stringify(businessMetrics, null, 2)}
 
-3. GROWTH PREDICTIONS & PLANNING:
-   - Revenue forecast (next 30/60/90 days)
-   - When will they hit next infrastructure trigger?
-   - Recommended hiring timeline (contractors, sales)
-   - Tool/infrastructure upgrade schedule
-   - Budget recommendations
-
-4. INTELLIGENT QUESTIONS TO ASK:
-   Based on the data gaps, ask 3-5 questions that would help you provide better insights:
-   - "How many hours per week does each contractor work?"
-   - "What's your customer acquisition cost?"
-   - "Are there seasonal patterns I should know about?"
-   etc.
-
-IMPORTANT: Match recommendations to their ACTUAL growth stage. Don't recommend enterprise tools for a startup. Be specific about triggers like "When you reach 100 jobs, implement X" or "At $50k monthly revenue, consider Y".
-
-Return JSON:
+Return a JSON object with this EXACT schema:
 {
-  "businessStage": "<startup|growth|scale-up|enterprise>",
-  "stageProgress": "<percentage through current stage>",
-  "summary": "<executive summary>",
-  "wins": ["<achievement 1>", "<achievement 2>"],
-  "concerns": ["<concern 1>", "<concern 2>"],
+  "businessStage": "startup|growth|scale-up|enterprise",
+  "stageProgress": "e.g. 35% through startup",
+  "currentState": {
+    "summary": "1-2 sentence executive summary",
+    "strengths": ["strength 1", "strength 2", ...],
+    "bottlenecks": ["bottleneck 1", "bottleneck 2", ...]
+  },
   "topPriorities": [
     {
-      "priority": "<priority name>",
-      "reasoning": "<why this matters now>",
-      "actionItems": ["<action 1>", "<action 2>"],
-      "timeline": "<when to implement>"
+      "priority": "priority name",
+      "timeline": "e.g. This week, Next 2 weeks",
+      "impact": "critical|high|medium",
+      "actionItems": ["step 1", "step 2"]
     }
   ],
   "infrastructureRecommendations": [
     {
-      "tool": "<tool/upgrade name>",
-      "trigger": "<when to implement>",
-      "reasoning": "<why needed>",
-      "cost": "<estimated cost>",
-      "priority": "<critical|high|medium|low>"
+      "tool": "tool name",
+      "trigger": "when to implement",
+      "priority": "critical|high|medium|low",
+      "reasoning": "why this matters",
+      "estimatedCost": "$X/month"
     }
   ],
   "predictions": {
-    "next30Days": {
-      "revenue": <number>,
-      "jobs": <number>,
-      "newClients": <number>
-    },
-    "next60Days": {
-      "revenue": <number>,
-      "jobs": <number>,
-      "newClients": <number>
-    },
+    "next30Days": { "revenue": 0, "jobs": 0, "newClients": 0 },
+    "next60Days": { "revenue": 0, "jobs": 0, "newClients": 0 },
     "milestones": [
-      {
-        "milestone": "<milestone name>",
-        "estimatedDate": "<when>",
-        "preparation": ["<what to do before>"]
-      }
+      { "milestone": "name", "estimatedDate": "when" }
     ]
   },
   "questionsForOwner": [
-    {
-      "question": "<question>",
-      "why": "<why this helps>",
-      "impact": "<high|medium|low>"
-    }
+    { "question": "...", "why": "why this matters", "impact": "high|medium|low" }
   ],
   "aiAgentPerformance": [
-    {
-      "agent": "<agent name>",
-      "status": "<excellent|good|needs-improvement>",
-      "recommendation": "<what to improve>"
-    }
+    { "agent": "agent name", "status": "excellent|good|needs-improvement", "recommendation": "..." }
   ]
 }
 
-Be data-driven, specific, and actionable. Return ONLY valid JSON, no markdown.`
+Return ONLY the JSON object. No markdown, no code fences.`;
 
     const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-3-5-haiku-20241022',
       max_tokens: 4096,
-      messages: [{
-        role: 'user',
-        content: prompt,
-      }],
-    })
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
+    });
 
-    const content = message.content[0]
+    const content = message.content[0];
     if (content.type !== 'text') {
-      throw new Error('Unexpected response type from Claude')
+      throw new Error('Unexpected response type');
     }
 
-    let insights
+    let insights;
     try {
-      const cleanedText = content.text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-      insights = JSON.parse(cleanedText)
-    } catch (parseError) {
-      console.error('Failed to parse Claude response:', content.text)
-      throw new Error('Failed to parse AI response as JSON')
+      // Strip any accidental markdown fences
+      let text = content.text.trim();
+      if (text.startsWith('```')) {
+        text = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
+      }
+      insights = JSON.parse(text);
+    } catch {
+      console.error('Failed to parse insights JSON:', content.text.slice(0, 500));
+      return NextResponse.json(
+        { error: 'AI returned invalid format. Please try again.' },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json({
@@ -319,14 +285,11 @@ Be data-driven, specific, and actionable. Return ONLY valid JSON, no markdown.`
       insights,
       metrics: businessMetrics,
       timestamp: new Date().toISOString(),
-    })
+    });
   } catch (error) {
-    console.error('Error generating business insights:', error)
+    console.error('Business Insights Error:', error);
     return NextResponse.json(
-      {
-        error: 'Failed to generate business insights',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
+      { error: 'Failed to generate business insights' },
       { status: 500 }
     )
   }

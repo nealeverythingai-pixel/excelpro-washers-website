@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { DbSchema, Client, Job, Quote, Invoice, Request, User, AIFeedback, ScheduledFollowUp } from './types';
+import { DbSchema, Client, Job, Quote, Invoice, Request, User, AIFeedback, ScheduledFollowUp, CallLog, CallConversation, ContractorApplication } from './types';
 
 // Store data in a hidden file in the project root
 const DB_PATH = path.join(process.cwd(), '.local-db.json');
@@ -22,8 +22,10 @@ const INITIAL_DB: DbSchema = {
   invoices: [],
   requests: [],
   users: [],
+  contractorApplications: [],
   scheduledFollowUps: [],
-  callLogs: []
+  callLogs: [],
+  callConversations: []
 };
 
 async function readDb(): Promise<DbSchema> {
@@ -52,7 +54,7 @@ export const db = {
       const data = await readDb();
       const newClient: Client = {
         ...client,
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random().toString(36).substring(2, 11),
         createdAt: new Date().toISOString()
       };
       data.clients.push(newClient);
@@ -81,7 +83,7 @@ export const db = {
       const data = await readDb();
       const newJob: Job = {
         ...job,
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random().toString(36).substring(2, 11),
         createdAt: new Date().toISOString()
       };
       data.jobs.push(newJob);
@@ -97,6 +99,11 @@ export const db = {
         return data.jobs[index];
       }
       return null;
+    },
+    delete: async (id: string) => {
+      const data = await readDb();
+      data.jobs = data.jobs.filter(j => j.id !== id);
+      await writeDb(data);
     }
   },
   aiFeedback: {
@@ -114,7 +121,7 @@ export const db = {
         if (!data.aiFeedback) data.aiFeedback = [];
         const newFeedback: AIFeedback = {
             ...feedback,
-            id: Math.random().toString(36).substr(2, 9),
+            id: Math.random().toString(36).substring(2, 11),
             timestamp: new Date().toISOString()
         };
         data.aiFeedback.push(newFeedback);
@@ -141,7 +148,7 @@ export const db = {
       const data = await readDb();
       const newQuote: Quote = {
         ...quote,
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random().toString(36).substring(2, 11),
         createdAt: new Date().toISOString()
       };
       data.quotes.push(newQuote);
@@ -165,6 +172,11 @@ export const db = {
       data.quotes[index].status = status;
       await writeDb(data);
       return data.quotes[index];
+    },
+    delete: async (id: string) => {
+      const data = await readDb();
+      data.quotes = data.quotes.filter(q => q.id !== id);
+      await writeDb(data);
     }
   },
   invoices: {
@@ -175,7 +187,7 @@ export const db = {
       const data = await readDb();
       const newInvoice: Invoice = {
         ...invoice,
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random().toString(36).substring(2, 11),
         createdAt: new Date().toISOString()
       };
       data.invoices.push(newInvoice);
@@ -199,6 +211,11 @@ export const db = {
       data.invoices[index].status = status;
       await writeDb(data);
       return data.invoices[index];
+    },
+    delete: async (id: string) => {
+      const data = await readDb();
+      data.invoices = data.invoices.filter(i => i.id !== id);
+      await writeDb(data);
     }
   },
   requests: {
@@ -209,7 +226,7 @@ export const db = {
       const newRequest: Request = {
         email: request.email || '',
         phone: request.phone || '',
-        status: request.status || 'new',
+        status: request.status || 'New',
         createdAt: request.createdAt || new Date().toISOString(),
         ...request
       } as Request;
@@ -284,6 +301,63 @@ export const db = {
       return data.scheduledFollowUps.filter(f => 
         !f.completed && new Date(f.scheduledFor) <= now
       );
+    }
+  },
+  callLogs: {
+    getAll: async () => (await readDb()).callLogs || [],
+    create: async (log: Omit<CallLog, 'id'>) => {
+      const data = await readDb();
+      if (!data.callLogs) data.callLogs = [];
+      const newLog: CallLog = { ...log, id: Math.random().toString(36).substring(2, 11) };
+      data.callLogs.push(newLog);
+      await writeDb(data);
+      return newLog;
+    },
+    findByCallSid: async (callSid: string) => {
+      const data = await readDb();
+      return (data.callLogs || []).find(l => l.callSid === callSid);
+    },
+    update: async (callSid: string, updates: Partial<CallLog>) => {
+      const data = await readDb();
+      if (!data.callLogs) return null;
+      const index = data.callLogs.findIndex(l => l.callSid === callSid);
+      if (index !== -1) {
+        data.callLogs[index] = { ...data.callLogs[index], ...updates };
+        await writeDb(data);
+        return data.callLogs[index];
+      }
+      return null;
+    }
+  },
+  callConversations: {
+    get: async (callSid: string): Promise<CallConversation | undefined> => {
+      const data = await readDb();
+      return (data.callConversations || []).find(c => c.callSid === callSid);
+    },
+    upsert: async (conversation: CallConversation) => {
+      const data = await readDb();
+      if (!data.callConversations) data.callConversations = [];
+      const index = data.callConversations.findIndex(c => c.callSid === conversation.callSid);
+      if (index !== -1) {
+        data.callConversations[index] = conversation;
+      } else {
+        data.callConversations.push(conversation);
+      }
+      await writeDb(data);
+      return conversation;
+    },
+    remove: async (callSid: string) => {
+      const data = await readDb();
+      if (!data.callConversations) return;
+      data.callConversations = data.callConversations.filter(c => c.callSid !== callSid);
+      await writeDb(data);
+    },
+    cleanup: async () => {
+      const data = await readDb();
+      if (!data.callConversations) return;
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      data.callConversations = data.callConversations.filter(c => c.lastActivity > oneHourAgo);
+      await writeDb(data);
     }
   }
 };

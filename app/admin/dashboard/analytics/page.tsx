@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,9 @@ import {
   Loader2,
   RefreshCw
 } from 'lucide-react';
+
+const CACHE_KEY = 'excelpro_insights';
+const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
 interface BusinessInsight {
   businessStage: 'startup' | 'growth' | 'scale-up' | 'enterprise';
@@ -66,26 +69,65 @@ interface BusinessInsight {
   }>;
 }
 
+function getCachedInsights(): BusinessInsight | null {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const { data, timestamp } = JSON.parse(raw);
+    if (Date.now() - timestamp > CACHE_TTL) {
+      sessionStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+    return data as BusinessInsight;
+  } catch {
+    return null;
+  }
+}
+
+function setCachedInsights(data: BusinessInsight) {
+  try {
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
+  } catch { /* quota exceeded — ignore */ }
+}
+
 export default function AnalyticsPage() {
   const [insights, setInsights] = useState<BusinessInsight | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchInsights = async () => {
+  const fetchInsights = useCallback(async (skipCache = false) => {
     try {
+      // Check sessionStorage cache first
+      if (!skipCache) {
+        const cached = getCachedInsights();
+        if (cached) {
+          setInsights(cached);
+          setLoading(false);
+          return;
+        }
+      }
+
       setRefreshing(true);
       const response = await fetch('/api/ai/business-insights', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
-      
+
+      if (response.status === 401) {
+        throw new Error('Session expired. Please log in again.');
+      }
+      if (response.status === 429) {
+        throw new Error('Too many requests. Please wait a moment and try again.');
+      }
       if (!response.ok) {
         throw new Error('Failed to fetch business insights');
       }
-      
+
       const data = await response.json();
-      setInsights(data);
+      const insightsData = data.insights as BusinessInsight;
+      setInsights(insightsData);
+      setCachedInsights(insightsData);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -93,11 +135,11 @@ export default function AnalyticsPage() {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchInsights();
-  }, []);
+  }, [fetchInsights]);
 
   const getStageColor = (stage: string) => {
     switch (stage) {
@@ -142,7 +184,7 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={fetchInsights}>
+            <Button onClick={() => fetchInsights(true)}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Retry
             </Button>
@@ -165,7 +207,7 @@ export default function AnalyticsPage() {
           </p>
         </div>
         <Button 
-          onClick={fetchInsights} 
+          onClick={() => fetchInsights(true)} 
           disabled={refreshing}
           variant="outline"
         >
@@ -336,30 +378,62 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Upcoming Milestones
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-3">
-              {insights.predictions.milestones.map((milestone, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5" />
-                  <div>
-                    <p className="font-semibold">{milestone.milestone}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Est. {milestone.estimatedDate}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
+        {insights.predictions.next60Days && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                60-Day Forecast
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Revenue</span>
+                <span className="text-2xl font-bold">
+                  ${insights.predictions.next60Days.revenue.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Jobs</span>
+                <span className="text-2xl font-bold">
+                  {insights.predictions.next60Days.jobs}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">New Clients</span>
+                <span className="text-2xl font-bold">
+                  {insights.predictions.next60Days.newClients}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
+
+      {/* Milestones */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5" />
+            Upcoming Milestones
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-3">
+            {insights.predictions.milestones.map((milestone, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5" />
+                <div>
+                  <p className="font-semibold">{milestone.milestone}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Est. {milestone.estimatedDate}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
 
       {/* Questions for Owner */}
       <Card>

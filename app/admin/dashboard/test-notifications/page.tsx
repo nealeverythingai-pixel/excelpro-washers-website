@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SpotlightCard } from '@/components/ui/SpotlightCard';
 
 export default function TestNotificationsPage() {
@@ -44,9 +44,9 @@ export default function TestNotificationsPage() {
     }
   };
 
-  useState(() => {
+  useEffect(() => {
     checkConfig();
-  });
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 p-6">

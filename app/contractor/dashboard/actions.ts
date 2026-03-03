@@ -61,17 +61,90 @@ export async function acceptJob(formData: FormData) {
   }
 }
 
+export async function uploadBeforePhotos(formData: FormData) {
+  const jobId = formData.get('jobId') as string
+  const photos = JSON.parse(formData.get('photos') as string || '[]') as string[]
+
+  if (!jobId || photos.length < 3) return
+
+  await db.jobs.update(jobId, {
+    beforePhotos: photos,
+    beforePhotosUploadedAt: new Date().toISOString(),
+    status: 'Active', // Move to active once before photos uploaded
+  })
+  revalidatePath('/contractor/dashboard')
+}
+
+export async function uploadAfterPhotos(formData: FormData) {
+  const jobId = formData.get('jobId') as string
+  const photos = JSON.parse(formData.get('photos') as string || '[]') as string[]
+
+  if (!jobId || photos.length < 3) return
+
+  await db.jobs.update(jobId, {
+    afterPhotos: photos,
+    afterPhotosUploadedAt: new Date().toISOString(),
+  })
+  revalidatePath('/contractor/dashboard')
+}
+
+export async function submitClientSignoff(formData: FormData) {
+  const jobId = formData.get('jobId') as string
+  const clientName = formData.get('clientName') as string
+  const notes = formData.get('notes') as string
+
+  if (!jobId || !clientName?.trim()) return
+
+  await db.jobs.update(jobId, {
+    clientSignoff: true,
+    clientSignoffName: clientName.trim(),
+    clientSignoffAt: new Date().toISOString(),
+    clientSignoffNotes: notes || undefined,
+  })
+  revalidatePath('/contractor/dashboard')
+}
+
 export async function completeJob(formData: FormData) {
   const jobId = formData.get('jobId') as string
-  const proofOfWork = formData.get('proofOfWork') as string // URL or Base64
+  const proofOfWork = formData.get('proofOfWork') as string
   const notes = formData.get('notes') as string
 
   if (!jobId) return
 
+  // Verify all requirements are met before allowing completion
+  const job = await db.jobs.findById(jobId)
+  if (!job) return
+
+  if ((job.beforePhotos?.length || 0) < 3) {
+    console.error('Cannot complete job: missing before photos')
+    return
+  }
+  if ((job.afterPhotos?.length || 0) < 3) {
+    console.error('Cannot complete job: missing after photos')
+    return
+  }
+  if (!job.clientSignoff) {
+    console.error('Cannot complete job: missing client sign-off')
+    return
+  }
+
   await db.jobs.update(jobId, {
     status: 'Completed',
-    proofOfWork: proofOfWork || undefined,
-    contractorNotes: notes || undefined
+    proofOfWork: proofOfWork || job.afterPhotos?.[0] || undefined,
+    contractorNotes: notes || undefined,
   })
+
+  // Update contractor stats
+  const contractorId = cookies().get('contractor_session')?.value
+  if (contractorId) {
+    const contractor = await db.users.findById(contractorId)
+    if (contractor) {
+      await db.users.update(contractorId, {
+        completedJobs: (contractor.completedJobs || 0) + 1,
+        totalEarnings: (contractor.totalEarnings || 0) + (job.contractorEarnings || 0),
+      })
+    }
+  }
+
   revalidatePath('/contractor/dashboard')
 }

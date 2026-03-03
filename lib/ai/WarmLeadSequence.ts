@@ -3,10 +3,9 @@
  * Handles automated follow-ups for leads scoring 50-79
  */
 
-import { db } from '../db';
+import { leadFollowUps, leadRequests, type LeadFollowUp } from '../db/leads';
 import { EmailService } from '../email/EmailService';
 import { LeadData } from './LeadRouter';
-import { ScheduledFollowUp } from '../types';
 
 export class WarmLeadSequence {
   /**
@@ -21,16 +20,15 @@ export class WarmLeadSequence {
     // Store in database for cron job to process
     const followUp = {
       id: `followup_${lead.id}_day${daysFromNow}_${Date.now()}`,
-      leadId: lead.id,
+      lead_id: lead.id,
       category: 'warm' as const,
       type: followUpType,
-      scheduledFor: scheduledDate.toISOString(),
+      scheduled_for: scheduledDate.toISOString(),
       completed: false,
-      createdAt: new Date().toISOString()
     };
 
-    // Save to database
-    await db.scheduledFollowUps.create(followUp);
+    // Save to Supabase
+    await leadFollowUps.create(followUp);
     
     console.log(`  📅 Scheduled ${followUpType} for ${lead.name} on ${scheduledDate.toLocaleDateString()}`);
   }
@@ -47,25 +45,25 @@ export class WarmLeadSequence {
   /**
    * Execute scheduled follow-up (called by cron job)
    */
-  static async executeFollowUp(followUp: ScheduledFollowUp): Promise<boolean> {
+  static async executeFollowUp(followUp: LeadFollowUp): Promise<boolean> {
     try {
-      // Get lead data from database
-      const lead = await db.requests.findById(followUp.leadId);
+      // Get lead data from Supabase
+      const lead = await leadRequests.findById(followUp.lead_id);
       if (!lead) {
-        console.error(`Lead ${followUp.leadId} not found`);
+        console.error(`Lead ${followUp.lead_id} not found`);
         return false;
       }
 
       const leadData: LeadData = {
         id: lead.id,
-        name: lead.name || `${lead.firstName} ${lead.lastName}`,
+        name: lead.name || `${lead.first_name || ''} ${lead.last_name || ''}`.trim(),
         email: lead.email,
         phone: lead.phone,
         service: lead.service || 'services',
-        details: lead.details || lead.message,
-        score: lead.aiScore || 0,
-        category: lead.aiCategory as 'hot' | 'warm' | 'cold',
-        estimatedValue: lead.estimatedValue || 0,
+        details: lead.message || '',
+        score: lead.ai_score || 0,
+        category: (lead.ai_category as 'hot' | 'warm' | 'cold') || 'warm',
+        estimatedValue: lead.estimated_value || 0,
       };
 
       switch (followUp.type) {
@@ -133,22 +131,14 @@ export class WarmLeadSequence {
   /**
    * Get pending follow-ups (for cron job)
    */
-  static async getPendingFollowUps(): Promise<ScheduledFollowUp[]> {
-    // TODO: Implement database query
-    // return await db.followUps.find({ 
-    //   completed: false,
-    //   scheduledFor: { $lte: new Date() }
-    // });
-    
-    return [];
+  static async getPendingFollowUps(): Promise<LeadFollowUp[]> {
+    return leadFollowUps.getPending();
   }
 
   /**
    * Mark follow-up as completed
    */
   static async markCompleted(followUpId: string): Promise<void> {
-    // TODO: Implement database update
-    // await db.followUps.update(followUpId, { completed: true });
-    console.log(`✅ Follow-up ${followUpId} marked as completed`);
+    await leadFollowUps.markCompleted(followUpId);
   }
 }

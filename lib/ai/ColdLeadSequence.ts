@@ -3,10 +3,9 @@
  * Handles long-term nurture for leads scoring <50
  */
 
-import { db } from '../db';
+import { leadFollowUps, leadRequests, type LeadFollowUp } from '../db/leads';
 import { EmailService } from '../email/EmailService';
 import { LeadData } from './LeadRouter';
-import { ScheduledFollowUp } from '../types';
 
 export class ColdLeadSequence {
   /**
@@ -20,16 +19,15 @@ export class ColdLeadSequence {
 
     const followUp = {
       id: `cold_followup_${lead.id}_day${daysFromNow}_${Date.now()}`,
-      leadId: lead.id,
+      lead_id: lead.id,
       category: 'cold' as const,
       type: followUpType,
-      scheduledFor: scheduledDate.toISOString(),
+      scheduled_for: scheduledDate.toISOString(),
       completed: false,
-      createdAt: new Date().toISOString()
     };
 
-    // Save to database
-    await db.scheduledFollowUps.create(followUp);
+    // Save to Supabase
+    await leadFollowUps.create(followUp);
     
     console.log(`  📅 Scheduled ${followUpType} for ${lead.name} on ${scheduledDate.toLocaleDateString()}`);
   }
@@ -46,24 +44,24 @@ export class ColdLeadSequence {
   /**
    * Execute scheduled follow-up (called by cron job)
    */
-  static async executeFollowUp(followUp: ScheduledFollowUp): Promise<boolean> {
+  static async executeFollowUp(followUp: LeadFollowUp): Promise<boolean> {
     try {
-      const lead = await db.requests.findById(followUp.leadId);
+      const lead = await leadRequests.findById(followUp.lead_id);
       if (!lead) {
-        console.error(`Lead ${followUp.leadId} not found`);
+        console.error(`Lead ${followUp.lead_id} not found`);
         return false;
       }
 
       const leadData: LeadData = {
         id: lead.id,
-        name: lead.name || `${lead.firstName} ${lead.lastName}`,
+        name: lead.name || `${lead.first_name || ''} ${lead.last_name || ''}`.trim(),
         email: lead.email,
         phone: lead.phone,
         service: lead.service || 'services',
-        details: lead.details || lead.message,
-        score: lead.aiScore || 0,
-        category: lead.aiCategory as 'hot' | 'warm' | 'cold',
-        estimatedValue: lead.estimatedValue || 0,
+        details: lead.message || '',
+        score: lead.ai_score || 0,
+        category: (lead.ai_category as 'hot' | 'warm' | 'cold') || 'cold',
+        estimatedValue: lead.estimated_value || 0,
       };
 
       switch (followUp.type) {
@@ -132,7 +130,16 @@ export class ColdLeadSequence {
    * Add to newsletter for continued engagement
    */
   static async addToNewsletter(lead: LeadData): Promise<void> {
-    // TODO: Integrate with newsletter service (Mailchimp, ConvertKit, etc.)
-    console.log(`📰 Adding ${lead.name} to monthly newsletter`);
+    const { subscribers } = await import('@/lib/db/subscribers');
+    const result = await subscribers.subscribe({
+      email: lead.email,
+      name: lead.name,
+      source: 'cold-lead',
+    });
+    if (result.success) {
+      console.log(`📰 Added ${lead.name} to newsletter`);
+    } else {
+      console.error(`📰 Failed to add ${lead.name} to newsletter:`, result.error);
+    }
   }
 }

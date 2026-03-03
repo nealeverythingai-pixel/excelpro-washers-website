@@ -31,3 +31,9 @@ export async function createJob(formData: FormData) {
   revalidatePath('/admin/dashboard') 
   redirect('/admin/dashboard/jobs')
 }
+
+export async function deleteJob(id: string) {
+  await db.jobs.delete(id)
+  revalidatePath('/admin/dashboard/jobs')
+  revalidatePath('/admin/dashboard')
+}

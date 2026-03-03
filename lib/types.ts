@@ -45,6 +45,18 @@ export interface Job {
   assignedAt?: string; // When job was accepted
   contractorEarnings?: number; // What contractor gets paid
   availableToContractors?: boolean; // If true, shows on contractor job board
+
+  // Before/After Photo Documentation
+  beforePhotos?: string[]; // base64 or URLs — min 3 required before starting
+  beforePhotosUploadedAt?: string;
+  afterPhotos?: string[]; // base64 or URLs — min 3 required before completion
+  afterPhotosUploadedAt?: string;
+
+  // Client Walkthrough Sign-off
+  clientSignoff?: boolean;
+  clientSignoffName?: string; // Client's typed name
+  clientSignoffAt?: string; // Timestamp
+  clientSignoffNotes?: string; // Any client feedback
 }
 
 export interface Quote {
@@ -79,7 +91,7 @@ export interface Request {
   service?: string; // Service type requested
   message?: string; // Customer message
   details?: string; // Legacy field
-  status: 'new' | 'New' | 'Viewed' | 'Contacted' | 'Converted' | 'Lost' | 'Archived';
+  status: 'New' | 'Viewed' | 'Contacted' | 'Converted' | 'Lost' | 'Archived';
   createdAt: string;
   // AI Lead Qualification
   aiScore?: number; // 0-100
@@ -91,7 +103,7 @@ export interface Request {
 
 export interface AIFeedback {
   id: string;
-  agentType: 'quote-optimizer' | 'lead-qualifier' | 'contractor-analytics' | 'business-insights' | 'customer-assistant';
+  agentType: 'lead-qualifier' | 'business-insights';
   inputData: any;
   outputData: any;
   actualOutcome?: 'success' | 'failure' | 'pending';
@@ -119,7 +131,47 @@ export interface CallLog {
   status: string;
   duration: number;
   recordingUrl?: string | null;
+  transcript?: { role: 'user' | 'assistant'; content: string }[];
+  bookingCreated?: boolean;
   timestamp: string;
+}
+
+export interface CallConversation {
+  callSid: string;
+  messages: { role: 'user' | 'assistant'; content: string }[];
+  callerPhone: string;
+  startedAt: string;
+  lastActivity: string;
+  bookingSaved?: boolean;
+}
+
+export interface ContractorApplication {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  emergencyContact: string;
+  emergencyPhone: string;
+  skills: string[];
+  experience: string;
+  hasOwnEquipment: boolean;
+  vehicleType: string;
+  insuranceProvider: string;
+  policyNumber: string;
+  insuranceExpiry: string;
+  insuranceFileName: string;
+  insuranceFileData: string; // base64
+  agreedToTermsAt: string;
+  signature: string;
+  status: 'pending' | 'approved' | 'rejected';
+  reviewedBy?: string;
+  reviewedAt?: string;
+  rejectionReason?: string;
+  submittedAt: string;
 }
 
 export interface DbSchema {
@@ -132,4 +184,6 @@ export interface DbSchema {
   aiFeedback?: AIFeedback[]
   scheduledFollowUps?: ScheduledFollowUp[]
   callLogs?: CallLog[]
+  callConversations?: CallConversation[]
+  contractorApplications?: ContractorApplication[]
 }

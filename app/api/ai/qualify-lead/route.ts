@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AILeadQualifier } from '@/lib/ai/LeadQualifier';
-import { db } from '@/lib/db';
 import { LeadRouter } from '@/lib/ai/LeadRouter';
+import { NotificationService } from '@/lib/notifications/NotificationService';
+import { leadRequests, leadQuotes, leadAIFeedback } from '@/lib/db/leads';
 
 /**
  * POST /api/ai/qualify-lead
@@ -40,9 +41,9 @@ export async function POST(request: NextRequest) {
 
     console.log(`📊 Lead Score: ${result.score.overall}/100 (${result.score.category.toUpperCase()})`);
 
-    // Store in database with AI analysis
+    // Store in Supabase with AI analysis
     const request_id = `req_${Date.now()}`;
-    await db.requests.create({
+    await leadRequests.create({
       id: request_id,
       name,
       email,
@@ -50,15 +51,31 @@ export async function POST(request: NextRequest) {
       service,
       message,
       status: 'new',
-      createdAt: new Date().toISOString(),
-      // Add AI scoring data
-      aiScore: result.score.overall,
-      aiCategory: result.score.category,
-      aiReasoning: result.score.reasoning,
-      estimatedValue: result.score.estimatedValue
+      ai_score: result.score.overall,
+      ai_category: result.score.category,
+      ai_reasoning: result.score.reasoning,
+      estimated_value: result.score.estimatedValue
     });
 
-    // Route lead to appropriate automation (Hot/Warm/Cold)
+    // Create quote in Supabase
+    const quote_id = `quote_${Date.now()}`;
+    await leadQuotes.create({
+      id: quote_id,
+      request_id: request_id,
+      title: `Quote for ${service}`,
+      items: [{
+        description: service,
+        quantity: 1,
+        unitPrice: result.quote.total
+      }],
+      total: result.quote.total,
+      status: 'draft',
+    });
+
+    console.log('✅ Lead qualified, quote generated:', quote_id);
+
+    // Route lead — the Router is the single orchestrator for:
+    //   notifications, customer emails, and follow-up scheduling
     try {
       await LeadRouter.routeLead({
         id: request_id,
@@ -67,30 +84,35 @@ export async function POST(request: NextRequest) {
         phone: phone || '',
         service,
         details: message,
+        message,
         score: result.score.overall,
         category: result.score.category,
         estimatedValue: result.score.estimatedValue,
+        reasoning: result.score.reasoning,
+        quoteTotal: result.quote.total,
+        address,
       });
     } catch (routingError) {
       console.error('Lead routing failed (non-critical):', routingError);
-      // Don't fail the request if automation fails
     }
 
-    // Create quote automatically
-    const quote_id = `quote_${Date.now()}`;
-    await db.quotes.create({
-      clientId: request_id, // Link to request
-      title: `Quote for ${service}`,
-      items: [{
-        description: service,
-        quantity: 1,
-        unitPrice: result.quote.total
-      }],
-      total: result.quote.total,
-      status: 'Draft',
-    });
-
-    console.log('✅ Lead qualified, quote generated:', quote_id);
+    // Log AI decision for performance tracking (separate from routing)
+    try {
+      await NotificationService.logAIDecision({
+        leadId: request_id,
+        inputData: { name, email, phone, service, message, address },
+        outputData: {
+          score: result.score.overall,
+          category: result.score.category,
+          reasoning: result.score.reasoning,
+          estimatedValue: result.score.estimatedValue,
+          quote: result.quote.total
+        }
+      });
+      console.log('📊 AI decision logged');
+    } catch (logError) {
+      console.error('AI decision log failed (non-critical):', logError);
+    }
 
     // Return comprehensive result
     return NextResponse.json({
@@ -133,7 +155,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const leadRequest = await db.requests.findById(requestId);
+    const leadRequest = await leadRequests.findById(requestId);
 
     if (!leadRequest) {
       return NextResponse.json(
@@ -146,10 +168,10 @@ export async function GET(request: NextRequest) {
       success: true,
       request: leadRequest,
       score: {
-        overall: leadRequest.aiScore || 0,
-        category: leadRequest.aiCategory || 'unknown',
-        reasoning: leadRequest.aiReasoning || 'Not analyzed',
-        estimatedValue: leadRequest.estimatedValue || 0
+        overall: leadRequest.ai_score || 0,
+        category: leadRequest.ai_category || 'unknown',
+        reasoning: leadRequest.ai_reasoning || 'Not analyzed',
+        estimatedValue: leadRequest.estimated_value || 0
       }
     });
 

@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { Job } from '@/lib/types'
-import { acceptJob, completeJob } from './actions'
-import { CheckCircle, Clock, MapPin, User, Upload, FileText, Briefcase } from 'lucide-react'
+import { acceptJob, completeJob, uploadBeforePhotos, uploadAfterPhotos, submitClientSignoff } from './actions'
+import { CheckCircle, Clock, MapPin, User, Upload, Camera, FileText, Briefcase, AlertTriangle, Shield, ChevronDown, ChevronUp } from 'lucide-react'
 
 type JobWithClient = Job & {
   clientName: string
@@ -98,20 +98,237 @@ export default function ContractorView({ jobs }: { jobs: JobWithClient[] }) {
   )
 }
 
-function JobCard({ job, type }: { job: JobWithClient, type: 'available' | 'active' | 'completed' }) {
-    const [uploading, setUploading] = useState(false)
-    const [filePreview, setFilePreview] = useState<string | null>(job.proofOfWork || null)
+// ── Helper: determine which step the active job is on ────────────
+function getJobStep(job: JobWithClient): 'before-photos' | 'work-in-progress' | 'after-photos' | 'client-signoff' | 'ready-to-complete' {
+  const hasBeforePhotos = (job.beforePhotos?.length || 0) >= 3;
+  const hasAfterPhotos = (job.afterPhotos?.length || 0) >= 3;
+  const hasClientSignoff = !!job.clientSignoff;
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (file) {
-            const reader = new FileReader()
-            reader.onloadend = () => {
-                setFilePreview(reader.result as string)
-            }
-            reader.readAsDataURL(file)
-        }
+  if (!hasBeforePhotos) return 'before-photos';
+  if (!hasAfterPhotos) return 'work-in-progress'; // They can work, then upload after photos
+  if (!hasClientSignoff) return 'client-signoff';
+  return 'ready-to-complete';
+}
+
+// ── Step Progress Bar ────────────────────────────────────────────
+function StepProgress({ job }: { job: JobWithClient }) {
+  const current = getJobStep(job);
+  const steps = [
+    { id: 'before-photos', label: 'Before Photos', done: (job.beforePhotos?.length || 0) >= 3 },
+    { id: 'work-in-progress', label: 'Do the Work', done: (job.afterPhotos?.length || 0) >= 3 },
+    { id: 'after-photos', label: 'After Photos', done: (job.afterPhotos?.length || 0) >= 3 },
+    { id: 'client-signoff', label: 'Client Sign-off', done: !!job.clientSignoff },
+  ];
+
+  return (
+    <div className="flex items-center gap-1 mb-3">
+      {steps.map((s, i) => {
+        const isActive = s.id === current || (s.id === 'after-photos' && current === 'work-in-progress');
+        return (
+          <div key={s.id} className="flex items-center gap-1 flex-1">
+            <div className={`h-1.5 flex-1 rounded-full ${s.done ? 'bg-green-500' : isActive ? 'bg-orange-400' : 'bg-gray-200'}`} />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Photo Upload Component ───────────────────────────────────────
+function PhotoUploader({
+  label,
+  description,
+  minCount,
+  existingPhotos,
+  onUpload,
+}: {
+  label: string;
+  description: string;
+  minCount: number;
+  existingPhotos: string[];
+  onUpload: (photos: string[]) => void;
+}) {
+  const [photos, setPhotos] = useState<string[]>(existingPhotos);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    setUploading(true);
+    const newPhotos = [...photos];
+    for (let i = 0; i < files.length; i++) {
+      const reader = new FileReader();
+      await new Promise<void>((resolve) => {
+        reader.onloadend = () => {
+          newPhotos.push(reader.result as string);
+          resolve();
+        };
+        reader.readAsDataURL(files[i]);
+      });
     }
+    setPhotos(newPhotos);
+    setUploading(false);
+  };
+
+  const remaining = Math.max(0, minCount - photos.length);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <div>
+          <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-1.5">
+            <Camera className="h-4 w-4 text-orange-500" />
+            {label}
+          </h4>
+          <p className="text-xs text-gray-500">{description}</p>
+        </div>
+        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+          photos.length >= minCount ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+        }`}>
+          {photos.length}/{minCount} required
+        </span>
+      </div>
+
+      {/* Photo grid */}
+      {photos.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {photos.map((p, i) => (
+            <div key={i} className="relative h-16 w-16 rounded-md overflow-hidden border border-gray-200">
+              <img src={p} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => setPhotos(prev => prev.filter((_, idx) => idx !== i))}
+                className="absolute top-0 right-0 bg-red-600 text-white text-xs px-1 rounded-bl"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+        <Upload className="h-4 w-4" />
+        {uploading ? 'Processing...' : `Add Photos${remaining > 0 ? ` (${remaining} more needed)` : ''}`}
+        <input type="file" className="hidden" accept="image/*" multiple onChange={handleFiles} />
+      </label>
+
+      {photos.length >= minCount && (
+        <button
+          type="button"
+          onClick={() => onUpload(photos)}
+          className="w-full rounded-md bg-orange-600 px-3 py-2 text-sm font-medium text-white hover:bg-orange-700"
+        >
+          Submit {label}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ── Client Signoff Component ─────────────────────────────────────
+function ClientSignoffForm({ jobId }: { jobId: string }) {
+  const [clientName, setClientName] = useState('');
+  const [notes, setNotes] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!clientName.trim()) { alert('Client must type their name to sign off'); return; }
+    setSubmitting(true);
+    const formData = new FormData();
+    formData.set('jobId', jobId);
+    formData.set('clientName', clientName);
+    formData.set('notes', notes);
+    await submitClientSignoff(formData);
+    setSubmitting(false);
+  };
+
+  return (
+    <div className="space-y-3 rounded-md border border-blue-200 bg-blue-50 p-3">
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="flex w-full items-center justify-between text-left"
+      >
+        <h4 className="text-sm font-semibold text-blue-800 flex items-center gap-1.5">
+          <Shield className="h-4 w-4" />
+          Client Walkthrough & Sign-off
+        </h4>
+        {expanded ? <ChevronUp className="h-4 w-4 text-blue-500" /> : <ChevronDown className="h-4 w-4 text-blue-500" />}
+      </button>
+
+      {expanded && (
+        <div className="space-y-3 pt-1">
+          <p className="text-xs text-blue-700">
+            Walk the client through the completed work. The client must type their name below to confirm they are satisfied with the job.
+          </p>
+
+          <div>
+            <label className="block text-xs font-medium text-blue-800 mb-1">Client&apos;s Full Name *</label>
+            <input
+              type="text"
+              value={clientName}
+              onChange={e => setClientName(e.target.value)}
+              placeholder="Client types their name here"
+              className="w-full rounded-md border border-blue-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-blue-800 mb-1">Client Feedback (optional)</label>
+            <textarea
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              rows={2}
+              placeholder="Any notes from the client..."
+              className="w-full rounded-md border border-blue-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={submitting || !clientName.trim()}
+            className="w-full rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          >
+            {submitting ? 'Submitting...' : 'Client Confirms & Signs Off'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+function JobCard({ job, type }: { job: JobWithClient, type: 'available' | 'active' | 'completed' }) {
+    const [completing, setCompleting] = useState(false);
+
+    const currentStep = type === 'active' ? getJobStep(job) : null;
+
+    const handleBeforePhotos = async (photos: string[]) => {
+      const formData = new FormData();
+      formData.set('jobId', job.id);
+      formData.set('photos', JSON.stringify(photos));
+      await uploadBeforePhotos(formData);
+    };
+
+    const handleAfterPhotos = async (photos: string[]) => {
+      const formData = new FormData();
+      formData.set('jobId', job.id);
+      formData.set('photos', JSON.stringify(photos));
+      await uploadAfterPhotos(formData);
+    };
+
+    const handleComplete = async () => {
+      setCompleting(true);
+      const formData = new FormData();
+      formData.set('jobId', job.id);
+      formData.set('proofOfWork', job.afterPhotos?.[0] || '');
+      formData.set('notes', '');
+      await completeJob(formData);
+      setCompleting(false);
+    };
 
     return (
         <div className="overflow-hidden rounded-lg bg-white shadow border border-gray-200">
@@ -126,7 +343,11 @@ function JobCard({ job, type }: { job: JobWithClient, type: 'available' | 'activ
                         {job.status}
                     </span>
                 </div>
-                <div className="mt-4 space-y-3">
+
+                {/* Step progress for active jobs */}
+                {type === 'active' && <StepProgress job={job} />}
+
+                <div className="mt-2 space-y-3">
                     <p className="text-sm text-gray-500 line-clamp-2">{job.description || 'No description provided.'}</p>
                     <div className="flex items-center text-sm text-gray-500">
                         <User className="mr-2 h-4 w-4 text-gray-400" />
@@ -156,46 +377,90 @@ function JobCard({ job, type }: { job: JobWithClient, type: 'available' | 'activ
                 )}
                 
                 {type === 'active' && (
-                    <form action={completeJob} className="space-y-3">
-                        <input type="hidden" name="jobId" value={job.id} />
-                        
+                    <div className="space-y-4">
+                      {/* Step 1: Before Photos */}
+                      {currentStep === 'before-photos' && (
                         <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Proof of Work (Photo)</label>
-                            <label className="flex w-full cursor-pointer appearance-none items-center justify-center rounded-md border border-dashed border-gray-300 bg-white px-3 py-2 text-sm leading-4 text-gray-600 hover:bg-gray-50 focus:outline-none">
-                                <Upload className="mr-2 h-4 w-4" />
-                                {filePreview ? 'Photo Selected' : 'Upload Photo'}
-                                <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} required />
-                            </label>
-                            <input type="hidden" name="proofOfWork" value={filePreview || ''} />
-                            {filePreview && (
-                                <div className="mt-2">
-                                    <img src={filePreview} alt="Proof" className="h-24 w-auto rounded object-cover border" />
-                                </div>
-                            )}
+                          <div className="flex items-center gap-2 mb-2 text-amber-700 bg-amber-50 rounded-md p-2 border border-amber-200">
+                            <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+                            <p className="text-xs font-medium">You must upload at least 3 before photos before starting work.</p>
+                          </div>
+                          <PhotoUploader
+                            label="Before Photos"
+                            description="Document the site condition before starting work"
+                            minCount={3}
+                            existingPhotos={job.beforePhotos || []}
+                            onUpload={handleBeforePhotos}
+                          />
                         </div>
+                      )}
 
+                      {/* Step 2: Work in progress — upload after photos when done */}
+                      {currentStep === 'work-in-progress' && (
                         <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
-                            <textarea
-                                name="notes"
-                                rows={2}
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
-                                placeholder="Any details about the job..."
-                            />
+                          <div className="flex items-center gap-2 mb-3 text-green-700 bg-green-50 rounded-md p-2 border border-green-200">
+                            <CheckCircle className="h-4 w-4 flex-shrink-0" />
+                            <p className="text-xs font-medium">Before photos submitted ✓ — Complete the work, then upload after photos.</p>
+                          </div>
+                          <PhotoUploader
+                            label="After Photos"
+                            description="Document the finished work — at least 3 photos required"
+                            minCount={3}
+                            existingPhotos={job.afterPhotos || []}
+                            onUpload={handleAfterPhotos}
+                          />
                         </div>
+                      )}
 
-                        <button
-                            type="submit"
-                            disabled={!filePreview}
-                            className="flex w-full justify-center items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Complete Job
-                        </button>
-                    </form>
+                      {/* Step 3: Client walkthrough sign-off */}
+                      {currentStep === 'client-signoff' && (
+                        <div>
+                          <div className="flex items-center gap-2 mb-3 text-green-700 bg-green-50 rounded-md p-2 border border-green-200">
+                            <CheckCircle className="h-4 w-4 flex-shrink-0" />
+                            <p className="text-xs font-medium">Photos complete ✓ — Now walk the client through the work.</p>
+                          </div>
+                          <ClientSignoffForm jobId={job.id} />
+                        </div>
+                      )}
+
+                      {/* Step 4: Ready to mark complete */}
+                      {currentStep === 'ready-to-complete' && (
+                        <div>
+                          <div className="space-y-1 mb-3 text-sm">
+                            <p className="text-green-700 flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5" /> Before photos ({job.beforePhotos?.length})</p>
+                            <p className="text-green-700 flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5" /> After photos ({job.afterPhotos?.length})</p>
+                            <p className="text-green-700 flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5" /> Client sign-off by {job.clientSignoffName}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleComplete}
+                            disabled={completing}
+                            className="flex w-full justify-center items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50"
+                          >
+                            {completing ? 'Completing...' : '✅ Mark Job Complete'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                 )}
 
                 {type === 'completed' && (
                     <div className="text-sm text-gray-500 space-y-2">
+                        {(job.beforePhotos?.length || 0) > 0 && (
+                          <p className="flex items-center gap-1 text-gray-600">
+                            <Camera className="h-3.5 w-3.5" /> {job.beforePhotos!.length} before photos
+                          </p>
+                        )}
+                        {(job.afterPhotos?.length || 0) > 0 && (
+                          <p className="flex items-center gap-1 text-gray-600">
+                            <Camera className="h-3.5 w-3.5" /> {job.afterPhotos!.length} after photos
+                          </p>
+                        )}
+                        {job.clientSignoff && (
+                          <p className="flex items-center gap-1 text-green-600">
+                            <Shield className="h-3.5 w-3.5" /> Signed off by {job.clientSignoffName}
+                          </p>
+                        )}
                         {job.proofOfWork && (
                              <div className="flex items-center gap-1 text-green-600">
                                 <CheckCircle className="h-4 w-4" />
@@ -203,7 +468,7 @@ function JobCard({ job, type }: { job: JobWithClient, type: 'available' | 'activ
                              </div>
                         )}
                         {job.contractorNotes && (
-                            <p className="italic">"{job.contractorNotes}"</p>
+                            <p className="italic">&quot;{job.contractorNotes}&quot;</p>
                         )}
                     </div>
                 )}
