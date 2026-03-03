@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
+import { signSession } from '@/lib/session'
 
 export async function login(prevState: any, formData: FormData) {
   const email = formData.get('email') as string
@@ -17,10 +18,19 @@ export async function login(prevState: any, formData: FormData) {
   )
 
   if (validUser) {
+    // HMAC-signed session cookie
+    const sessionValue = signSession({
+      userId: validUser.id,
+      role: 'CONTRACTOR',
+      email: validUser.email,
+      loginAt: new Date().toISOString(),
+    })
+
     const cookieStore = await cookies()
-    cookieStore.set('contractor_session', validUser.id, {
+    cookieStore.set('contractor_session', sessionValue, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 1 week
       path: '/',
     })

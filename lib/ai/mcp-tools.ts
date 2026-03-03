@@ -485,7 +485,7 @@ export async function executeTool(
         return { success: true, data: job };
       }
       case 'update_job_status': {
-        const updated = await db.jobs.updateStatus(input.id, input.status);
+        const updated = await db.jobs.update(input.id, { status: input.status });
         return { success: true, data: updated };
       }
 
@@ -639,7 +639,7 @@ export async function executeTool(
         return {
           success: true,
           data: {
-            leads: { total: leads.length, ...leadStats },
+            leads: { ...leadStats, total: leads.length },
             requests: { total: requests.length, new: requests.filter(r => r.status === 'New').length },
             clients: { total: clients.length },
             quotes: {
@@ -651,7 +651,7 @@ export async function executeTool(
             jobs: {
               total: jobs.length,
               scheduled: jobs.filter(j => j.status === 'Scheduled').length,
-              inProgress: jobs.filter(j => j.status === 'In Progress').length,
+              inProgress: jobs.filter(j => j.status === 'Active').length,
               completed: jobs.filter(j => j.status === 'Completed').length,
             },
             invoices: {

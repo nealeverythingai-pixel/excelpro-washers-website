@@ -5,12 +5,13 @@ import { leadRequests, leadFollowUps } from '@/lib/db/leads';
 import { subscribers } from '@/lib/db/subscribers';
 import { voiceCallLogs, voiceBookings } from '@/lib/db/voice';
 import { isRateLimited, getClientIp, rateLimitResponse } from '@/lib/rateLimit';
+import { verifyAdminSession } from '@/lib/session';
 
 export async function POST(request: NextRequest) {
   try {
     // ── Auth: verify admin session ──────────────────────────────────
-    const adminSession = request.cookies.get('admin_session');
-    if (!adminSession) {
+    const adminSession = request.cookies.get('admin_session')?.value;
+    if (!verifyAdminSession(adminSession)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

@@ -22,7 +22,6 @@ export async function POST(request: NextRequest) {
       total,
       status: status || 'Draft',
       salesRepId: undefined, // TODO: Get from session when auth is implemented
-      createdAt: new Date().toISOString()
     })
 
     return NextResponse.json({ success: true, quote })

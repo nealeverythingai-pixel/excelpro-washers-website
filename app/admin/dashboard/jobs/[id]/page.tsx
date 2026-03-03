@@ -2,8 +2,9 @@ import { db } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import JobDetailClient from './JobDetailClient'
 
-export default async function JobDetailPage({ params }: { params: { id: string } }) {
-  const job = await db.jobs.findById(params.id)
+export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const job = await db.jobs.findById(id)
   
   if (!job) {
     notFound()
@@ -26,7 +27,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
     <JobDetailClient 
       job={job} 
       client={client} 
-      contractor={contractor}
+      contractor={contractor || null}
       invoice={invoice || null}
     />
   )

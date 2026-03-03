@@ -3,9 +3,10 @@ import { db } from '@/lib/db'
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const { status } = body
 
@@ -16,7 +17,7 @@ export async function PATCH(
       )
     }
 
-    const lead = await db.requests.findById(params.id)
+    const lead = await db.requests.findById(id)
     
     if (!lead) {
       return NextResponse.json(
@@ -25,7 +26,7 @@ export async function PATCH(
       )
     }
 
-    const updatedLead = await db.requests.updateStatus(params.id, status)
+    const updatedLead = await db.requests.updateStatus(id, status)
 
     return NextResponse.json(updatedLead)
   } catch (error) {

@@ -3,10 +3,11 @@ import { db } from '@/lib/db'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const lead = await db.requests.findById(params.id)
+    const { id } = await params
+    const lead = await db.requests.findById(id)
     
     if (!lead) {
       return NextResponse.json(
@@ -23,11 +24,10 @@ export async function POST(
       phone: lead.phone,
       address: lead.address || '',
       companyName: '',
-      createdAt: new Date().toISOString()
     })
 
     // Update lead status to Converted
-    await db.requests.updateStatus(params.id, 'Converted')
+    await db.requests.updateStatus(id, 'Converted')
 
     return NextResponse.json({ 
       success: true, 

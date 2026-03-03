@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { syncAllEmbeddings } from '@/lib/ai/embeddings';
+import { verifyAdminSession } from '@/lib/session';
 
 /**
  * POST /api/ai/sync-embeddings
@@ -9,10 +10,10 @@ import { syncAllEmbeddings } from '@/lib/ai/embeddings';
  */
 export async function POST(request: NextRequest) {
   try {
-    // Auth check
-    const adminSession = request.cookies.get('admin_session');
+    // Auth check — HMAC-signed session or cron secret
+    const adminCookie = request.cookies.get('admin_session')?.value;
     const cronSecret = request.headers.get('authorization');
-    const isAuthed = adminSession || cronSecret === `Bearer ${process.env.CRON_SECRET}`;
+    const isAuthed = verifyAdminSession(adminCookie) || cronSecret === `Bearer ${process.env.CRON_SECRET}`;
 
     if (!isAuthed) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

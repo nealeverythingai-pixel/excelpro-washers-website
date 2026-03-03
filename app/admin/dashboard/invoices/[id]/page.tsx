@@ -2,8 +2,9 @@ import { db } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import InvoiceDetailClient from './InvoiceDetailClient'
 
-export default async function InvoiceDetailPage({ params }: { params: { id: string } }) {
-  const invoice = await db.invoices.findById(params.id)
+export default async function InvoiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const invoice = await db.invoices.findById(id)
   
   if (!invoice) {
     notFound()
@@ -20,7 +21,7 @@ export default async function InvoiceDetailPage({ params }: { params: { id: stri
     <InvoiceDetailClient 
       invoice={invoice} 
       client={client} 
-      job={job}
+      job={job || null}
     />
   )
 }

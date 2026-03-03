@@ -5,6 +5,25 @@ import { voiceConversations, voiceBookings, voiceCallLogs } from '@/lib/db/voice
 
 const VoiceResponse = twilio.twiml.VoiceResponse;
 
+// ── Twilio signature validation ──────────────────────────────
+
+function validateTwilioRequest(request: NextRequest, params: Record<string, string>): boolean {
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  if (!authToken) {
+    console.warn('[Voice] TWILIO_AUTH_TOKEN not set — skipping signature validation');
+    return true; // Allow in dev, but log warning
+  }
+
+  const signature = request.headers.get('x-twilio-signature');
+  if (!signature) return false;
+
+  const url = process.env.NEXT_PUBLIC_SITE_URL
+    ? `${process.env.NEXT_PUBLIC_SITE_URL}/api/voice/respond`
+    : request.url;
+
+  return twilio.validateRequest(authToken, signature, url, params);
+}
+
 // ── Helpers ──────────────────────────────────────────────────
 
 /** Speak text via ElevenLabs (if configured) or Twilio built-in TTS */
@@ -28,15 +47,15 @@ function speakInGather(gather: any, text: string, baseUrl: string) {
 // ── Business hours check ─────────────────────────────────────
 
 function getBusinessHoursContext(): string {
-  // Seattle is Pacific Time (UTC-8 / UTC-7 DST)
+  // Ottawa is Eastern Time (UTC-5 / UTC-4 DST)
   const now = new Date();
-  const seattleTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-  const day = seattleTime.getDay(); // 0=Sun, 1=Mon...6=Sat
-  const hour = seattleTime.getHours();
+  const ottawaTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Toronto' }));
+  const day = ottawaTime.getDay(); // 0=Sun, 1=Mon...6=Sat
+  const hour = ottawaTime.getHours();
   
   const isOpen = day >= 1 && day <= 6 && hour >= 8 && hour < 18;
   const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day];
-  const timeStr = seattleTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  const timeStr = ottawaTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
   
   if (isOpen) {
     return `CURRENT STATUS: It's ${dayName} ${timeStr} — you are OPEN right now.`;
@@ -80,8 +99,8 @@ const RECEPTIONIST_PROMPT = `You are a friendly, professional receptionist for E
 BUSINESS INFO:
 - Services: window cleaning (interior & exterior), pressure washing (driveways, decks, siding), gutter cleaning, commercial building washing
 - Pricing: residential jobs start around $150, commercial jobs are quoted individually after a free estimate
-- Service area: Greater Seattle area
-- Hours: Monday through Saturday, 8 AM to 6 PM
+- Service area: Ottawa and surrounding areas (Kanata, Orleans, Barrhaven, Nepean, Gloucester)
+- Hours: Monday through Saturday, 8 AM to 6 PM Eastern Time
 - Booking: collect their info and someone from the team will call back to schedule
 
 CONVERSATION RULES:
@@ -163,6 +182,15 @@ async function notifyOwnerOfBooking(booking: BookingInfo, callSid: string) {
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
+
+    // ── Validate Twilio signature to prevent spoofing ─────────
+    const formParams: Record<string, string> = {};
+    formData.forEach((value, key) => { formParams[key] = value.toString(); });
+    if (!validateTwilioRequest(request, formParams)) {
+      console.error('[Voice] ❌ Invalid Twilio signature — rejecting request');
+      return new NextResponse('Forbidden', { status: 403 });
+    }
+
     const speechResult = formData.get('SpeechResult') as string;
     const callSid = formData.get('CallSid') as string;
     const callerPhone = formData.get('From') as string || 'unknown';

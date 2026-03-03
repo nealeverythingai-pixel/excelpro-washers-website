@@ -35,7 +35,6 @@ export async function POST(request: NextRequest) {
       contractorId: contractorId || undefined,
       availableToContractors: true, // Make available to contractor portal
       contractorEarnings: Math.round((total || 0) * 0.7), // 70% goes to contractor
-      createdAt: new Date().toISOString()
     })
 
     // Trigger contractor notifications (async, don't await)

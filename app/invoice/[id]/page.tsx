@@ -7,8 +7,9 @@ export const metadata = {
   description: 'View your invoice from ExcelPro Washers',
 }
 
-export default async function PublicInvoicePage({ params }: { params: { id: string } }) {
-  const invoice = await db.invoices.findById(params.id)
+export default async function PublicInvoicePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const invoice = await db.invoices.findById(id)
   
   if (!invoice) {
     notFound()
@@ -25,7 +26,7 @@ export default async function PublicInvoicePage({ params }: { params: { id: stri
     <CustomerInvoice 
       invoice={invoice} 
       client={client} 
-      job={job}
+      job={job || null}
     />
   )
 }

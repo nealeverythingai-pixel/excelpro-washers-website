@@ -4,7 +4,7 @@ import { db } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { User, UserRole } from '@/lib/types'
 
-export async function createUser(formData: FormData) {
+export async function createUser(prevState: any, formData: FormData) {
   const name = formData.get('name') as string
   const email = formData.get('email') as string
   const pin = formData.get('pin') as string

@@ -3,6 +3,7 @@
 import { db } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
+import { verifyPortalSession } from '@/lib/session'
 
 export async function createQuote(prevState: any, formData: FormData) {
   const firstName = formData.get('firstName') as string
@@ -13,9 +14,11 @@ export async function createQuote(prevState: any, formData: FormData) {
   const total = parseFloat(formData.get('total') as string)
   const itemsJson = formData.get('items') as string
   
-  // Get Sales Rep ID
+  // Get Sales Rep ID from signed session
   const cookieStore = await cookies()
-  const salesRepId = cookieStore.get('sales_session')?.value
+  const raw = cookieStore.get('sales_session')?.value
+  const session = verifyPortalSession(raw, 'SALES')
+  const salesRepId = session?.userId || raw
 
   // 1. Create Client
   const client = await db.clients.create({

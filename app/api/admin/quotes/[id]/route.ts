@@ -3,9 +3,10 @@ import { db } from '@/lib/db'
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const { status } = body
 
@@ -16,7 +17,7 @@ export async function PATCH(
       )
     }
 
-    const quote = await db.quotes.findById(params.id)
+    const quote = await db.quotes.findById(id)
     
     if (!quote) {
       return NextResponse.json(
@@ -25,7 +26,7 @@ export async function PATCH(
       )
     }
 
-    const updatedQuote = await db.quotes.updateStatus(params.id, status)
+    const updatedQuote = await db.quotes.updateStatus(id, status)
 
     return NextResponse.json(updatedQuote)
   } catch (error) {
@@ -39,9 +40,10 @@ export async function PATCH(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const { clientId, title, items, total, status } = await request.json()
 
     // Validate required fields
@@ -53,7 +55,7 @@ export async function PUT(
     }
 
     // Verify quote exists
-    const existingQuote = await db.quotes.findById(params.id)
+    const existingQuote = await db.quotes.findById(id)
     if (!existingQuote) {
       return NextResponse.json(
         { error: 'Quote not found' },
@@ -89,7 +91,7 @@ export async function PUT(
     }
 
     // Update the quote
-    const updatedQuote = await db.quotes.update(params.id, {
+    const updatedQuote = await db.quotes.update(id, {
       clientId,
       title,
       items,
@@ -109,10 +111,11 @@ export async function PUT(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const quote = await db.quotes.findById(params.id)
+    const { id } = await params
+    const quote = await db.quotes.findById(id)
     
     if (!quote) {
       return NextResponse.json(

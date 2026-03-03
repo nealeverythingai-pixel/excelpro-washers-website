@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { signSession, verifyAdminSession, type AdminSessionData } from '@/lib/session'
 
 export async function login(prevState: any, formData: FormData) {
   const email = formData.get('email') as string
@@ -24,14 +25,14 @@ export async function login(prevState: any, formData: FormData) {
   }
 
   if (password === CORRECT_PASSWORD) {
-    // Store a session with admin identity — base64 encoded JSON
-    const sessionData = {
+    // HMAC-signed session cookie — tamper-proof
+    const sessionData: AdminSessionData = {
       email,
       role: 'ADMIN',
       loginAt: new Date().toISOString(),
       id: Buffer.from(email).toString('base64').substring(0, 12),
     }
-    const sessionValue = Buffer.from(JSON.stringify(sessionData)).toString('base64')
+    const sessionValue = signSession(sessionData)
 
     const cookieStore = await cookies()
     cookieStore.set('admin_session', sessionValue, {
@@ -53,16 +54,8 @@ export async function logout() {
   redirect('/admin/login')
 }
 
-export async function getAdminSession(): Promise<{ email: string; role: string; id: string; loginAt: string } | null> {
-  try {
-    const cookieStore = await cookies()
-    const session = cookieStore.get('admin_session')?.value
-    if (!session) return null
-    // Handle legacy 'true' cookie from old auth system
-    if (session === 'true') return { email: 'admin@excelpro.ca', role: 'ADMIN', id: 'legacy', loginAt: '' }
-    const data = JSON.parse(Buffer.from(session, 'base64').toString('utf-8'))
-    return data
-  } catch {
-    return null
-  }
+export async function getAdminSession(): Promise<AdminSessionData | null> {
+  const cookieStore = await cookies()
+  const session = cookieStore.get('admin_session')?.value
+  return verifyAdminSession(session)
 }

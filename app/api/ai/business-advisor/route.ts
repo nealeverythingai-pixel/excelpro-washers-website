@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { toolDefinitions, executeTool } from '@/lib/ai/mcp-tools';
 import { isRateLimited, getClientIp, rateLimitResponse } from '@/lib/rateLimit';
+import { verifyAdminSession } from '@/lib/session';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -47,8 +48,8 @@ CURRENT DATE: ${new Date().toISOString().split('T')[0]}`;
 export async function POST(request: NextRequest) {
   try {
     // ── Auth ──────────────────────────────────────────────────────
-    const adminSession = request.cookies.get('admin_session');
-    if (!adminSession) {
+    const adminSession = request.cookies.get('admin_session')?.value;
+    if (!verifyAdminSession(adminSession)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

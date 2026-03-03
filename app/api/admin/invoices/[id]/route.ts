@@ -3,9 +3,10 @@ import { db } from '@/lib/db'
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const { clientId, jobId, total, dueDate, status } = await request.json()
 
     // Validate required fields
@@ -17,7 +18,7 @@ export async function PUT(
     }
 
     // Verify invoice exists
-    const existingInvoice = await db.invoices.findById(params.id)
+    const existingInvoice = await db.invoices.findById(id)
     if (!existingInvoice) {
       return NextResponse.json(
         { error: 'Invoice not found' },
@@ -52,7 +53,7 @@ export async function PUT(
     }
 
     // Update the invoice
-    const updatedInvoice = await db.invoices.update(params.id, {
+    const updatedInvoice = await db.invoices.update(id, {
       clientId,
       jobId: jobId || undefined,
       total,

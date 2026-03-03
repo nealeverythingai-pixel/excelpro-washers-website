@@ -4,10 +4,20 @@ import { db } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { Job } from '@/lib/types'
 import { cookies } from 'next/headers'
+import { verifyPortalSession } from '@/lib/session'
+
+function getContractorId(cookieStore: any): string | undefined {
+  const raw = cookieStore.get('contractor_session')?.value
+  // New signed cookie — extract userId from payload
+  const session = verifyPortalSession(raw, 'CONTRACTOR')
+  if (session) return session.userId
+  // Legacy fallback for plain-text userId cookies (will be rejected by middleware anyway)
+  return raw
+}
 
 export async function getJobs() {
   const cookieStore = await cookies()
-  const contractorId = cookieStore.get('contractor_session')?.value
+  const contractorId = getContractorId(cookieStore)
   
   const jobs = await db.jobs.getAll()
   const clients = await db.clients.getAll()
@@ -38,7 +48,7 @@ export async function getJobs() {
 export async function acceptJob(formData: FormData) {
   const jobId = formData.get('jobId') as string
   const cookieStore = await cookies()
-  const contractorId = cookieStore.get('contractor_session')?.value
+  const contractorId = getContractorId(cookieStore)
 
   if (!jobId || !contractorId) return
 
@@ -138,7 +148,7 @@ export async function completeJob(formData: FormData) {
 
   // Update contractor stats
   const cookieStore = await cookies()
-  const contractorId = cookieStore.get('contractor_session')?.value
+  const contractorId = getContractorId(cookieStore)
   if (contractorId) {
     const contractor = await db.users.findById(contractorId)
     if (contractor) {

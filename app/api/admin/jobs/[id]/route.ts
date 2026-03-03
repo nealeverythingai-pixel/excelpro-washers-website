@@ -3,9 +3,10 @@ import { db } from '@/lib/db'
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const { clientId, title, description, startDate, endDate, status, contractorId, total } = await request.json()
 
     // Validate required fields
@@ -17,7 +18,7 @@ export async function PUT(
     }
 
     // Verify job exists
-    const existingJob = await db.jobs.findById(params.id)
+    const existingJob = await db.jobs.findById(id)
     if (!existingJob) {
       return NextResponse.json(
         { error: 'Job not found' },
@@ -52,7 +53,7 @@ export async function PUT(
     }
 
     // Update the job
-    const updatedJob = await db.jobs.update(params.id, {
+    const updatedJob = await db.jobs.update(id, {
       clientId,
       title,
       description: description || existingJob.description,
@@ -75,10 +76,11 @@ export async function PUT(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const job = await db.jobs.findById(params.id)
+    const { id } = await params
+    const job = await db.jobs.findById(id)
     
     if (!job) {
       return NextResponse.json(

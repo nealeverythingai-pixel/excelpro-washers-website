@@ -3,10 +3,11 @@ import { db } from '@/lib/db'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const quote = await db.quotes.findById(params.id)
+    const { id } = await params
+    const quote = await db.quotes.findById(id)
     
     if (!quote) {
       return NextResponse.json(
@@ -27,9 +28,9 @@ export async function POST(
 
     // TODO: Send email with quote details using Resend
     // For now, just update status to Sent
-    await db.quotes.updateStatus(params.id, 'Sent')
+    await db.quotes.updateStatus(id, 'Sent')
 
-    console.log(`Quote ${params.id} sent to ${client.email}`)
+    console.log(`Quote ${id} sent to ${client.email}`)
 
     return NextResponse.json({ 
       success: true, 

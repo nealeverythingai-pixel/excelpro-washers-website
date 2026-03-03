@@ -22,46 +22,21 @@ export interface EmbeddingRecord {
 }
 
 // ── Embedding generation ─────────────────────────────────────────────
-// Uses Anthropic's Voyage embeddings via the API if available,
-// otherwise falls back to a lightweight text representation.
+// DB column is vector(1536), so we must produce 1536-dim vectors.
+// OpenAI ada-002 outputs 1536 natively. Voyage voyage-3-lite outputs 512
+// which is incompatible — so we prefer OpenAI for embeddings.
 
 const EMBEDDING_DIM = 1536;
 
 /**
- * Generate an embedding vector for text using Voyage API.
+ * Generate an embedding vector for text.
+ * Uses OpenAI ada-002 (1536d) to match the pgvector column.
  * Falls back to null if not available (records still stored for keyword search).
  */
 async function generateEmbedding(text: string): Promise<number[] | null> {
-  const apiKey = process.env.VOYAGE_API_KEY || process.env.OPENAI_API_KEY;
-  
-  if (!apiKey) {
-    console.warn('[Embeddings] No VOYAGE_API_KEY or OPENAI_API_KEY set — skipping vector embedding');
-    return null;
-  }
-
-  try {
-    // Try Voyage API first (recommended for Anthropic ecosystem)
-    if (process.env.VOYAGE_API_KEY) {
-      const res = await fetch('https://api.voyageai.com/v1/embeddings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.VOYAGE_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: 'voyage-3-lite',
-          input: [text.slice(0, 4000)], // Truncate to stay within limits
-          input_type: 'document',
-        }),
-      });
-      const data = await res.json();
-      if (data.data?.[0]?.embedding) {
-        return data.data[0].embedding;
-      }
-    }
-
-    // Fallback: OpenAI ada-002
-    if (process.env.OPENAI_API_KEY) {
+  // Prefer OpenAI ada-002 — guaranteed 1536 dims matching our DB column
+  if (process.env.OPENAI_API_KEY) {
+    try {
       const res = await fetch('https://api.openai.com/v1/embeddings', {
         method: 'POST',
         headers: {
@@ -77,13 +52,46 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
       if (data.data?.[0]?.embedding) {
         return data.data[0].embedding;
       }
+    } catch (e) {
+      console.warn('[Embeddings] OpenAI embedding failed:', e);
     }
-
-    return null;
-  } catch (err) {
-    console.error('[Embeddings] Failed to generate embedding:', err);
-    return null;
   }
+
+  // Fallback: Voyage API (only if user explicitly wants it)
+  if (process.env.VOYAGE_API_KEY && !process.env.OPENAI_API_KEY) {
+    try {
+      const res = await fetch('https://api.voyageai.com/v1/embeddings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.VOYAGE_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'voyage-3-lite',
+          input: [text.slice(0, 4000)],
+          input_type: 'document',
+        }),
+      });
+      const data = await res.json();
+      if (data.data?.[0]?.embedding) {
+        const embedding = data.data[0].embedding;
+        // Voyage voyage-3-lite outputs 512 dims — pad to 1536 for DB compatibility
+        if (embedding.length < EMBEDDING_DIM) {
+          console.warn(`[Embeddings] Voyage returned ${embedding.length}d — padding to ${EMBEDDING_DIM}d`);
+          while (embedding.length < EMBEDDING_DIM) embedding.push(0);
+        }
+        return embedding;
+      }
+    } catch (e) {
+      console.warn('[Embeddings] Voyage embedding failed:', e);
+    }
+  }
+
+  if (!process.env.OPENAI_API_KEY && !process.env.VOYAGE_API_KEY) {
+    console.warn('[Embeddings] No OPENAI_API_KEY or VOYAGE_API_KEY set — skipping vector embedding');
+  }
+
+  return null;
 }
 
 // ── Text builders (turn records into searchable text) ────────────────

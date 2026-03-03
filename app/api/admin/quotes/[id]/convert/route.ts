@@ -3,10 +3,11 @@ import { db } from '@/lib/db'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const quote = await db.quotes.findById(params.id)
+    const { id } = await params
+    const quote = await db.quotes.findById(id)
     
     if (!quote) {
       return NextResponse.json(
@@ -35,7 +36,7 @@ export async function POST(
     })
 
     // Update quote status to Converted
-    await db.quotes.updateStatus(params.id, 'Converted')
+    await db.quotes.updateStatus(id, 'Converted')
 
     // Trigger contractor notifications (async, don't await)
     console.log(`🔔 Triggering contractor notifications for job ${job.id}`)

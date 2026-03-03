@@ -24,19 +24,22 @@ export async function GET(request: NextRequest) {
 
     const audio = await elevenlabs.textToSpeech.convert(voiceId, {
       text,
-      model_id: 'eleven_turbo_v2_5',
-      voice_settings: {
+      modelId: 'eleven_turbo_v2_5',
+      voiceSettings: {
         stability: 0.4,
-        similarity_boost: 0.8,
+        similarityBoost: 0.8,
         style: 0.5,
-        use_speaker_boost: true,
+        useSpeakerBoost: true,
       },
     });
 
     // Convert the stream to a buffer
     const chunks: Uint8Array[] = [];
-    for await (const chunk of audio) {
-      chunks.push(chunk);
+    const reader = (audio as ReadableStream<Uint8Array>).getReader();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) chunks.push(value);
     }
     const buffer = Buffer.concat(chunks);
 
