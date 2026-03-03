@@ -33,7 +33,8 @@ export async function login(prevState: any, formData: FormData) {
     }
     const sessionValue = Buffer.from(JSON.stringify(sessionData)).toString('base64')
 
-    cookies().set('admin_session', sessionValue, {
+    const cookieStore = await cookies()
+    cookieStore.set('admin_session', sessionValue, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -47,13 +48,15 @@ export async function login(prevState: any, formData: FormData) {
 }
 
 export async function logout() {
-  cookies().delete('admin_session')
+  const cookieStore = await cookies()
+  cookieStore.delete('admin_session')
   redirect('/admin/login')
 }
 
 export async function getAdminSession(): Promise<{ email: string; role: string; id: string; loginAt: string } | null> {
   try {
-    const session = cookies().get('admin_session')?.value
+    const cookieStore = await cookies()
+    const session = cookieStore.get('admin_session')?.value
     if (!session) return null
     // Handle legacy 'true' cookie from old auth system
     if (session === 'true') return { email: 'admin@excelpro.ca', role: 'ADMIN', id: 'legacy', loginAt: '' }

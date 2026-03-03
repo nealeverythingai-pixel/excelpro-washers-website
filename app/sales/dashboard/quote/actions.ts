@@ -14,7 +14,8 @@ export async function createQuote(prevState: any, formData: FormData) {
   const itemsJson = formData.get('items') as string
   
   // Get Sales Rep ID
-  const salesRepId = cookies().get('sales_session')?.value
+  const cookieStore = await cookies()
+  const salesRepId = cookieStore.get('sales_session')?.value
 
   // 1. Create Client
   const client = await db.clients.create({

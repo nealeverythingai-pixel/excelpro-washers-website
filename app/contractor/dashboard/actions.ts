@@ -6,7 +6,8 @@ import { Job } from '@/lib/types'
 import { cookies } from 'next/headers'
 
 export async function getJobs() {
-  const contractorId = cookies().get('contractor_session')?.value
+  const cookieStore = await cookies()
+  const contractorId = cookieStore.get('contractor_session')?.value
   
   const jobs = await db.jobs.getAll()
   const clients = await db.clients.getAll()
@@ -36,7 +37,8 @@ export async function getJobs() {
 
 export async function acceptJob(formData: FormData) {
   const jobId = formData.get('jobId') as string
-  const contractorId = cookies().get('contractor_session')?.value
+  const cookieStore = await cookies()
+  const contractorId = cookieStore.get('contractor_session')?.value
 
   if (!jobId || !contractorId) return
 
@@ -135,7 +137,8 @@ export async function completeJob(formData: FormData) {
   })
 
   // Update contractor stats
-  const contractorId = cookies().get('contractor_session')?.value
+  const cookieStore = await cookies()
+  const contractorId = cookieStore.get('contractor_session')?.value
   if (contractorId) {
     const contractor = await db.users.findById(contractorId)
     if (contractor) {

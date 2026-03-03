@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers'
 import { AdminDashboardShell } from './AdminDashboardShell'
 
-function getAdminInfo(): { email: string; initials: string } {
-  const cookieStore = cookies()
+async function getAdminInfo(): Promise<{ email: string; initials: string }> {
+  const cookieStore = await cookies()
   const session = cookieStore.get('admin_session')?.value
   if (!session || session === 'true') return { email: 'Admin', initials: 'A' }
   try {
@@ -15,12 +15,12 @@ function getAdminInfo(): { email: string; initials: string } {
   }
 }
 
-export default function AdminDashboardLayout({
+export default async function AdminDashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { email, initials } = getAdminInfo()
+  const { email, initials } = await getAdminInfo()
   return (
     <AdminDashboardShell adminEmail={email} adminInitials={initials}>
       {children}

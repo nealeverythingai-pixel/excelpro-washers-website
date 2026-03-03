@@ -17,7 +17,8 @@ export async function login(prevState: any, formData: FormData) {
   )
 
   if (validUser) {
-    cookies().set('contractor_session', validUser.id, {
+    const cookieStore = await cookies()
+    cookieStore.set('contractor_session', validUser.id, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24 * 7, // 1 week
@@ -30,6 +31,7 @@ export async function login(prevState: any, formData: FormData) {
 }
 
 export async function logout() {
-  cookies().delete('contractor_session')
+  const cookieStore = await cookies()
+  cookieStore.delete('contractor_session')
   redirect('/contractor/login')
 }
