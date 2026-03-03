@@ -34,15 +34,24 @@ async function readDb(): Promise<DbSchema> {
     const existingData = JSON.parse(data);
     // Merge with INITIAL_DB to ensure new fields are present
     return { ...INITIAL_DB, ...existingData };
-  } catch (error) {
-    // If file doesn't exist, create it with initial data
-    await writeDb(INITIAL_DB);
+  } catch {
+    // File doesn't exist — try to create it, but don't crash if
+    // the filesystem is read-only (e.g. Vercel serverless)
+    try {
+      await writeDb(INITIAL_DB);
+    } catch {
+      // Read-only filesystem (Vercel) — return defaults in memory
+    }
     return INITIAL_DB;
   }
 }
 
 async function writeDb(data: DbSchema): Promise<void> {
-  await fs.writeFile(DB_PATH, JSON.stringify(data, null, 2));
+  try {
+    await fs.writeFile(DB_PATH, JSON.stringify(data, null, 2));
+  } catch {
+    console.warn('⚠️ Could not write to local DB (read-only filesystem)');
+  }
 }
 
 export const db = {
