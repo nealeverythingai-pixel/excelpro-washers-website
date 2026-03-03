@@ -261,7 +261,7 @@ Return ONLY the JSON object. No markdown, no code fences.`;
     });
 
     const message = await anthropic.messages.create({
-      model: 'claude-haiku-4-20250414',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 4096,
       system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }],
