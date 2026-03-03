@@ -6,16 +6,20 @@ import { subscribers } from '@/lib/db/subscribers';
 import { voiceCallLogs, voiceBookings } from '@/lib/db/voice';
 import { isRateLimited, getClientIp, rateLimitResponse } from '@/lib/rateLimit';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
-
 export async function POST(request: NextRequest) {
   try {
     // ── Auth: verify admin session ──────────────────────────────────
     const adminSession = request.cookies.get('admin_session');
     if (!adminSession) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // ── Check required API keys ─────────────────────────────────
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return NextResponse.json(
+        { error: 'ANTHROPIC_API_KEY is not configured. Add it to your Vercel environment variables.' },
+        { status: 500 }
+      );
     }
 
     // ── Rate limiting: 5 req/min per IP (dashboard page, not chat) ──
@@ -252,6 +256,10 @@ Return a JSON object with this EXACT schema:
 
 Return ONLY the JSON object. No markdown, no code fences.`;
 
+    const anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    });
+
     const message = await anthropic.messages.create({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 4096,
@@ -288,8 +296,9 @@ Return ONLY the JSON object. No markdown, no code fences.`;
     });
   } catch (error) {
     console.error('Business Insights Error:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to generate business insights' },
+      { error: `Analytics failed: ${message}` },
       { status: 500 }
     )
   }
