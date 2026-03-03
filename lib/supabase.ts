@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://wloqmcksdjanhiatvnsz.supabase.co';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'placeholder-key-for-build';
 
-if (!supabaseKey) {
-  console.warn('⚠️ SUPABASE_ANON_KEY is not set — Supabase features will not work');
+if (supabaseKey === 'placeholder-key-for-build') {
+  console.warn('⚠️ SUPABASE_ANON_KEY is not set — Supabase features will not work at runtime');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey);

@@ -1,29 +1,21 @@
 'use server';
 
-import { readDb, writeDb } from '@/lib/db';
+import { db } from '@/lib/db';
 import { ContractorApplication, User } from '@/lib/types';
 
 export async function getContractorApplications(): Promise<ContractorApplication[]> {
-  const data = await readDb();
-  return (data.contractorApplications || []).sort(
-    (a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
-  );
+  return db.contractorApplications.getAll();
 }
 
 export async function getContractors(): Promise<User[]> {
-  const data = await readDb();
-  return data.users.filter(u => u.role === 'CONTRACTOR');
+  const users = await db.users.getAll();
+  return users.filter(u => u.role === 'CONTRACTOR');
 }
 
 export async function approveApplication(applicationId: string): Promise<{ success: boolean; error?: string }> {
   try {
-    const data = await readDb();
-    if (!data.contractorApplications) return { success: false, error: 'No applications found' };
-
-    const appIndex = data.contractorApplications.findIndex(a => a.id === applicationId);
-    if (appIndex === -1) return { success: false, error: 'Application not found' };
-
-    const application = data.contractorApplications[appIndex];
+    const application = await db.contractorApplications.findById(applicationId);
+    if (!application) return { success: false, error: 'Application not found' };
     if (application.status !== 'pending') return { success: false, error: 'Application is not pending' };
 
     // Generate a 6-digit PIN
@@ -31,7 +23,7 @@ export async function approveApplication(applicationId: string): Promise<{ succe
 
     // Create user account
     const newUser: User = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: Math.random().toString(36).substring(2, 11),
       name: `${application.firstName} ${application.lastName}`,
       email: application.email,
       pin,
@@ -43,17 +35,14 @@ export async function approveApplication(applicationId: string): Promise<{ succe
       totalEarnings: 0,
     };
 
-    data.users.push(newUser);
+    await db.users.create(newUser);
 
     // Update application status
-    data.contractorApplications[appIndex] = {
-      ...application,
+    await db.contractorApplications.update(applicationId, {
       status: 'approved',
       reviewedAt: new Date().toISOString(),
       reviewedBy: 'admin',
-    };
-
-    await writeDb(data);
+    });
 
     console.log(`✅ Contractor approved: ${newUser.name} (${newUser.email}) — PIN: ${pin}`);
 
@@ -66,24 +55,16 @@ export async function approveApplication(applicationId: string): Promise<{ succe
 
 export async function rejectApplication(applicationId: string, reason: string): Promise<{ success: boolean; error?: string }> {
   try {
-    const data = await readDb();
-    if (!data.contractorApplications) return { success: false, error: 'No applications found' };
-
-    const appIndex = data.contractorApplications.findIndex(a => a.id === applicationId);
-    if (appIndex === -1) return { success: false, error: 'Application not found' };
-
-    const application = data.contractorApplications[appIndex];
+    const application = await db.contractorApplications.findById(applicationId);
+    if (!application) return { success: false, error: 'Application not found' };
     if (application.status !== 'pending') return { success: false, error: 'Application is not pending' };
 
-    data.contractorApplications[appIndex] = {
-      ...application,
+    await db.contractorApplications.update(applicationId, {
       status: 'rejected',
       rejectionReason: reason,
       reviewedAt: new Date().toISOString(),
       reviewedBy: 'admin',
-    };
-
-    await writeDb(data);
+    });
 
     console.log(`❌ Contractor rejected: ${application.firstName} ${application.lastName} — Reason: ${reason}`);
 
@@ -96,12 +77,10 @@ export async function rejectApplication(applicationId: string, reason: string): 
 
 export async function toggleContractorActive(userId: string): Promise<{ success: boolean; error?: string }> {
   try {
-    const data = await readDb();
-    const index = data.users.findIndex(u => u.id === userId && u.role === 'CONTRACTOR');
-    if (index === -1) return { success: false, error: 'Contractor not found' };
+    const user = await db.users.findById(userId);
+    if (!user || user.role !== 'CONTRACTOR') return { success: false, error: 'Contractor not found' };
 
-    data.users[index].active = !data.users[index].active;
-    await writeDb(data);
+    await db.users.update(userId, { active: !user.active });
 
     return { success: true };
   } catch (error) {

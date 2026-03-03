@@ -1,375 +1,559 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { DbSchema, Client, Job, Quote, Invoice, Request, User, AIFeedback, ScheduledFollowUp, CallLog, CallConversation, ContractorApplication } from './types';
+/**
+ * Supabase-backed database layer
+ * Replaces the JSON file DB with Supabase PostgreSQL
+ */
 
-// Store data in a hidden file in the project root
-const DB_PATH = path.join(process.cwd(), '.local-db.json');
+import { supabase } from './supabase';
+import {
+  Client, Job, Quote, Invoice, Request, User,
+  AIFeedback, ScheduledFollowUp, CallLog, CallConversation,
+  ContractorApplication
+} from './types';
 
-const INITIAL_DB: DbSchema = {
-  clients: [
-      {
-          id: '1',
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john@example.com',
-          phone: '(555) 123-4567',
-          address: '123 Main St, Springfield',
-          createdAt: new Date().toISOString(),
-      }
-  ],
-  jobs: [],
-  quotes: [],
-  invoices: [],
-  requests: [],
-  users: [],
-  contractorApplications: [],
-  scheduledFollowUps: [],
-  callLogs: [],
-  callConversations: []
-};
+// ── Helper: camelCase ↔ snake_case mappers ──────────────────────────
 
-async function readDb(): Promise<DbSchema> {
-  try {
-    const data = await fs.readFile(DB_PATH, 'utf-8');
-    const existingData = JSON.parse(data);
-    // Merge with INITIAL_DB to ensure new fields are present
-    return { ...INITIAL_DB, ...existingData };
-  } catch {
-    // File doesn't exist — try to create it, but don't crash if
-    // the filesystem is read-only (e.g. Vercel serverless)
-    try {
-      await writeDb(INITIAL_DB);
-    } catch {
-      // Read-only filesystem (Vercel) — return defaults in memory
-    }
-    return INITIAL_DB;
-  }
+function clientFromRow(row: any): Client {
+  return {
+    id: row.id,
+    firstName: row.first_name,
+    lastName: row.last_name,
+    companyName: row.company_name || undefined,
+    email: row.email,
+    phone: row.phone,
+    address: row.address,
+    createdAt: row.created_at,
+  };
 }
 
-async function writeDb(data: DbSchema): Promise<void> {
-  try {
-    await fs.writeFile(DB_PATH, JSON.stringify(data, null, 2));
-  } catch {
-    console.warn('⚠️ Could not write to local DB (read-only filesystem)');
-  }
+function clientToRow(client: Partial<Client>) {
+  const row: any = {};
+  if (client.firstName !== undefined) row.first_name = client.firstName;
+  if (client.lastName !== undefined) row.last_name = client.lastName;
+  if (client.companyName !== undefined) row.company_name = client.companyName;
+  if (client.email !== undefined) row.email = client.email;
+  if (client.phone !== undefined) row.phone = client.phone;
+  if (client.address !== undefined) row.address = client.address;
+  return row;
 }
+
+function jobFromRow(row: any): Job {
+  return {
+    id: row.id,
+    clientId: row.client_id,
+    title: row.title,
+    description: row.description || undefined,
+    status: row.status,
+    startDate: row.start_date,
+    endDate: row.end_date || undefined,
+    total: Number(row.total),
+    createdAt: row.created_at,
+    proofOfWork: row.proof_of_work || undefined,
+    contractorNotes: row.contractor_notes || undefined,
+    contractorId: row.contractor_id || undefined,
+    assignedContractorId: row.assigned_contractor_id || undefined,
+    assignedContractorName: row.assigned_contractor_name || undefined,
+    assignedAt: row.assigned_at || undefined,
+    contractorEarnings: row.contractor_earnings != null ? Number(row.contractor_earnings) : undefined,
+    availableToContractors: row.available_to_contractors || undefined,
+    beforePhotos: row.before_photos || undefined,
+    beforePhotosUploadedAt: row.before_photos_uploaded_at || undefined,
+    afterPhotos: row.after_photos || undefined,
+    afterPhotosUploadedAt: row.after_photos_uploaded_at || undefined,
+    clientSignoff: row.client_signoff || undefined,
+    clientSignoffName: row.client_signoff_name || undefined,
+    clientSignoffAt: row.client_signoff_at || undefined,
+    clientSignoffNotes: row.client_signoff_notes || undefined,
+  };
+}
+
+function jobToRow(job: Partial<Job>) {
+  const row: any = {};
+  if (job.clientId !== undefined) row.client_id = job.clientId;
+  if (job.title !== undefined) row.title = job.title;
+  if (job.description !== undefined) row.description = job.description;
+  if (job.status !== undefined) row.status = job.status;
+  if (job.startDate !== undefined) row.start_date = job.startDate;
+  if (job.endDate !== undefined) row.end_date = job.endDate;
+  if (job.total !== undefined) row.total = job.total;
+  if (job.proofOfWork !== undefined) row.proof_of_work = job.proofOfWork;
+  if (job.contractorNotes !== undefined) row.contractor_notes = job.contractorNotes;
+  if (job.contractorId !== undefined) row.contractor_id = job.contractorId;
+  if (job.assignedContractorId !== undefined) row.assigned_contractor_id = job.assignedContractorId;
+  if (job.assignedContractorName !== undefined) row.assigned_contractor_name = job.assignedContractorName;
+  if (job.assignedAt !== undefined) row.assigned_at = job.assignedAt;
+  if (job.contractorEarnings !== undefined) row.contractor_earnings = job.contractorEarnings;
+  if (job.availableToContractors !== undefined) row.available_to_contractors = job.availableToContractors;
+  if (job.beforePhotos !== undefined) row.before_photos = job.beforePhotos;
+  if (job.beforePhotosUploadedAt !== undefined) row.before_photos_uploaded_at = job.beforePhotosUploadedAt;
+  if (job.afterPhotos !== undefined) row.after_photos = job.afterPhotos;
+  if (job.afterPhotosUploadedAt !== undefined) row.after_photos_uploaded_at = job.afterPhotosUploadedAt;
+  if (job.clientSignoff !== undefined) row.client_signoff = job.clientSignoff;
+  if (job.clientSignoffName !== undefined) row.client_signoff_name = job.clientSignoffName;
+  if (job.clientSignoffAt !== undefined) row.client_signoff_at = job.clientSignoffAt;
+  if (job.clientSignoffNotes !== undefined) row.client_signoff_notes = job.clientSignoffNotes;
+  return row;
+}
+
+function quoteFromRow(row: any): Quote {
+  return {
+    id: row.id,
+    clientId: row.client_id,
+    title: row.title,
+    items: row.items || [],
+    total: Number(row.total),
+    status: row.status,
+    createdAt: row.created_at,
+    salesRepId: row.sales_rep_id || undefined,
+  };
+}
+
+function quoteToRow(quote: Partial<Quote>) {
+  const row: any = {};
+  if (quote.clientId !== undefined) row.client_id = quote.clientId;
+  if (quote.title !== undefined) row.title = quote.title;
+  if (quote.items !== undefined) row.items = quote.items;
+  if (quote.total !== undefined) row.total = quote.total;
+  if (quote.status !== undefined) row.status = quote.status;
+  if (quote.salesRepId !== undefined) row.sales_rep_id = quote.salesRepId;
+  return row;
+}
+
+function invoiceFromRow(row: any): Invoice {
+  return {
+    id: row.id,
+    clientId: row.client_id,
+    jobId: row.job_id || undefined,
+    total: Number(row.total),
+    status: row.status,
+    dueDate: row.due_date,
+    createdAt: row.created_at,
+  };
+}
+
+function invoiceToRow(invoice: Partial<Invoice>) {
+  const row: any = {};
+  if (invoice.clientId !== undefined) row.client_id = invoice.clientId;
+  if (invoice.jobId !== undefined) row.job_id = invoice.jobId;
+  if (invoice.total !== undefined) row.total = invoice.total;
+  if (invoice.status !== undefined) row.status = invoice.status;
+  if (invoice.dueDate !== undefined) row.due_date = invoice.dueDate;
+  return row;
+}
+
+function userFromRow(row: any): User {
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    pin: row.pin,
+    role: row.role,
+    active: row.active,
+    phone: row.phone || undefined,
+    skills: row.skills || undefined,
+    completedJobs: row.completed_jobs || undefined,
+    totalEarnings: row.total_earnings != null ? Number(row.total_earnings) : undefined,
+  };
+}
+
+function userToRow(user: Partial<User>) {
+  const row: any = {};
+  if (user.name !== undefined) row.name = user.name;
+  if (user.email !== undefined) row.email = user.email;
+  if (user.pin !== undefined) row.pin = user.pin;
+  if (user.role !== undefined) row.role = user.role;
+  if (user.active !== undefined) row.active = user.active;
+  if (user.phone !== undefined) row.phone = user.phone;
+  if (user.skills !== undefined) row.skills = user.skills;
+  if (user.completedJobs !== undefined) row.completed_jobs = user.completedJobs;
+  if (user.totalEarnings !== undefined) row.total_earnings = user.totalEarnings;
+  return row;
+}
+
+function requestFromRow(row: any): Request {
+  return {
+    id: row.id,
+    name: row.name || undefined,
+    firstName: row.first_name || undefined,
+    lastName: row.last_name || undefined,
+    email: row.email,
+    phone: row.phone,
+    address: row.address || undefined,
+    service: row.service || undefined,
+    message: row.message || undefined,
+    details: row.details || undefined,
+    status: row.status,
+    createdAt: row.created_at,
+    aiScore: row.ai_score || undefined,
+    aiCategory: row.ai_category || undefined,
+    aiReasoning: row.ai_reasoning || undefined,
+    estimatedValue: row.estimated_value != null ? Number(row.estimated_value) : undefined,
+    nextFollowUp: row.next_follow_up || undefined,
+  };
+}
+
+function requestToRow(request: Partial<Request>) {
+  const row: any = {};
+  if (request.name !== undefined) row.name = request.name;
+  if (request.firstName !== undefined) row.first_name = request.firstName;
+  if (request.lastName !== undefined) row.last_name = request.lastName;
+  if (request.email !== undefined) row.email = request.email;
+  if (request.phone !== undefined) row.phone = request.phone;
+  if (request.address !== undefined) row.address = request.address;
+  if (request.service !== undefined) row.service = request.service;
+  if (request.message !== undefined) row.message = request.message;
+  if (request.details !== undefined) row.details = request.details;
+  if (request.status !== undefined) row.status = request.status;
+  if (request.aiScore !== undefined) row.ai_score = request.aiScore;
+  if (request.aiCategory !== undefined) row.ai_category = request.aiCategory;
+  if (request.aiReasoning !== undefined) row.ai_reasoning = request.aiReasoning;
+  if (request.estimatedValue !== undefined) row.estimated_value = request.estimatedValue;
+  if (request.nextFollowUp !== undefined) row.next_follow_up = request.nextFollowUp;
+  return row;
+}
+
+function contractorAppFromRow(row: any): ContractorApplication {
+  return {
+    id: row.id,
+    firstName: row.first_name,
+    lastName: row.last_name,
+    email: row.email,
+    phone: row.phone,
+    address: row.address,
+    city: row.city,
+    postalCode: row.postal_code,
+    emergencyContact: row.emergency_contact,
+    emergencyPhone: row.emergency_phone,
+    skills: row.skills || [],
+    experience: row.experience,
+    hasOwnEquipment: row.has_own_equipment,
+    vehicleType: row.vehicle_type,
+    insuranceProvider: row.insurance_provider,
+    policyNumber: row.policy_number,
+    insuranceExpiry: row.insurance_expiry,
+    insuranceFileName: row.insurance_file_name,
+    insuranceFileData: row.insurance_file_data,
+    agreedToTermsAt: row.agreed_to_terms_at,
+    signature: row.signature,
+    status: row.status,
+    reviewedBy: row.reviewed_by || undefined,
+    reviewedAt: row.reviewed_at || undefined,
+    rejectionReason: row.rejection_reason || undefined,
+    submittedAt: row.submitted_at,
+  };
+}
+
+function contractorAppToRow(app: Partial<ContractorApplication>) {
+  const row: any = {};
+  if (app.firstName !== undefined) row.first_name = app.firstName;
+  if (app.lastName !== undefined) row.last_name = app.lastName;
+  if (app.email !== undefined) row.email = app.email;
+  if (app.phone !== undefined) row.phone = app.phone;
+  if (app.address !== undefined) row.address = app.address;
+  if (app.city !== undefined) row.city = app.city;
+  if (app.postalCode !== undefined) row.postal_code = app.postalCode;
+  if (app.emergencyContact !== undefined) row.emergency_contact = app.emergencyContact;
+  if (app.emergencyPhone !== undefined) row.emergency_phone = app.emergencyPhone;
+  if (app.skills !== undefined) row.skills = app.skills;
+  if (app.experience !== undefined) row.experience = app.experience;
+  if (app.hasOwnEquipment !== undefined) row.has_own_equipment = app.hasOwnEquipment;
+  if (app.vehicleType !== undefined) row.vehicle_type = app.vehicleType;
+  if (app.insuranceProvider !== undefined) row.insurance_provider = app.insuranceProvider;
+  if (app.policyNumber !== undefined) row.policy_number = app.policyNumber;
+  if (app.insuranceExpiry !== undefined) row.insurance_expiry = app.insuranceExpiry;
+  if (app.insuranceFileName !== undefined) row.insurance_file_name = app.insuranceFileName;
+  if (app.insuranceFileData !== undefined) row.insurance_file_data = app.insuranceFileData;
+  if (app.agreedToTermsAt !== undefined) row.agreed_to_terms_at = app.agreedToTermsAt;
+  if (app.signature !== undefined) row.signature = app.signature;
+  if (app.status !== undefined) row.status = app.status;
+  if (app.reviewedBy !== undefined) row.reviewed_by = app.reviewedBy;
+  if (app.reviewedAt !== undefined) row.reviewed_at = app.reviewedAt;
+  if (app.rejectionReason !== undefined) row.rejection_reason = app.rejectionReason;
+  return row;
+}
+
+// ── Database export ─────────────────────────────────────────────────
 
 export const db = {
+  // ── CLIENTS ─────────────────────────────────────────────────────
   clients: {
-    getAll: async () => (await readDb()).clients,
-    getById: async (id: string) => (await readDb()).clients.find(c => c.id === id),
-    findById: async (id: string) => (await readDb()).clients.find(c => c.id === id),
-    create: async (client: Omit<Client, 'id' | 'createdAt'>) => {
-      const data = await readDb();
-      const newClient: Client = {
-        ...client,
-        id: Math.random().toString(36).substring(2, 11),
-        createdAt: new Date().toISOString()
-      };
-      data.clients.push(newClient);
-      await writeDb(data);
-      return newClient;
+    getAll: async (): Promise<Client[]> => {
+      const { data, error } = await supabase.from('clients').select('*').order('created_at', { ascending: false });
+      if (error) { console.error('db.clients.getAll:', error.message); return []; }
+      return (data || []).map(clientFromRow);
     },
-    update: async (id: string, updates: Partial<Client>) => {
-        const data = await readDb();
-        const index = data.clients.findIndex(c => c.id === id);
-        if (index === -1) return null;
-        data.clients[index] = { ...data.clients[index], ...updates };
-        await writeDb(data);
-        return data.clients[index];
+    getById: async (id: string): Promise<Client | undefined> => {
+      const { data, error } = await supabase.from('clients').select('*').eq('id', id).single();
+      if (error || !data) return undefined;
+      return clientFromRow(data);
     },
-    delete: async(id: string) => {
-        const data = await readDb();
-        data.clients = data.clients.filter(c => c.id !== id);
-        await writeDb(data);
-    }
+    findById: async (id: string): Promise<Client | undefined> => {
+      const { data, error } = await supabase.from('clients').select('*').eq('id', id).single();
+      if (error || !data) return undefined;
+      return clientFromRow(data);
+    },
+    create: async (client: Omit<Client, 'id' | 'createdAt'>): Promise<Client> => {
+      const row = clientToRow(client);
+      const { data, error } = await supabase.from('clients').insert(row).select().single();
+      if (error) { console.error('db.clients.create:', error.message); throw error; }
+      return clientFromRow(data);
+    },
+    update: async (id: string, updates: Partial<Client>): Promise<Client | null> => {
+      const row = clientToRow(updates);
+      const { data, error } = await supabase.from('clients').update(row).eq('id', id).select().single();
+      if (error || !data) { console.error('db.clients.update:', error?.message); return null; }
+      return clientFromRow(data);
+    },
+    delete: async (id: string): Promise<void> => {
+      const { error } = await supabase.from('clients').delete().eq('id', id);
+      if (error) console.error('db.clients.delete:', error.message);
+    },
   },
-  jobs: {
-    getAll: async () => (await readDb()).jobs,
-    findById: async (id: string) => (await readDb()).jobs.find(j => j.id === id),
-    getByClientId: async(clientId: string) => (await readDb()).jobs.filter(j => j.clientId === clientId),
-    create: async (job: Omit<Job, 'id' | 'createdAt'>) => {
-      const data = await readDb();
-      const newJob: Job = {
-        ...job,
-        id: Math.random().toString(36).substring(2, 11),
-        createdAt: new Date().toISOString()
-      };
-      data.jobs.push(newJob);
-      await writeDb(data);
-      return newJob;
-    },
-    update: async (id: string, updates: Partial<Job>) => {
-      const data = await readDb();
-      const index = data.jobs.findIndex(j => j.id === id);
-      if (index !== -1) {
-        data.jobs[index] = { ...data.jobs[index], ...updates };
-        await writeDb(data);
-        return data.jobs[index];
-      }
-      return null;
-    },
-    delete: async (id: string) => {
-      const data = await readDb();
-      data.jobs = data.jobs.filter(j => j.id !== id);
-      await writeDb(data);
-    }
-  },
-  aiFeedback: {
-    getAll: async () => (await readDb()).aiFeedback || [],
-    getRecent: async (agentType: string, limit: number = 10) => {
-        const data = await readDb();
-        const feedback = data.aiFeedback || [];
-        return feedback
-            .filter((f: AIFeedback) => f.agentType === agentType)
-            .sort((a: AIFeedback, b: AIFeedback) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-            .slice(0, limit);
-    },
-    create: async (feedback: Omit<AIFeedback, 'id' | 'timestamp'>) => {
-        const data = await readDb();
-        if (!data.aiFeedback) data.aiFeedback = [];
-        const newFeedback: AIFeedback = {
-            ...feedback,
-            id: Math.random().toString(36).substring(2, 11),
-            timestamp: new Date().toISOString()
-        };
-        data.aiFeedback.push(newFeedback);
-        await writeDb(data);
-        return newFeedback;
-    },
-    update: async (id: string, updates: Partial<AIFeedback>) => {
-        const data = await readDb();
-        if (!data.aiFeedback) return null;
-        const index = data.aiFeedback.findIndex((f: AIFeedback) => f.id === id);
-        if (index !== -1) {
-            data.aiFeedback[index] = { ...data.aiFeedback[index], ...updates };
-            await writeDb(data);
-            return data.aiFeedback[index];
-        }
-        return null;
-    }
-  },
-  quotes: {
-    getAll: async () => (await readDb()).quotes,
-    findById: async (id: string) => (await readDb()).quotes.find(q => q.id === id),
-    getByClientId: async(clientId: string) => (await readDb()).quotes.filter(q => q.clientId === clientId),
-    create: async (quote: Omit<Quote, 'id' | 'createdAt'>) => {
-      const data = await readDb();
-      const newQuote: Quote = {
-        ...quote,
-        id: Math.random().toString(36).substring(2, 11),
-        createdAt: new Date().toISOString()
-      };
-      data.quotes.push(newQuote);
-      await writeDb(data);
-      return newQuote;
-    },
-    update: async (id: string, updates: Partial<Quote>) => {
-      const data = await readDb();
-      const index = data.quotes.findIndex(q => q.id === id);
-      if (index !== -1) {
-        data.quotes[index] = { ...data.quotes[index], ...updates };
-        await writeDb(data);
-        return data.quotes[index];
-      }
-      return null;
-    },
-    updateStatus: async (id: string, status: Quote['status']) => {
-      const data = await readDb();
-      const index = data.quotes.findIndex(q => q.id === id);
-      if (index === -1) return null;
-      data.quotes[index].status = status;
-      await writeDb(data);
-      return data.quotes[index];
-    },
-    delete: async (id: string) => {
-      const data = await readDb();
-      data.quotes = data.quotes.filter(q => q.id !== id);
-      await writeDb(data);
-    }
-  },
-  invoices: {
-    getAll: async () => (await readDb()).invoices,
-    findById: async (id: string) => (await readDb()).invoices.find(i => i.id === id),
-    getByClientId: async(clientId: string) => (await readDb()).invoices.filter(i => i.clientId === clientId),
-    create: async (invoice: Omit<Invoice, 'id' | 'createdAt'>) => {
-      const data = await readDb();
-      const newInvoice: Invoice = {
-        ...invoice,
-        id: Math.random().toString(36).substring(2, 11),
-        createdAt: new Date().toISOString()
-      };
-      data.invoices.push(newInvoice);
-      await writeDb(data);
-      return newInvoice;
-    },
-    update: async (id: string, updates: Partial<Invoice>) => {
-      const data = await readDb();
-      const index = data.invoices.findIndex(i => i.id === id);
-      if (index !== -1) {
-        data.invoices[index] = { ...data.invoices[index], ...updates };
-        await writeDb(data);
-        return data.invoices[index];
-      }
-      return null;
-    },
-    updateStatus: async (id: string, status: Invoice['status']) => {
-      const data = await readDb();
-      const index = data.invoices.findIndex(i => i.id === id);
-      if (index === -1) return null;
-      data.invoices[index].status = status;
-      await writeDb(data);
-      return data.invoices[index];
-    },
-    delete: async (id: string) => {
-      const data = await readDb();
-      data.invoices = data.invoices.filter(i => i.id !== id);
-      await writeDb(data);
-    }
-  },
-  requests: {
-    getAll: async () => (await readDb()).requests,
-    findById: async (id: string) => (await readDb()).requests.find(r => r.id === id),
-    create: async (request: Partial<Request> & { id: string }) => {
-      const data = await readDb();
-      const newRequest: Request = {
-        email: request.email || '',
-        phone: request.phone || '',
-        status: request.status || 'New',
-        createdAt: request.createdAt || new Date().toISOString(),
-        ...request
-      } as Request;
-      data.requests.push(newRequest);
-      await writeDb(data);
-      return newRequest;
-    },
-    updateStatus: async (id: string, status: Request['status']) => {
-        const data = await readDb();
-        const index = data.requests.findIndex(r => r.id === id);
-        if (index === -1) return null;
-        data.requests[index].status = status;
-        await writeDb(data);
-        return data.requests[index];
-    }
-  },
-  users: {
-    getAll: async () => (await readDb()).users,
-    findMany: async () => (await readDb()).users,
-    findById: async (id: string) => (await readDb()).users.find(u => u.id === id),
-    create: async (user: User) => {
-        const data = await readDb();
-        data.users.push(user);
-        await writeDb(data);
-        return user;
-    },
-    update: async (id: string, updates: Partial<User>) => {
-        const data = await readDb();
-        const index = data.users.findIndex(u => u.id === id);
-        if (index !== -1) {
-            data.users[index] = { ...data.users[index], ...updates };
-            await writeDb(data);
-            return data.users[index];
-        }
-        return null;
-    },
-    delete: async (id: string) => {
-        const data = await readDb();
-        data.users = data.users.filter(u => u.id !== id);
-        await writeDb(data);
-    }
-  },
-  scheduledFollowUps: {
-    getAll: async () => (await readDb()).scheduledFollowUps || [],
-    findById: async (id: string) => (await readDb()).scheduledFollowUps?.find(f => f.id === id),
-    create: async (followUp: ScheduledFollowUp) => {
-      const data = await readDb();
-      if (!data.scheduledFollowUps) {
-        data.scheduledFollowUps = [];
-      }
-      data.scheduledFollowUps.push(followUp);
-      await writeDb(data);
-      return followUp;
-    },
-    update: async (id: string, updates: Partial<ScheduledFollowUp>) => {
-      const data = await readDb();
-      if (!data.scheduledFollowUps) return null;
-      
-      const index = data.scheduledFollowUps.findIndex(f => f.id === id);
-      if (index !== -1) {
-        data.scheduledFollowUps[index] = { ...data.scheduledFollowUps[index], ...updates };
-        await writeDb(data);
-        return data.scheduledFollowUps[index];
-      }
-      return null;
-    },
-    getPending: async () => {
-      const data = await readDb();
-      if (!data.scheduledFollowUps) return [];
-      
-      const now = new Date();
-      return data.scheduledFollowUps.filter(f => 
-        !f.completed && new Date(f.scheduledFor) <= now
-      );
-    }
-  },
-  callLogs: {
-    getAll: async () => (await readDb()).callLogs || [],
-    create: async (log: Omit<CallLog, 'id'>) => {
-      const data = await readDb();
-      if (!data.callLogs) data.callLogs = [];
-      const newLog: CallLog = { ...log, id: Math.random().toString(36).substring(2, 11) };
-      data.callLogs.push(newLog);
-      await writeDb(data);
-      return newLog;
-    },
-    findByCallSid: async (callSid: string) => {
-      const data = await readDb();
-      return (data.callLogs || []).find(l => l.callSid === callSid);
-    },
-    update: async (callSid: string, updates: Partial<CallLog>) => {
-      const data = await readDb();
-      if (!data.callLogs) return null;
-      const index = data.callLogs.findIndex(l => l.callSid === callSid);
-      if (index !== -1) {
-        data.callLogs[index] = { ...data.callLogs[index], ...updates };
-        await writeDb(data);
-        return data.callLogs[index];
-      }
-      return null;
-    }
-  },
-  callConversations: {
-    get: async (callSid: string): Promise<CallConversation | undefined> => {
-      const data = await readDb();
-      return (data.callConversations || []).find(c => c.callSid === callSid);
-    },
-    upsert: async (conversation: CallConversation) => {
-      const data = await readDb();
-      if (!data.callConversations) data.callConversations = [];
-      const index = data.callConversations.findIndex(c => c.callSid === conversation.callSid);
-      if (index !== -1) {
-        data.callConversations[index] = conversation;
-      } else {
-        data.callConversations.push(conversation);
-      }
-      await writeDb(data);
-      return conversation;
-    },
-    remove: async (callSid: string) => {
-      const data = await readDb();
-      if (!data.callConversations) return;
-      data.callConversations = data.callConversations.filter(c => c.callSid !== callSid);
-      await writeDb(data);
-    },
-    cleanup: async () => {
-      const data = await readDb();
-      if (!data.callConversations) return;
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-      data.callConversations = data.callConversations.filter(c => c.lastActivity > oneHourAgo);
-      await writeDb(data);
-    }
-  }
-};
 
-// Export readDb and writeDb for direct database access
-export { readDb, writeDb };
+  // ── JOBS ────────────────────────────────────────────────────────
+  jobs: {
+    getAll: async (): Promise<Job[]> => {
+      const { data, error } = await supabase.from('jobs').select('*').order('created_at', { ascending: false });
+      if (error) { console.error('db.jobs.getAll:', error.message); return []; }
+      return (data || []).map(jobFromRow);
+    },
+    findById: async (id: string): Promise<Job | undefined> => {
+      const { data, error } = await supabase.from('jobs').select('*').eq('id', id).single();
+      if (error || !data) return undefined;
+      return jobFromRow(data);
+    },
+    getByClientId: async (clientId: string): Promise<Job[]> => {
+      const { data, error } = await supabase.from('jobs').select('*').eq('client_id', clientId).order('created_at', { ascending: false });
+      if (error) { console.error('db.jobs.getByClientId:', error.message); return []; }
+      return (data || []).map(jobFromRow);
+    },
+    create: async (job: Omit<Job, 'id' | 'createdAt'>): Promise<Job> => {
+      const row = jobToRow(job);
+      const { data, error } = await supabase.from('jobs').insert(row).select().single();
+      if (error) { console.error('db.jobs.create:', error.message); throw error; }
+      return jobFromRow(data);
+    },
+    update: async (id: string, updates: Partial<Job>): Promise<Job | null> => {
+      const row = jobToRow(updates);
+      const { data, error } = await supabase.from('jobs').update(row).eq('id', id).select().single();
+      if (error || !data) { console.error('db.jobs.update:', error?.message); return null; }
+      return jobFromRow(data);
+    },
+    delete: async (id: string): Promise<void> => {
+      const { error } = await supabase.from('jobs').delete().eq('id', id);
+      if (error) console.error('db.jobs.delete:', error.message);
+    },
+  },
+
+  // ── QUOTES ──────────────────────────────────────────────────────
+  quotes: {
+    getAll: async (): Promise<Quote[]> => {
+      const { data, error } = await supabase.from('quotes').select('*').order('created_at', { ascending: false });
+      if (error) { console.error('db.quotes.getAll:', error.message); return []; }
+      return (data || []).map(quoteFromRow);
+    },
+    findById: async (id: string): Promise<Quote | undefined> => {
+      const { data, error } = await supabase.from('quotes').select('*').eq('id', id).single();
+      if (error || !data) return undefined;
+      return quoteFromRow(data);
+    },
+    getByClientId: async (clientId: string): Promise<Quote[]> => {
+      const { data, error } = await supabase.from('quotes').select('*').eq('client_id', clientId).order('created_at', { ascending: false });
+      if (error) { console.error('db.quotes.getByClientId:', error.message); return []; }
+      return (data || []).map(quoteFromRow);
+    },
+    create: async (quote: Omit<Quote, 'id' | 'createdAt'>): Promise<Quote> => {
+      const row = quoteToRow(quote);
+      const { data, error } = await supabase.from('quotes').insert(row).select().single();
+      if (error) { console.error('db.quotes.create:', error.message); throw error; }
+      return quoteFromRow(data);
+    },
+    update: async (id: string, updates: Partial<Quote>): Promise<Quote | null> => {
+      const row = quoteToRow(updates);
+      const { data, error } = await supabase.from('quotes').update(row).eq('id', id).select().single();
+      if (error || !data) { console.error('db.quotes.update:', error?.message); return null; }
+      return quoteFromRow(data);
+    },
+    updateStatus: async (id: string, status: Quote['status']): Promise<Quote | null> => {
+      const { data, error } = await supabase.from('quotes').update({ status }).eq('id', id).select().single();
+      if (error || !data) return null;
+      return quoteFromRow(data);
+    },
+    delete: async (id: string): Promise<void> => {
+      const { error } = await supabase.from('quotes').delete().eq('id', id);
+      if (error) console.error('db.quotes.delete:', error.message);
+    },
+  },
+
+  // ── INVOICES ────────────────────────────────────────────────────
+  invoices: {
+    getAll: async (): Promise<Invoice[]> => {
+      const { data, error } = await supabase.from('invoices').select('*').order('created_at', { ascending: false });
+      if (error) { console.error('db.invoices.getAll:', error.message); return []; }
+      return (data || []).map(invoiceFromRow);
+    },
+    findById: async (id: string): Promise<Invoice | undefined> => {
+      const { data, error } = await supabase.from('invoices').select('*').eq('id', id).single();
+      if (error || !data) return undefined;
+      return invoiceFromRow(data);
+    },
+    getByClientId: async (clientId: string): Promise<Invoice[]> => {
+      const { data, error } = await supabase.from('invoices').select('*').eq('client_id', clientId).order('created_at', { ascending: false });
+      if (error) { console.error('db.invoices.getByClientId:', error.message); return []; }
+      return (data || []).map(invoiceFromRow);
+    },
+    create: async (invoice: Omit<Invoice, 'id' | 'createdAt'>): Promise<Invoice> => {
+      const row = invoiceToRow(invoice);
+      const { data, error } = await supabase.from('invoices').insert(row).select().single();
+      if (error) { console.error('db.invoices.create:', error.message); throw error; }
+      return invoiceFromRow(data);
+    },
+    update: async (id: string, updates: Partial<Invoice>): Promise<Invoice | null> => {
+      const row = invoiceToRow(updates);
+      const { data, error } = await supabase.from('invoices').update(row).eq('id', id).select().single();
+      if (error || !data) { console.error('db.invoices.update:', error?.message); return null; }
+      return invoiceFromRow(data);
+    },
+    updateStatus: async (id: string, status: Invoice['status']): Promise<Invoice | null> => {
+      const { data, error } = await supabase.from('invoices').update({ status }).eq('id', id).select().single();
+      if (error || !data) return null;
+      return invoiceFromRow(data);
+    },
+    delete: async (id: string): Promise<void> => {
+      const { error } = await supabase.from('invoices').delete().eq('id', id);
+      if (error) console.error('db.invoices.delete:', error.message);
+    },
+  },
+
+  // ── REQUESTS ────────────────────────────────────────────────────
+  requests: {
+    getAll: async (): Promise<Request[]> => {
+      const { data, error } = await supabase.from('requests').select('*').order('created_at', { ascending: false });
+      if (error) { console.error('db.requests.getAll:', error.message); return []; }
+      return (data || []).map(requestFromRow);
+    },
+    findById: async (id: string): Promise<Request | undefined> => {
+      const { data, error } = await supabase.from('requests').select('*').eq('id', id).single();
+      if (error || !data) return undefined;
+      return requestFromRow(data);
+    },
+    create: async (request: Partial<Request> & { id: string }): Promise<Request> => {
+      const row: any = { id: request.id, ...requestToRow(request) };
+      if (request.createdAt) row.created_at = request.createdAt;
+      const { data, error } = await supabase.from('requests').insert(row).select().single();
+      if (error) { console.error('db.requests.create:', error.message); throw error; }
+      return requestFromRow(data);
+    },
+    updateStatus: async (id: string, status: Request['status']): Promise<Request | null> => {
+      const { data, error } = await supabase.from('requests').update({ status }).eq('id', id).select().single();
+      if (error || !data) return null;
+      return requestFromRow(data);
+    },
+  },
+
+  // ── USERS ───────────────────────────────────────────────────────
+  users: {
+    getAll: async (): Promise<User[]> => {
+      const { data, error } = await supabase.from('users').select('*');
+      if (error) { console.error('db.users.getAll:', error.message); return []; }
+      return (data || []).map(userFromRow);
+    },
+    findMany: async (): Promise<User[]> => {
+      const { data, error } = await supabase.from('users').select('*');
+      if (error) { console.error('db.users.findMany:', error.message); return []; }
+      return (data || []).map(userFromRow);
+    },
+    findById: async (id: string): Promise<User | undefined> => {
+      const { data, error } = await supabase.from('users').select('*').eq('id', id).single();
+      if (error || !data) return undefined;
+      return userFromRow(data);
+    },
+    create: async (user: User): Promise<User> => {
+      const row = { id: user.id, ...userToRow(user) };
+      const { data, error } = await supabase.from('users').insert(row).select().single();
+      if (error) { console.error('db.users.create:', error.message); throw error; }
+      return userFromRow(data);
+    },
+    update: async (id: string, updates: Partial<User>): Promise<User | null> => {
+      const row = userToRow(updates);
+      const { data, error } = await supabase.from('users').update(row).eq('id', id).select().single();
+      if (error || !data) { console.error('db.users.update:', error?.message); return null; }
+      return userFromRow(data);
+    },
+    delete: async (id: string): Promise<void> => {
+      const { error } = await supabase.from('users').delete().eq('id', id);
+      if (error) console.error('db.users.delete:', error.message);
+    },
+  },
+
+  // ── AI FEEDBACK ─────────────────────────────────────────────────
+  // AI feedback is managed via Supabase in lib/db/leads.ts (leadAIFeedback)
+  aiFeedback: {
+    getAll: async (): Promise<AIFeedback[]> => [],
+    getRecent: async (_agentType: string, _limit: number = 10): Promise<AIFeedback[]> => [],
+    create: async (feedback: Omit<AIFeedback, 'id' | 'timestamp'>): Promise<AIFeedback> => {
+      return { ...feedback, id: crypto.randomUUID(), timestamp: new Date().toISOString() } as AIFeedback;
+    },
+    update: async (_id: string, _updates: Partial<AIFeedback>): Promise<AIFeedback | null> => null,
+  },
+
+  // ── SCHEDULED FOLLOW-UPS ────────────────────────────────────────
+  // Follow-ups are managed via Supabase in lib/db/leads.ts (leadFollowUps)
+  scheduledFollowUps: {
+    getAll: async (): Promise<ScheduledFollowUp[]> => [],
+    findById: async (_id: string): Promise<ScheduledFollowUp | undefined> => undefined,
+    create: async (followUp: ScheduledFollowUp): Promise<ScheduledFollowUp> => followUp,
+    update: async (_id: string, _updates: Partial<ScheduledFollowUp>): Promise<ScheduledFollowUp | null> => null,
+    getPending: async (): Promise<ScheduledFollowUp[]> => [],
+  },
+
+  // ── CALL LOGS ───────────────────────────────────────────────────
+  // Call logs are managed via Supabase in lib/db/voice.ts (voiceCallLogs)
+  callLogs: {
+    getAll: async (): Promise<CallLog[]> => [],
+    create: async (log: Omit<CallLog, 'id'>): Promise<CallLog> => {
+      return { ...log, id: crypto.randomUUID() } as CallLog;
+    },
+    findByCallSid: async (_callSid: string): Promise<CallLog | undefined> => undefined,
+    update: async (_callSid: string, _updates: Partial<CallLog>): Promise<CallLog | null> => null,
+  },
+
+  // ── CALL CONVERSATIONS ─────────────────────────────────────────
+  // Conversations are managed via Supabase in lib/db/voice.ts (callConversations)
+  callConversations: {
+    get: async (_callSid: string): Promise<CallConversation | undefined> => undefined,
+    upsert: async (conversation: CallConversation): Promise<CallConversation> => conversation,
+    remove: async (_callSid: string): Promise<void> => {},
+    cleanup: async (): Promise<void> => {},
+  },
+
+  // ── CONTRACTOR APPLICATIONS ─────────────────────────────────────
+  contractorApplications: {
+    getAll: async (): Promise<ContractorApplication[]> => {
+      const { data, error } = await supabase.from('contractor_applications').select('*').order('submitted_at', { ascending: false });
+      if (error) { console.error('db.contractorApplications.getAll:', error.message); return []; }
+      return (data || []).map(contractorAppFromRow);
+    },
+    findById: async (id: string): Promise<ContractorApplication | undefined> => {
+      const { data, error } = await supabase.from('contractor_applications').select('*').eq('id', id).single();
+      if (error || !data) return undefined;
+      return contractorAppFromRow(data);
+    },
+    create: async (app: ContractorApplication): Promise<ContractorApplication> => {
+      const row = { id: app.id, ...contractorAppToRow(app), submitted_at: app.submittedAt };
+      const { data, error } = await supabase.from('contractor_applications').insert(row).select().single();
+      if (error) { console.error('db.contractorApplications.create:', error.message); throw error; }
+      return contractorAppFromRow(data);
+    },
+    update: async (id: string, updates: Partial<ContractorApplication>): Promise<ContractorApplication | null> => {
+      const row = contractorAppToRow(updates);
+      const { data, error } = await supabase.from('contractor_applications').update(row).eq('id', id).select().single();
+      if (error || !data) { console.error('db.contractorApplications.update:', error?.message); return null; }
+      return contractorAppFromRow(data);
+    },
+    findByEmail: async (email: string): Promise<ContractorApplication | undefined> => {
+      const { data, error } = await supabase.from('contractor_applications').select('*').eq('email', email).single();
+      if (error || !data) return undefined;
+      return contractorAppFromRow(data);
+    },
+  },
+};

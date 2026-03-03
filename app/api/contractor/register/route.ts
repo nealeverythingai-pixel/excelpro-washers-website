@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readDb, writeDb } from '@/lib/db';
+import { db } from '@/lib/db';
 import { ContractorApplication } from '@/lib/types';
 
 export async function POST(request: NextRequest) {
@@ -66,13 +66,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for existing application or user with same email
-    const data = await readDb();
-    const existingUser = data.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const allUsers = await db.users.getAll();
+    const existingUser = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
     if (existingUser) {
       return NextResponse.json({ error: 'An account with this email already exists. Please log in instead.' }, { status: 409 });
     }
 
-    const existingApp = (data.contractorApplications || []).find(
+    const allApps = await db.contractorApplications.getAll();
+    const existingApp = allApps.find(
       a => a.email.toLowerCase() === email.toLowerCase() && a.status === 'pending'
     );
     if (existingApp) {
@@ -110,11 +111,7 @@ export async function POST(request: NextRequest) {
       submittedAt: new Date().toISOString(),
     };
 
-    if (!data.contractorApplications) {
-      data.contractorApplications = [];
-    }
-    data.contractorApplications.push(application);
-    await writeDb(data);
+    await db.contractorApplications.create(application);
 
     console.log(`📋 New contractor application from ${firstName} ${lastName} (${email})`);
 
