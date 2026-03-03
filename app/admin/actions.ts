@@ -51,7 +51,7 @@ export async function logout() {
   redirect('/admin/login')
 }
 
-export function getAdminSession(): { email: string; role: string; id: string; loginAt: string } | null {
+export async function getAdminSession(): Promise<{ email: string; role: string; id: string; loginAt: string } | null> {
   try {
     const session = cookies().get('admin_session')?.value
     if (!session) return null
