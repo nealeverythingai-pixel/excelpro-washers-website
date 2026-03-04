@@ -23,6 +23,7 @@ export interface LeadRequest {
   ai_reasoning?: string;
   estimated_value?: number;
   next_follow_up?: string;
+  source?: 'website' | 'yelp' | 'google' | 'thumbtack' | 'referral' | 'phone' | 'other';
   created_at: string;
 }
 
@@ -97,6 +98,7 @@ export const leadRequests = {
       ai_reasoning: request.ai_reasoning || null,
       estimated_value: request.estimated_value ?? null,
       next_follow_up: request.next_follow_up || null,
+      source: request.source || null,
     };
     const { data, error } = await supabase
       .from('lead_requests')
