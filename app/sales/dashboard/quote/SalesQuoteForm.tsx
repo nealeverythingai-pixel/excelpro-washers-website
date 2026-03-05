@@ -21,22 +21,65 @@ const WINDOW_TYPES = [
   {
     key: 'small', label: 'Small', weight: 1.0, size: '~2ft × 2ft',
     locations: 'Bathroom, basement, garage, transom above doors',
-    visual: ['┌──────┐', '│      │', '│  ▪   │', '│      │', '└──────┘'],
+    visual: [
+      '╔══════════╗',
+      '║ ╭──────╮ ║',
+      '║ │ ·  · │ ║',
+      '║ │      │ ║',
+      '║ │  ··  │ ║',
+      '║ ╰──────╯ ║',
+      '║     ○     ║',
+      '╚══════════╝',
+    ],
   },
   {
     key: 'medium', label: 'Medium', weight: 1.5, size: '~3ft × 4ft',
     locations: 'Bedrooms, kitchen, dining room, hallways',
-    visual: ['┌─────┬─────┐', '│     │     │', '│     │     │', '│     │     │', '└─────┴─────┘'],
+    visual: [
+      '╔═════════╦═════════╗',
+      '║ ╭─────╮ ║ ╭─────╮ ║',
+      '║ │     │ ║ │     │ ║',
+      '║ │     │ ║ │     │ ║',
+      '║ │     │ ║ │     │ ║',
+      '║ │     │ ║ │     │ ║',
+      '║ ╰─────╯ ║ ╰─────╯ ║',
+      '║    ○     ║    ○     ║',
+      '╚═════════╩═════════╝',
+    ],
   },
   {
     key: 'large', label: 'Large', weight: 2.5, size: '~5ft × 6ft+',
     locations: 'Living room picture windows, sliding patio doors, bay windows',
-    visual: ['┌───────────────┐', '│               │', '│     ☀         │', '│        ⌂      │', '│               │', '└───────────────┘'],
+    visual: [
+      '╔══════════════════════════════╗',
+      '║ ╭────────╮╭────────╮╭────────╮ ║',
+      '║ │        ││   ☀    ││        │ ║',
+      '║ │        ││  ╱ ╲   ││        │ ║',
+      '║ │        ││ ╱   ╲  ││        │ ║',
+      '║ │        ││╱ ⌂   ╲ ││        │ ║',
+      '║ │        ││────────││        │ ║',
+      '║ │        ││  ≋≋≋   ││        │ ║',
+      '║ ╰────────╯╰────────╯╰────────╯ ║',
+      '╚══════════════════════════════╝',
+    ],
   },
   {
     key: 'specialty', label: 'Specialty', weight: 3.5, size: 'Varies',
     locations: 'Skylights, French doors, floor-to-ceiling, arched/custom shapes',
-    visual: ['      ╱╲', '    ╱    ╲', '  ╱        ╲', '  │  ┌──┐  │', '  │  │  │  │', '  └──┴──┴──┘'],
+    visual: [
+      '        ╭───────╮',
+      '      ╭─┤  ☆    ├─╮',
+      '    ╭─┤  ╲     ╱  ├─╮',
+      '    │  ╲   ╲ ╱   ╱  │',
+      '    │   ╰───┼───╯   │',
+      '  ╔═╧═══════╧═══════╧═╗',
+      '  ║ ╭──────╮ ╭──────╮ ║',
+      '  ║ │      │ │      │ ║',
+      '  ║ │      │ │      │ ║',
+      '  ║ │      │ │      │ ║',
+      '  ║ ╰──────╯ ╰──────╯ ║',
+      '  ╚═══════════════════╝',
+    ],
   },
 ] as const
 
@@ -260,18 +303,24 @@ export function SalesQuoteForm() {
         {showGuide && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {WINDOW_TYPES.map(wt => (
-              <div key={wt.key} className="border border-gray-200 rounded-xl p-3 bg-gradient-to-b from-gray-50 to-white">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <p className="font-semibold text-gray-900 text-sm">{wt.label}</p>
-                    <p className="text-xs text-gray-500">{wt.size}</p>
+              <div key={wt.key} className="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm">
+                {/* Visual */}
+                <div className="bg-gradient-to-b from-sky-50 to-blue-50 px-3 py-4 flex items-center justify-center border-b border-gray-100">
+                  <pre className="text-[9px] sm:text-[10px] leading-[1.3] text-sky-800/70 font-mono select-none whitespace-pre">{wt.visual.join('\n')}</pre>
+                </div>
+                {/* Info */}
+                <div className="p-3 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-bold text-gray-900 text-sm">{wt.label}</p>
+                      <p className="text-[11px] text-gray-400 font-medium">{wt.size}</p>
+                    </div>
+                    <span className="text-xs font-bold bg-green-100 text-green-700 px-2.5 py-1 rounded-lg">{wt.weight}×</span>
                   </div>
-                  <span className="text-xs font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full">{wt.weight}×</span>
+                  <p className="text-[11px] text-gray-500 leading-relaxed">
+                    <span className="font-semibold text-gray-600">📍 </span>{wt.locations}
+                  </p>
                 </div>
-                <div className="bg-white border border-dashed border-gray-200 rounded-lg p-2.5 mb-2 flex items-center justify-center">
-                  <pre className="text-[10px] leading-tight text-gray-500 font-mono select-none">{wt.visual.join('\n')}</pre>
-                </div>
-                <p className="text-[11px] text-gray-500"><span className="font-medium text-gray-700">Find: </span>{wt.locations}</p>
               </div>
             ))}
           </div>
