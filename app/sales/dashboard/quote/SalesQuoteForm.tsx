@@ -18,70 +18,158 @@ const TIER_CONFIG = {
 const STORY_MULTIPLIERS: Record<number, number> = { 1: 1.0, 2: 1.15, 3: 1.30 }
 
 const WINDOW_TYPES = [
-  {
-    key: 'small', label: 'Small', weight: 1.0, size: '~2ft × 2ft',
-    locations: 'Bathroom, basement, garage, transom above doors',
-    visual: [
-      '╔══════════╗',
-      '║ ╭──────╮ ║',
-      '║ │ ·  · │ ║',
-      '║ │      │ ║',
-      '║ │  ··  │ ║',
-      '║ ╰──────╯ ║',
-      '║     ○     ║',
-      '╚══════════╝',
-    ],
-  },
-  {
-    key: 'medium', label: 'Medium', weight: 1.5, size: '~3ft × 4ft',
-    locations: 'Bedrooms, kitchen, dining room, hallways',
-    visual: [
-      '╔═════════╦═════════╗',
-      '║ ╭─────╮ ║ ╭─────╮ ║',
-      '║ │     │ ║ │     │ ║',
-      '║ │     │ ║ │     │ ║',
-      '║ │     │ ║ │     │ ║',
-      '║ │     │ ║ │     │ ║',
-      '║ ╰─────╯ ║ ╰─────╯ ║',
-      '║    ○     ║    ○     ║',
-      '╚═════════╩═════════╝',
-    ],
-  },
-  {
-    key: 'large', label: 'Large', weight: 2.5, size: '~5ft × 6ft+',
-    locations: 'Living room picture windows, sliding patio doors, bay windows',
-    visual: [
-      '╔══════════════════════════════╗',
-      '║ ╭────────╮╭────────╮╭────────╮ ║',
-      '║ │        ││   ☀    ││        │ ║',
-      '║ │        ││  ╱ ╲   ││        │ ║',
-      '║ │        ││ ╱   ╲  ││        │ ║',
-      '║ │        ││╱ ⌂   ╲ ││        │ ║',
-      '║ │        ││────────││        │ ║',
-      '║ │        ││  ≋≋≋   ││        │ ║',
-      '║ ╰────────╯╰────────╯╰────────╯ ║',
-      '╚══════════════════════════════╝',
-    ],
-  },
-  {
-    key: 'specialty', label: 'Specialty', weight: 3.5, size: 'Varies',
-    locations: 'Skylights, French doors, floor-to-ceiling, arched/custom shapes',
-    visual: [
-      '        ╭───────╮',
-      '      ╭─┤  ☆    ├─╮',
-      '    ╭─┤  ╲     ╱  ├─╮',
-      '    │  ╲   ╲ ╱   ╱  │',
-      '    │   ╰───┼───╯   │',
-      '  ╔═╧═══════╧═══════╧═╗',
-      '  ║ ╭──────╮ ╭──────╮ ║',
-      '  ║ │      │ │      │ ║',
-      '  ║ │      │ │      │ ║',
-      '  ║ │      │ │      │ ║',
-      '  ║ ╰──────╯ ╰──────╯ ║',
-      '  ╚═══════════════════╝',
-    ],
-  },
+  { key: 'small', label: 'Small', weight: 1.0, size: '~2ft × 2ft', locations: 'Bathroom, basement, garage, transom above doors' },
+  { key: 'medium', label: 'Medium', weight: 1.5, size: '~3ft × 4ft', locations: 'Bedrooms, kitchen, dining room, hallways' },
+  { key: 'large', label: 'Large', weight: 2.5, size: '~5ft × 6ft+', locations: 'Living room picture windows, sliding patio doors, bay windows' },
+  { key: 'specialty', label: 'Specialty', weight: 3.5, size: 'Varies', locations: 'Skylights, French doors, floor-to-ceiling, arched/custom shapes' },
 ] as const
+
+// SVG Window Illustrations
+function WindowSVG({ type }: { type: string }) {
+  const glass = '#dbeafe'
+  const glassStroke = '#93c5fd'
+  const frame = '#78716c'
+  const frameDark = '#57534e'
+  const sill = '#a8a29e'
+  const sky = '#e0f2fe'
+  const sun = '#fbbf24'
+
+  if (type === 'small') {
+    return (
+      <svg viewBox="0 0 100 100" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        {/* Wall */}
+        <rect x="0" y="0" width="100" height="100" rx="4" fill="#f5f5f4" />
+        {/* Outer frame */}
+        <rect x="18" y="12" width="64" height="72" rx="3" fill={frameDark} />
+        {/* Glass pane */}
+        <rect x="22" y="16" width="56" height="64" rx="2" fill={glass} stroke={glassStroke} strokeWidth="0.5" />
+        {/* Frosted pattern */}
+        <circle cx="38" cy="38" r="6" fill="white" opacity="0.4" />
+        <circle cx="58" cy="52" r="4" fill="white" opacity="0.3" />
+        <circle cx="48" cy="44" r="8" fill="white" opacity="0.25" />
+        {/* Cross divider */}
+        <line x1="50" y1="16" x2="50" y2="80" stroke={frame} strokeWidth="2.5" />
+        <line x1="22" y1="48" x2="78" y2="48" stroke={frame} strokeWidth="2.5" />
+        {/* Handle */}
+        <rect x="54" y="44" width="8" height="3" rx="1" fill={sill} />
+        {/* Sill */}
+        <rect x="14" y="82" width="72" height="6" rx="2" fill={sill} />
+      </svg>
+    )
+  }
+
+  if (type === 'medium') {
+    return (
+      <svg viewBox="0 0 120 140" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        {/* Wall */}
+        <rect x="0" y="0" width="120" height="140" rx="4" fill="#f5f5f4" />
+        {/* Outer frame */}
+        <rect x="10" y="10" width="100" height="112" rx="3" fill={frameDark} />
+        {/* Left pane */}
+        <rect x="14" y="14" width="44" height="104" rx="2" fill={glass} stroke={glassStroke} strokeWidth="0.5" />
+        {/* Right pane */}
+        <rect x="62" y="14" width="44" height="104" rx="2" fill={glass} stroke={glassStroke} strokeWidth="0.5" />
+        {/* Horizontal divider left */}
+        <line x1="14" y1="66" x2="58" y2="66" stroke={frame} strokeWidth="2.5" />
+        {/* Horizontal divider right */}
+        <line x1="62" y1="66" x2="106" y2="66" stroke={frame} strokeWidth="2.5" />
+        {/* Center mullion */}
+        <rect x="56" y="10" width="8" height="112" rx="1" fill={frameDark} />
+        {/* Left handle */}
+        <rect x="46" y="62" width="8" height="3" rx="1" fill={sill} />
+        {/* Right handle */}
+        <rect x="66" y="62" width="8" height="3" rx="1" fill={sill} />
+        {/* Sky reflection top-left */}
+        <circle cx="30" cy="36" r="8" fill="white" opacity="0.3" />
+        <circle cx="82" cy="36" r="6" fill="white" opacity="0.25" />
+        {/* Sill */}
+        <rect x="6" y="120" width="108" height="8" rx="3" fill={sill} />
+        <rect x="8" y="126" width="104" height="4" rx="2" fill="#d6d3d1" />
+      </svg>
+    )
+  }
+
+  if (type === 'large') {
+    return (
+      <svg viewBox="0 0 180 120" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        {/* Wall */}
+        <rect x="0" y="0" width="180" height="120" rx="4" fill="#f5f5f4" />
+        {/* Outer frame */}
+        <rect x="8" y="8" width="164" height="96" rx="3" fill={frameDark} />
+        {/* Left pane */}
+        <rect x="12" y="12" width="50" height="88" rx="2" fill={glass} stroke={glassStroke} strokeWidth="0.5" />
+        {/* Center pane (picture window) */}
+        <rect x="65" y="12" width="50" height="88" rx="2" fill={sky} stroke={glassStroke} strokeWidth="0.5" />
+        {/* Right pane */}
+        <rect x="118" y="12" width="50" height="88" rx="2" fill={glass} stroke={glassStroke} strokeWidth="0.5" />
+        {/* Mullions */}
+        <rect x="60" y="8" width="7" height="96" rx="1" fill={frameDark} />
+        <rect x="113" y="8" width="7" height="96" rx="1" fill={frameDark} />
+        {/* Sun in center pane */}
+        <circle cx="90" cy="32" r="10" fill={sun} />
+        <line x1="90" y1="18" x2="90" y2="22" stroke={sun} strokeWidth="2" strokeLinecap="round" />
+        <line x1="90" y1="42" x2="90" y2="46" stroke={sun} strokeWidth="2" strokeLinecap="round" />
+        <line x1="76" y1="32" x2="80" y2="32" stroke={sun} strokeWidth="2" strokeLinecap="round" />
+        <line x1="100" y1="32" x2="104" y2="32" stroke={sun} strokeWidth="2" strokeLinecap="round" />
+        {/* Landscape in center */}
+        <path d="M65 75 L80 55 L90 65 L100 50 L115 75 Z" fill="#86efac" opacity="0.6" />
+        <path d="M65 80 L75 68 L90 78 L105 65 L115 80 Z" fill="#4ade80" opacity="0.5" />
+        {/* House silhouette */}
+        <path d="M83 75 L90 65 L97 75 Z" fill="#a3a3a3" opacity="0.4" />
+        <rect x="86" y="70" width="8" height="10" rx="0.5" fill="#a3a3a3" opacity="0.4" />
+        {/* Reflection on side panes */}
+        <circle cx="37" cy="40" r="10" fill="white" opacity="0.25" />
+        <circle cx="143" cy="40" r="8" fill="white" opacity="0.2" />
+        {/* Sill */}
+        <rect x="4" y="102" width="172" height="8" rx="3" fill={sill} />
+        <rect x="6" y="108" width="168" height="4" rx="2" fill="#d6d3d1" />
+      </svg>
+    )
+  }
+
+  // Specialty — arched top with French doors
+  return (
+    <svg viewBox="0 0 140 160" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      {/* Wall */}
+      <rect x="0" y="0" width="140" height="160" rx="4" fill="#f5f5f4" />
+      {/* Arched top */}
+      <path d="M20 60 Q20 14 70 14 Q120 14 120 60 L120 60 L20 60 Z" fill={frameDark} />
+      <path d="M24 60 Q24 18 70 18 Q116 18 116 60 L116 60 L24 60 Z" fill={sky} />
+      {/* Arch spokes (fan pattern) */}
+      <line x1="70" y1="58" x2="38" y2="30" stroke={frame} strokeWidth="1.5" />
+      <line x1="70" y1="58" x2="52" y2="22" stroke={frame} strokeWidth="1.5" />
+      <line x1="70" y1="58" x2="70" y2="18" stroke={frame} strokeWidth="1.5" />
+      <line x1="70" y1="58" x2="88" y2="22" stroke={frame} strokeWidth="1.5" />
+      <line x1="70" y1="58" x2="102" y2="30" stroke={frame} strokeWidth="1.5" />
+      {/* Arch base bar */}
+      <rect x="20" y="56" width="100" height="6" rx="1" fill={frameDark} />
+      {/* Door frame */}
+      <rect x="20" y="60" width="100" height="88" rx="2" fill={frameDark} />
+      {/* Left door */}
+      <rect x="24" y="64" width="44" height="80" rx="2" fill={glass} stroke={glassStroke} strokeWidth="0.5" />
+      {/* Right door */}
+      <rect x="72" y="64" width="44" height="80" rx="2" fill={glass} stroke={glassStroke} strokeWidth="0.5" />
+      {/* Left door grid */}
+      <line x1="24" y1="92" x2="68" y2="92" stroke={frame} strokeWidth="1.5" />
+      <line x1="24" y1="118" x2="68" y2="118" stroke={frame} strokeWidth="1.5" />
+      <line x1="46" y1="64" x2="46" y2="144" stroke={frame} strokeWidth="1.5" />
+      {/* Right door grid */}
+      <line x1="72" y1="92" x2="116" y2="92" stroke={frame} strokeWidth="1.5" />
+      <line x1="72" y1="118" x2="116" y2="118" stroke={frame} strokeWidth="1.5" />
+      <line x1="94" y1="64" x2="94" y2="144" stroke={frame} strokeWidth="1.5" />
+      {/* Door handles */}
+      <circle cx="64" cy="106" r="2.5" fill={sill} />
+      <circle cx="76" cy="106" r="2.5" fill={sill} />
+      {/* Reflections */}
+      <circle cx="36" cy="78" r="6" fill="white" opacity="0.3" />
+      <circle cx="100" cy="80" r="5" fill="white" opacity="0.25" />
+      {/* Star in arch */}
+      <circle cx="70" cy="36" r="4" fill={sun} opacity="0.6" />
+      {/* Sill */}
+      <rect x="16" y="146" width="108" height="6" rx="2" fill={sill} />
+    </svg>
+  )
+}
 
 const ADDONS = [
   { key: 'interiorWindows', label: 'Interior Windows', price: 80, emoji: '🪟' },
@@ -301,23 +389,25 @@ export function SalesQuoteForm() {
         </button>
 
         {showGuide && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {WINDOW_TYPES.map(wt => (
               <div key={wt.key} className="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm">
-                {/* Visual */}
-                <div className="bg-gradient-to-b from-sky-50 to-blue-50 px-3 py-4 flex items-center justify-center border-b border-gray-100">
-                  <pre className="text-[9px] sm:text-[10px] leading-[1.3] text-sky-800/70 font-mono select-none whitespace-pre">{wt.visual.join('\n')}</pre>
+                {/* SVG Illustration */}
+                <div className="bg-gradient-to-b from-sky-50 to-blue-50 p-3 flex items-center justify-center border-b border-gray-100">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28">
+                    <WindowSVG type={wt.key} />
+                  </div>
                 </div>
                 {/* Info */}
-                <div className="p-3 space-y-1.5">
+                <div className="p-2.5 space-y-1">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-bold text-gray-900 text-sm">{wt.label}</p>
-                      <p className="text-[11px] text-gray-400 font-medium">{wt.size}</p>
+                      <p className="text-[10px] text-gray-400 font-medium">{wt.size}</p>
                     </div>
-                    <span className="text-xs font-bold bg-green-100 text-green-700 px-2.5 py-1 rounded-lg">{wt.weight}×</span>
+                    <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-lg">{wt.weight}×</span>
                   </div>
-                  <p className="text-[11px] text-gray-500 leading-relaxed">
+                  <p className="text-[10px] text-gray-500 leading-snug">
                     <span className="font-semibold text-gray-600">📍 </span>{wt.locations}
                   </p>
                 </div>
