@@ -2,84 +2,91 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, PlusCircle, LogOut, FileText, User } from 'lucide-react'
+import { LayoutDashboard, PlusCircle, LogOut } from 'lucide-react'
 import { logout } from '../actions'
+import { cn } from '@/lib/utils'
+
+const NAV_ITEMS = [
+  { name: 'Home', href: '/sales/dashboard', icon: LayoutDashboard },
+  { name: 'New Quote', href: '/sales/dashboard/quote', icon: PlusCircle, accent: true },
+]
 
 export function SalesNav() {
   const pathname = usePathname()
 
-  const links = [
-    { name: 'Dashboard', href: '/sales/dashboard', icon: Home },
-    { name: 'New Quote', href: '/sales/dashboard/quote', icon: PlusCircle },
-  ]
-
   return (
     <>
-      {/* Desktop Sidebar */}
-      <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-gray-900 text-white">
-        <div className="flex h-16 items-center justify-center border-b border-gray-800 bg-gray-900 px-4">
-            <h1 className="text-xl font-bold tracking-wider text-green-500">ExcelPro Sales</h1>
+      {/* ─── Desktop Sidebar ─── */}
+      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-gray-950 text-white z-50">
+        <div className="flex h-16 items-center gap-3 px-5 border-b border-white/10">
+          <div className="w-9 h-9 rounded-xl bg-green-500 flex items-center justify-center font-black text-sm text-white">EP</div>
+          <div>
+            <p className="font-bold text-sm leading-none">ExcelPro</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">Sales Portal</p>
+          </div>
         </div>
-        <div className="flex-1 flex flex-col overflow-y-auto pt-5 pb-4">
-            <nav className="mt-5 flex-1 space-y-1 px-2">
-                {links.map((item) => {
-                    const isActive = pathname === item.href
-                    return (
-                        <Link
-                            key={item.name}
-                            href={item.href}
-                            className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                                isActive ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                            }`}
-                        >
-                            <item.icon className="mr-3 h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-300" />
-                            {item.name}
-                        </Link>
-                    )
-                })}
-            </nav>
-        </div>
-        <div className="flex-shrink-0 flex border-t border-gray-800 p-4">
-             <form action={logout} className="w-full">
-                <button type="submit" className="flex-shrink-0 w-full group block">
-                    <div className="flex items-center">
-                        <div>
-                           <LogOut className="inline-block h-5 w-5 text-gray-400" />
-                        </div>
-                        <div className="ml-3">
-                            <p className="text-sm font-medium text-white group-hover:text-gray-300">Sign Out</p>
-                        </div>
-                    </div>
-                </button>
-            </form>
-        </div>
-      </div>
 
-      {/* Mobile Bottom Nav */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 pb-safe">
-        <div className="flex justify-around items-center h-16">
-             <Link 
-                href="/sales/dashboard"
-                className={`flex flex-col items-center justify-center w-full h-full ${pathname === '/sales/dashboard' ? 'text-green-600' : 'text-gray-500'}`}
-             >
-                <Home className="h-6 w-6" />
-                <span className="text-xs mt-1">Home</span>
-             </Link>
-             <Link 
-                href="/sales/dashboard/quote"
-                 className={`flex flex-col items-center justify-center w-full h-full ${pathname === '/sales/dashboard/quote' ? 'text-green-600' : 'text-gray-500'}`}
-             >
-                <PlusCircle className="h-8 w-8 text-green-600" />
-                <span className="text-xs mt-1 font-bold">New Quote</span>
-             </Link>
-              <form action={logout} className="flex flex-col items-center justify-center w-full h-full">
-                <button type="submit" className="flex flex-col items-center justify-center text-gray-500">
-                    <LogOut className="h-6 w-6" />
-                    <span className="text-xs mt-1">Logout</span>
-                </button>
-             </form>
+        <nav className="flex-1 px-3 pt-6 space-y-1">
+          {NAV_ITEMS.map(item => {
+            const isActive = pathname === item.href
+            return (
+              <Link key={item.name} href={item.href}
+                className={cn('flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
+                  isActive
+                    ? 'bg-green-500/15 text-green-400'
+                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                )}>
+                <item.icon className={cn('w-5 h-5', isActive && 'text-green-400')} />
+                {item.name}
+                {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-green-400" />}
+              </Link>
+            )
+          })}
+        </nav>
+
+        <div className="p-3 border-t border-white/10">
+          <form action={logout}>
+            <button type="submit"
+              className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all">
+              <LogOut className="w-5 h-5" /> Sign Out
+            </button>
+          </form>
         </div>
-      </div>
+      </aside>
+
+      {/* ─── Mobile Bottom Tab Bar (glassmorphism) ─── */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/80 backdrop-blur-xl border-t border-gray-200/80"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <div className="flex items-center justify-around h-16 max-w-md mx-auto px-2">
+          {NAV_ITEMS.map(item => {
+            const isActive = pathname === item.href
+            return (
+              <Link key={item.name} href={item.href}
+                className={cn(
+                  'flex flex-col items-center justify-center gap-0.5 w-20 h-14 rounded-2xl transition-all active:scale-95',
+                  item.accent && !isActive && 'text-green-600',
+                  isActive
+                    ? 'bg-green-50 text-green-700'
+                    : !item.accent ? 'text-gray-400' : ''
+                )}>
+                <item.icon className={cn('w-6 h-6', item.accent && !isActive && 'w-7 h-7')} strokeWidth={isActive ? 2.5 : 2} />
+                <span className={cn('text-[10px] font-semibold', isActive && 'text-green-700')}>
+                  {item.name}
+                </span>
+              </Link>
+            )
+          })}
+
+          {/* Logout tab */}
+          <form action={logout}>
+            <button type="submit"
+              className="flex flex-col items-center justify-center gap-0.5 w-20 h-14 rounded-2xl text-gray-400 active:scale-95 transition-all">
+              <LogOut className="w-6 h-6" strokeWidth={2} />
+              <span className="text-[10px] font-semibold">Logout</span>
+            </button>
+          </form>
+        </div>
+      </nav>
     </>
   )
 }

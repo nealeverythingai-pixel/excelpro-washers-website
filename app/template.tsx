@@ -6,8 +6,11 @@ import { usePathname } from "next/navigation";
 export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
+  const isSales = pathname?.startsWith("/sales");
+  const isContractor = pathname?.startsWith("/contractor");
 
-  if (isAdmin) {
+  // Skip page transition for portal/app routes
+  if (isAdmin || isSales || isContractor) {
     return <>{children}</>;
   }
 

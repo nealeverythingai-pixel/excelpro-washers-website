@@ -1,26 +1,41 @@
 import { SalesNav } from './SalesNav'
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover' as const,
+}
+
 export default function SalesDashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-[100dvh] bg-gray-50 flex flex-col">
       <SalesNav />
-      
+
+      {/* Desktop offset for sidebar */}
       <div className="md:pl-64 flex flex-col flex-1">
-        {/* Top Header for Mobile Title or Desktop Info */}
-        <header className="bg-white shadow-sm md:hidden sticky top-0 z-40">
-           <div className="flex h-16 items-center justify-between px-4">
-              <h1 className="text-lg font-bold text-gray-900">ExcelPro Sales</h1>
-              <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xs">
-                 SR
-              </div>
-           </div>
+        {/* Mobile Status Bar / Header */}
+        <header className="md:hidden sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200/60"
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+          <div className="flex h-14 items-center justify-between px-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-green-500 flex items-center justify-center font-black text-xs text-white">EP</div>
+              <span className="text-base font-bold text-gray-900">Sales</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-xs font-medium text-gray-500">Online</span>
+            </div>
+          </div>
         </header>
 
-        <main className="flex-1 py-6 px-4 sm:px-6 md:py-8 mb-16 md:mb-0">
+        {/* Page Content — padded for bottom nav on mobile */}
+        <main className="flex-1 px-4 pt-4 pb-24 md:pb-8 md:px-8 md:pt-8">
           {children}
         </main>
       </div>

@@ -1,19 +1,17 @@
 import { SalesQuoteForm } from './SalesQuoteForm'
+import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 
 export default function NewQuotePage() {
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="md:flex md:items-center md:justify-between mb-8">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-            New Quote
-          </h2>
-        </div>
-      </div>
-      
-      <div className="bg-white px-4 py-5 shadow sm:rounded-lg sm:p-6">
-        <SalesQuoteForm />
-      </div>
+    <div className="max-w-2xl mx-auto">
+      {/* Back nav */}
+      <Link href="/sales/dashboard"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-700 mb-4 active:scale-95 transition-all">
+        <ArrowLeft className="w-4 h-4" /> Back
+      </Link>
+
+      <SalesQuoteForm />
     </div>
   )
 }
