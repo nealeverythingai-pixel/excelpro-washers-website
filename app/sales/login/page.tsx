@@ -11,9 +11,9 @@ export default function SalesLoginPage() {
   const [state, formAction] = useFormState(login, initialState)
 
   return (
-    <div className="flex min-h-[100dvh] flex-col justify-center bg-gray-50 px-6"
+    <div className="flex min-h-[100dvh] flex-col justify-center bg-gray-50 lg:bg-gray-100 px-6"
       style={{ paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-      <div className="w-full max-w-sm mx-auto space-y-8">
+      <div className="w-full max-w-sm mx-auto space-y-8 lg:bg-white lg:rounded-3xl lg:shadow-xl lg:border lg:border-gray-200 lg:p-10 lg:max-w-md">
         {/* Logo + Branding */}
         <div className="text-center space-y-3">
           <div className="w-16 h-16 rounded-2xl bg-green-500 flex items-center justify-center mx-auto shadow-lg shadow-green-500/20">

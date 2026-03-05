@@ -289,7 +289,7 @@ export function SalesQuoteForm() {
             <div className={cn('h-1.5 w-full rounded-full transition-colors',
               i <= activeStep ? 'bg-green-500' : 'bg-gray-200'
             )} />
-            <span className={cn('text-[9px] font-semibold hidden sm:block',
+            <span className={cn('text-[9px] lg:text-[11px] font-semibold hidden sm:block',
               i <= activeStep ? 'text-green-600' : 'text-gray-400'
             )}>{label}</span>
           </div>
@@ -301,16 +301,18 @@ export function SalesQuoteForm() {
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <input name="firstName" placeholder="First Name *" required inputMode="text" autoComplete="given-name"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 text-base focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
+              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
             <input name="lastName" placeholder="Last Name *" required inputMode="text" autoComplete="family-name"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 text-base focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
+              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
           </div>
-          <input name="email" type="email" placeholder="Email *" required autoComplete="email"
-            className="w-full rounded-xl border border-gray-200 px-4 py-3.5 text-base focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
-          <input name="phone" type="tel" placeholder="Phone *" required inputMode="tel" autoComplete="tel"
-            className="w-full rounded-xl border border-gray-200 px-4 py-3.5 text-base focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <input name="email" type="email" placeholder="Email *" required autoComplete="email"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
+            <input name="phone" type="tel" placeholder="Phone *" required inputMode="tel" autoComplete="tel"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
+          </div>
           <input name="address" placeholder="Street Address *" required autoComplete="street-address"
-            className="w-full rounded-xl border border-gray-200 px-4 py-3.5 text-base focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
+            className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
         </div>
       </StepSection>
 
@@ -320,6 +322,7 @@ export function SalesQuoteForm() {
         <p className="text-sm text-gray-500">Measure the diagonal in Google Earth (meters).</p>
 
         <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* House */}
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
@@ -327,7 +330,7 @@ export function SalesQuoteForm() {
             </label>
             <input type="number" step="0.1" min="0" inputMode="decimal" placeholder="e.g. 18.5"
               value={houseDiag} onChange={e => setHouseDiag(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 text-lg font-semibold focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50" />
+              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50" />
             {houseAreaSqft > 0 && (
               <div className="rounded-xl bg-green-50 border border-green-200 px-3 py-2.5">
                 <p className="text-sm font-semibold text-green-800">≈ {houseAreaSqft.toLocaleString()} sqft</p>
@@ -343,13 +346,14 @@ export function SalesQuoteForm() {
             </label>
             <input type="number" step="0.1" min="0" inputMode="decimal" placeholder="e.g. 12"
               value={drivewayDiag} onChange={e => setDrivewayDiag(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 text-lg font-semibold focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50" />
+              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50" />
             {drivewayAreaSqft > 0 && (
               <div className="rounded-xl bg-blue-50 border border-blue-200 px-3 py-2.5">
                 <p className="text-sm font-semibold text-blue-800">≈ {drivewayAreaSqft.toLocaleString()} sqft</p>
                 <p className="text-xs text-blue-600 mt-0.5">Pressure washing: +${drivewayAddon}</p>
               </div>
             )}
+          </div>
           </div>
 
           {/* Combined total */}
@@ -389,12 +393,12 @@ export function SalesQuoteForm() {
         </button>
 
         {showGuide && (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {WINDOW_TYPES.map(wt => (
               <div key={wt.key} className="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm">
                 {/* SVG Illustration */}
                 <div className="bg-gradient-to-b from-sky-50 to-blue-50 p-3 flex items-center justify-center border-b border-gray-100">
-                  <div className="w-24 h-24 sm:w-28 sm:h-28">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32">
                     <WindowSVG type={wt.key} />
                   </div>
                 </div>
@@ -416,8 +420,8 @@ export function SalesQuoteForm() {
           </div>
         )}
 
-        {/* Window Counters — 2 column grid with big touch targets */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* Window Counters — 2-col mobile, 4-col desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {WINDOW_TYPES.map(wt => (
             <div key={wt.key} className="bg-gray-50 border border-gray-200 rounded-2xl p-4 text-center">
               <p className="text-xs font-semibold text-gray-700 mb-2">{wt.label} <span className="text-gray-400">({wt.weight}×)</span></p>
@@ -450,10 +454,11 @@ export function SalesQuoteForm() {
       {/* ═══════ STEP 4: PACKAGE ═══════ */}
       <StepSection step={3} title="Package Selection"
         badge={`${TIER_CONFIG[tier].label} — $${basePrice}`}>
-        <div className="space-y-3">
+        <div className="space-y-3 lg:grid lg:grid-cols-3 lg:gap-4 lg:space-y-0">
           {(Object.entries(TIER_CONFIG) as [keyof typeof TIER_CONFIG, typeof TIER_CONFIG[keyof typeof TIER_CONFIG]][]).map(([key, cfg]) => (
             <button key={key} type="button" onClick={() => setTier(key)}
-              className={cn('w-full relative p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98]',
+              className={cn('w-full relative p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] lg:hover:shadow-md',
+
                 tier === key
                   ? 'border-green-500 bg-green-50 ring-2 ring-green-200 shadow-sm'
                   : 'border-gray-200 bg-white')}>
@@ -516,7 +521,8 @@ export function SalesQuoteForm() {
       <StepSection step={5} title="Quote Summary"
         badge={`$${finalPrice.toLocaleString()}`}>
 
-        {/* Breakdown */}
+        {/* Breakdown — stacked on mobile, side-by-side with total on desktop */}
+        <div className="lg:grid lg:grid-cols-2 lg:gap-6">
         <div className="space-y-2 text-sm">
           <div className="flex justify-between text-gray-600">
             <span>Base ({TIER_CONFIG[tier].label})</span><span>${basePrice}</span>
@@ -545,7 +551,8 @@ export function SalesQuoteForm() {
         </div>
 
         {/* Total */}
-        <div className="rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 p-4 text-white">
+        <div className="space-y-4">
+        <div className="rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 p-4 lg:p-6 text-white">
           <div className="flex items-end justify-between">
             <div>
               <p className="text-green-100 text-xs font-medium">Client Quote</p>
@@ -569,6 +576,8 @@ export function SalesQuoteForm() {
             {quoteCopied ? '✓ Copied!' : '📋 Copy Quote Text'}
           </button>
         </div>
+        </div>
+        </div>
       </StepSection>
 
       {/* Hidden form fields */}
@@ -583,9 +592,9 @@ export function SalesQuoteForm() {
       <input type="hidden" name="storyMultiplier" value={storyMultiplier.toFixed(2)} />
 
       {/* ─── Sticky Bottom: Price + Submit ─── */}
-      <div className="fixed bottom-16 md:bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-xl border-t border-gray-200/80 shadow-lg"
+      <div className="fixed bottom-16 lg:bottom-0 inset-x-0 lg:left-72 z-40 bg-white/90 backdrop-blur-xl border-t border-gray-200/80 shadow-lg"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-        <div className="max-w-2xl mx-auto flex items-center gap-3 px-4 py-3">
+        <div className="max-w-4xl mx-auto flex items-center gap-3 px-4 lg:px-8 py-3">
           <div className="flex-1 min-w-0">
             <p className="text-2xl font-extrabold text-gray-900 tabular-nums">${finalPrice.toLocaleString()}</p>
             <p className="text-[10px] text-gray-500 font-medium">Sub ${contractorPay.toLocaleString()} · You ${ownerCut.toLocaleString()}</p>
