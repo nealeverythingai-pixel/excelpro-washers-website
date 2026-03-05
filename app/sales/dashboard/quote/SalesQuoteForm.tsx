@@ -112,11 +112,10 @@ export function SalesQuoteForm() {
   const totalWindowCount = windows.small + windows.medium + windows.large + windows.specialty
   const windowFactor = 1.0 + (weightedWindows * 0.015)
 
-  // Driveway add-on (>30m diagonal)
-  let drivewayAddon = 0
-  if (drivewayDiagM > 30) {
-    drivewayAddon = 150 + 3 * (drivewayDiagM - 30)
-  }
+  // Driveway pressure washing — any measurement = pressure wash service ($0.25/sqft)
+  const drivewaySideM = drivewayDiagM / Math.SQRT2
+  const drivewayAreaSqft = Math.round((drivewaySideM * drivewaySideM) * 10.764)
+  const drivewayAddon = drivewayAreaSqft > 0 ? roundTo5(drivewayAreaSqft * 0.25) : 0
 
   // Fixed add-ons
   const fixedAddons = ADDONS.reduce((sum, a) => sum + (addons[a.key as keyof typeof addons] ? a.price : 0), 0)
@@ -138,7 +137,7 @@ export function SalesQuoteForm() {
   const getItemsJSON = () => {
     const items: { description: string; quantity: number; unitPrice: number }[] = []
     items.push({ description: `${TIER_CONFIG[tier].label} Package`, quantity: 1, unitPrice: roundTo5(basePrice * sizeMultiplier * storyMultiplier * windowFactor) })
-    if (drivewayAddon > 0) items.push({ description: 'Large Driveway Surcharge', quantity: 1, unitPrice: roundTo5(drivewayAddon) })
+    if (drivewayAddon > 0) items.push({ description: `Driveway Pressure Washing (${drivewayAreaSqft} sqft)`, quantity: 1, unitPrice: drivewayAddon })
     ADDONS.forEach(a => { if (addons[a.key as keyof typeof addons]) items.push({ description: a.label, quantity: 1, unitPrice: a.price }) })
     return JSON.stringify(items)
   }
@@ -197,8 +196,8 @@ export function SalesQuoteForm() {
             <label className="text-sm font-medium text-gray-700 flex items-center gap-1"><Ruler className="w-4 h-4" /> Driveway Diagonal (m)</label>
             <input type="number" step="0.1" min="0" placeholder="e.g. 12" value={drivewayDiag} onChange={e => setDrivewayDiag(e.target.value)}
               className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500" />
-            {drivewayDiagM > 30 && (
-              <p className="text-xs text-amber-700 font-medium">Large driveway surcharge: +${roundTo5(drivewayAddon)}</p>
+            {drivewayAreaSqft > 0 && (
+              <p className="text-xs text-green-700 font-medium">≈ {drivewayAreaSqft.toLocaleString()} sqft → Pressure washing: +${drivewayAddon}</p>
             )}
           </div>
         </div>
@@ -336,10 +335,10 @@ export function SalesQuoteForm() {
               <span className="text-sm font-bold text-gray-600">+${a.price}</span>
             </label>
           ))}
-          {drivewayDiagM > 30 && (
-            <div className="flex items-center justify-between p-3 rounded-lg border-2 border-amber-300 bg-amber-50">
-              <span className="text-sm font-medium text-amber-800">🚗 Large Driveway Surcharge (auto-applied, &gt;30m)</span>
-              <span className="text-sm font-bold text-amber-700">+${roundTo5(drivewayAddon)}</span>
+          {drivewayAddon > 0 && (
+            <div className="flex items-center justify-between p-3 rounded-lg border-2 border-green-300 bg-green-50">
+              <span className="text-sm font-medium text-green-800">🚗 Driveway Pressure Washing ({drivewayAreaSqft.toLocaleString()} sqft)</span>
+              <span className="text-sm font-bold text-green-700">+${drivewayAddon}</span>
             </div>
           )}
         </div>
@@ -368,7 +367,7 @@ export function SalesQuoteForm() {
           </div>
           {drivewayAddon > 0 && (
             <div className="flex justify-between text-gray-600">
-              <span>Driveway surcharge</span><span>+${roundTo5(drivewayAddon)}</span>
+              <span>Driveway pressure wash ({drivewayAreaSqft.toLocaleString()} sqft)</span><span>+${drivewayAddon}</span>
             </div>
           )}
           {fixedAddons > 0 && (
