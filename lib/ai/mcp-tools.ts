@@ -251,13 +251,12 @@ export const toolDefinitions: Anthropic.Messages.Tool[] = [
   // ── READ: Leads ────────────────────────────────────────────────
   {
     name: 'list_leads',
-    description: 'List all leads from the AI-qualified pipeline. Returns name, email, phone, service, aiScore, aiCategory (hot/warm/cold), status, estimatedValue, source (website/yelp/google/etc).',
+    description: 'List all leads from the AI-qualified pipeline. Returns name, email, phone, service, aiScore, aiCategory (hot/warm/cold), status, estimatedValue.',
     input_schema: {
       type: 'object' as const,
       properties: {
         category: { type: 'string', description: 'Filter by AI category: hot, warm, cold' },
         status: { type: 'string', description: 'Filter by status: new, viewed, contacted, converted, lost, archived' },
-        source: { type: 'string', description: 'Filter by lead source: website, yelp, google, thumbtack, referral, phone, other' },
       },
       required: [],
     },
@@ -459,38 +458,6 @@ export const toolDefinitions: Anthropic.Messages.Tool[] = [
       required: ['name', 'email', 'service', 'originalPrice'],
     },
   },
-
-  // ── Yelp Lead Management ───────────────────────────────────────
-  {
-    name: 'list_yelp_leads',
-    description: 'List all leads that came from Yelp. Shortcut for list_leads with source=yelp. Returns name, email, phone, service, aiScore, category, status.',
-    input_schema: {
-      type: 'object' as const,
-      properties: {
-        category: { type: 'string', description: 'Filter by AI category: hot, warm, cold' },
-        status: { type: 'string', description: 'Filter by status: new, viewed, contacted, converted, lost, archived' },
-      },
-      required: [],
-    },
-  },
-  {
-    name: 'get_yelp_lead_stats',
-    description: 'Get Yelp-specific lead statistics: total Yelp leads, breakdown by category (hot/warm/cold), conversion rate, average AI score, total estimated value.',
-    input_schema: {
-      type: 'object' as const,
-      properties: {},
-      required: [],
-    },
-  },
-  {
-    name: 'get_leads_by_source',
-    description: 'Get a breakdown of leads grouped by source (website, yelp, google, thumbtack, referral, phone). Shows count, conversion rate, and avg score per source.',
-    input_schema: {
-      type: 'object' as const,
-      properties: {},
-      required: [],
-    },
-  },
 ];
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -637,7 +604,6 @@ export async function executeTool(
         let leads = await leadRequests.getAll();
         if (input.category) leads = leads.filter(l => l.ai_category === input.category);
         if (input.status) leads = leads.filter(l => l.status === input.status);
-        if (input.source) leads = leads.filter(l => l.source === input.source);
         return { success: true, data: leads };
       }
       case 'get_lead_stats': {
@@ -647,66 +613,6 @@ export async function executeTool(
       case 'update_lead_status': {
         const updated = await leadRequests.update(input.id, { status: input.status });
         return { success: true, data: updated };
-      }
-
-      // ── Yelp Leads ───────────────────────────────────────────
-      case 'list_yelp_leads': {
-        let leads = await leadRequests.getAll();
-        leads = leads.filter(l => l.source === 'yelp');
-        if (input.category) leads = leads.filter(l => l.ai_category === input.category);
-        if (input.status) leads = leads.filter(l => l.status === input.status);
-        return { success: true, data: leads };
-      }
-      case 'get_yelp_lead_stats': {
-        const allLeads = await leadRequests.getAll();
-        const yelpLeads = allLeads.filter(l => l.source === 'yelp');
-        const hot = yelpLeads.filter(l => l.ai_category === 'hot').length;
-        const warm = yelpLeads.filter(l => l.ai_category === 'warm').length;
-        const cold = yelpLeads.filter(l => l.ai_category === 'cold').length;
-        const converted = yelpLeads.filter(l => l.status === 'converted').length;
-        const avgScore = yelpLeads.length > 0 ? Math.round(yelpLeads.reduce((s, l) => s + (l.ai_score || 0), 0) / yelpLeads.length) : 0;
-        const totalValue = yelpLeads.reduce((s, l) => s + (l.estimated_value || 0), 0);
-        return {
-          success: true,
-          data: {
-            total: yelpLeads.length,
-            hot, warm, cold,
-            converted,
-            conversionRate: yelpLeads.length > 0 ? `${Math.round((converted / yelpLeads.length) * 100)}%` : '0%',
-            avgAiScore: avgScore,
-            totalEstimatedValue: totalValue,
-          },
-        };
-      }
-      case 'get_leads_by_source': {
-        const allLeads = await leadRequests.getAll();
-        const sources = ['website', 'yelp', 'google', 'thumbtack', 'referral', 'phone', 'other'];
-        const breakdown = sources.map(src => {
-          const srcLeads = allLeads.filter(l => (l.source || 'website') === src);
-          const conv = srcLeads.filter(l => l.status === 'converted').length;
-          return {
-            source: src,
-            count: srcLeads.length,
-            converted: conv,
-            conversionRate: srcLeads.length > 0 ? `${Math.round((conv / srcLeads.length) * 100)}%` : '0%',
-            avgScore: srcLeads.length > 0 ? Math.round(srcLeads.reduce((s, l) => s + (l.ai_score || 0), 0) / srcLeads.length) : 0,
-            totalValue: srcLeads.reduce((s, l) => s + (l.estimated_value || 0), 0),
-          };
-        }).filter(s => s.count > 0);
-        // Also show untagged leads (source is null/undefined)
-        const untagged = allLeads.filter(l => !l.source);
-        if (untagged.length > 0) {
-          const conv = untagged.filter(l => l.status === 'converted').length;
-          breakdown.push({
-            source: 'untagged',
-            count: untagged.length,
-            converted: conv,
-            conversionRate: untagged.length > 0 ? `${Math.round((conv / untagged.length) * 100)}%` : '0%',
-            avgScore: Math.round(untagged.reduce((s, l) => s + (l.ai_score || 0), 0) / untagged.length),
-            totalValue: untagged.reduce((s, l) => s + (l.estimated_value || 0), 0),
-          });
-        }
-        return { success: true, data: breakdown };
       }
 
       // ── Requests ─────────────────────────────────────────────

@@ -13,6 +13,13 @@ export async function createQuote(prevState: any, formData: FormData) {
   const address = formData.get('address') as string
   const total = parseFloat(formData.get('total') as string)
   const itemsJson = formData.get('items') as string
+  const tier = formData.get('tier') as string || 'mid'
+  const contractorPay = parseFloat(formData.get('contractorPay') as string) || 0
+  const ownerCut = parseFloat(formData.get('ownerCut') as string) || 0
+  const houseAreaSqft = parseInt(formData.get('houseAreaSqft') as string) || 0
+  const windowFactor = parseFloat(formData.get('windowFactor') as string) || 1
+  const sizeMultiplier = parseFloat(formData.get('sizeMultiplier') as string) || 1
+  const storyMultiplier = parseFloat(formData.get('storyMultiplier') as string) || 1
   
   // Get Sales Rep ID from signed session
   const cookieStore = await cookies()
@@ -29,15 +36,24 @@ export async function createQuote(prevState: any, formData: FormData) {
     address
   })
 
-  // 2. Create Quote
+  // 2. Create Quote with pricing metadata
   if (client) {
       await db.quotes.create({
         clientId: client.id,
-        title: `Estimate for ${address}`,
+        title: `${tier.charAt(0).toUpperCase() + tier.slice(1)} — ${address}`,
         items: JSON.parse(itemsJson),
         total: total,
         status: 'Sent',
-        salesRepId: salesRepId 
+        salesRepId: salesRepId,
+        notes: JSON.stringify({
+          tier,
+          contractorPay,
+          ownerCut,
+          houseAreaSqft,
+          windowFactor,
+          sizeMultiplier,
+          storyMultiplier,
+        }),
       })
   }
 

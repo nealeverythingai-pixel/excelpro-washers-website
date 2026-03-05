@@ -68,6 +68,7 @@ export interface Quote {
   status: 'Draft' | 'Sent' | 'Approved' | 'Accepted' | 'Converted';
   createdAt: string;
   salesRepId?: string; // Sales rep who created the quote
+  notes?: string; // JSON pricing metadata (tier, splits, multipliers)
 }
 
 export interface Invoice {

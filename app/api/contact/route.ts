@@ -54,7 +54,6 @@ export async function POST(request: NextRequest) {
       ai_category: result.score.category,
       ai_reasoning: result.score.reasoning,
       estimated_value: result.score.estimatedValue,
-      source: 'website',
     });
 
     // 3. Create quote in Supabase

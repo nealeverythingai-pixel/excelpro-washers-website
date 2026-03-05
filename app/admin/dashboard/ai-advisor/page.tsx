@@ -13,13 +13,13 @@ interface Message {
 
 const SUGGESTED_QUESTIONS = [
   "Show me today's pipeline overview",
-  "Show me all my Yelp leads",
+  "List all my hot leads",
   "How's my revenue this month?",
-  "Compare lead sources — which channel converts best?",
   "Email a spring cleaning promo to my top clients",
-  "How many Yelp leads came in this week?",
-  "Convert my top lead to a client",
   "Send a follow-up to leads who haven't booked",
+  "Convert my top lead to a client",
+  "Show me unpaid invoices",
+  "Send a 15% off offer to cold leads"
 ];
 
 // ── Simple markdown → HTML renderer ─────────────────────────────────

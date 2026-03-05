@@ -104,6 +104,7 @@ function quoteFromRow(row: any): Quote {
     status: row.status,
     createdAt: row.created_at,
     salesRepId: row.sales_rep_id || undefined,
+    notes: row.notes || undefined,
   };
 }
 
@@ -115,6 +116,7 @@ function quoteToRow(quote: Partial<Quote>) {
   if (quote.total !== undefined) row.total = quote.total;
   if (quote.status !== undefined) row.status = quote.status;
   if (quote.salesRepId !== undefined) row.sales_rep_id = quote.salesRepId;
+  if (quote.notes !== undefined) row.notes = quote.notes;
   return row;
 }
 
