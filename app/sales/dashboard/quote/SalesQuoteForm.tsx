@@ -112,17 +112,24 @@ export function SalesQuoteForm() {
   const totalWindowCount = windows.small + windows.medium + windows.large + windows.specialty
   const windowFactor = 1.0 + (weightedWindows * 0.015)
 
+  // House washing — any measurement = house wash service ($0.25/sqft)
+  const houseWashCost = houseAreaSqft > 0 ? roundTo5(houseAreaSqft * 0.25) : 0
+
   // Driveway pressure washing — any measurement = pressure wash service ($0.25/sqft)
   const drivewaySideM = drivewayDiagM / Math.SQRT2
   const drivewayAreaSqft = Math.round((drivewaySideM * drivewaySideM) * 10.764)
   const drivewayAddon = drivewayAreaSqft > 0 ? roundTo5(drivewayAreaSqft * 0.25) : 0
+
+  // Combined washing total
+  const totalWashSqft = houseAreaSqft + drivewayAreaSqft
+  const totalWashCost = houseWashCost + drivewayAddon
 
   // Fixed add-ons
   const fixedAddons = ADDONS.reduce((sum, a) => sum + (addons[a.key as keyof typeof addons] ? a.price : 0), 0)
 
   // FINAL PRICE
   const basePrice = TIER_CONFIG[tier].base
-  const rawPrice = basePrice * sizeMultiplier * storyMultiplier * windowFactor + drivewayAddon + fixedAddons
+  const rawPrice = basePrice * sizeMultiplier * storyMultiplier * windowFactor + houseWashCost + drivewayAddon + fixedAddons
   const finalPrice = roundTo5(rawPrice)
 
   // 70/30 split
@@ -137,7 +144,8 @@ export function SalesQuoteForm() {
   const getItemsJSON = () => {
     const items: { description: string; quantity: number; unitPrice: number }[] = []
     items.push({ description: `${TIER_CONFIG[tier].label} Package`, quantity: 1, unitPrice: roundTo5(basePrice * sizeMultiplier * storyMultiplier * windowFactor) })
-    if (drivewayAddon > 0) items.push({ description: `Driveway Pressure Washing (${drivewayAreaSqft} sqft)`, quantity: 1, unitPrice: drivewayAddon })
+    if (houseWashCost > 0) items.push({ description: `House Washing (${houseAreaSqft.toLocaleString()} sqft)`, quantity: 1, unitPrice: houseWashCost })
+    if (drivewayAddon > 0) items.push({ description: `Driveway Pressure Washing (${drivewayAreaSqft.toLocaleString()} sqft)`, quantity: 1, unitPrice: drivewayAddon })
     ADDONS.forEach(a => { if (addons[a.key as keyof typeof addons]) items.push({ description: a.label, quantity: 1, unitPrice: a.price }) })
     return JSON.stringify(items)
   }
@@ -189,7 +197,7 @@ export function SalesQuoteForm() {
             <input type="number" step="0.1" min="0" placeholder="e.g. 18.5" value={houseDiag} onChange={e => setHouseDiag(e.target.value)}
               className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500" />
             {houseAreaSqft > 0 && (
-              <p className="text-xs text-green-700 font-medium">≈ {houseAreaSqft.toLocaleString()} sq ft &nbsp;|&nbsp; Size multiplier: {sizeMultiplier.toFixed(2)}×</p>
+              <p className="text-xs text-green-700 font-medium">≈ {houseAreaSqft.toLocaleString()} sqft → House washing: +${houseWashCost} &nbsp;|&nbsp; Size: {sizeMultiplier.toFixed(2)}×</p>
             )}
           </div>
           <div className="space-y-1">
@@ -335,10 +343,22 @@ export function SalesQuoteForm() {
               <span className="text-sm font-bold text-gray-600">+${a.price}</span>
             </label>
           ))}
+          {houseWashCost > 0 && (
+            <div className="flex items-center justify-between p-3 rounded-lg border-2 border-green-300 bg-green-50">
+              <span className="text-sm font-medium text-green-800">🏠 House Washing ({houseAreaSqft.toLocaleString()} sqft)</span>
+              <span className="text-sm font-bold text-green-700">+${houseWashCost}</span>
+            </div>
+          )}
           {drivewayAddon > 0 && (
             <div className="flex items-center justify-between p-3 rounded-lg border-2 border-green-300 bg-green-50">
               <span className="text-sm font-medium text-green-800">🚗 Driveway Pressure Washing ({drivewayAreaSqft.toLocaleString()} sqft)</span>
               <span className="text-sm font-bold text-green-700">+${drivewayAddon}</span>
+            </div>
+          )}
+          {totalWashCost > 0 && (
+            <div className="flex items-center justify-between p-3 rounded-lg border-2 border-emerald-400 bg-emerald-50">
+              <span className="text-sm font-bold text-emerald-900">💧 Total Washing ({totalWashSqft.toLocaleString()} sqft)</span>
+              <span className="text-sm font-extrabold text-emerald-700">${totalWashCost}</span>
             </div>
           )}
         </div>
@@ -365,9 +385,19 @@ export function SalesQuoteForm() {
           <div className="flex justify-between text-gray-600">
             <span>Window factor ({weightedWindows.toFixed(1)} weighted)</span><span>×{windowFactor.toFixed(2)}</span>
           </div>
+          {houseWashCost > 0 && (
+            <div className="flex justify-between text-gray-600">
+              <span>House washing ({houseAreaSqft.toLocaleString()} sqft)</span><span>+${houseWashCost}</span>
+            </div>
+          )}
           {drivewayAddon > 0 && (
             <div className="flex justify-between text-gray-600">
               <span>Driveway pressure wash ({drivewayAreaSqft.toLocaleString()} sqft)</span><span>+${drivewayAddon}</span>
+            </div>
+          )}
+          {totalWashCost > 0 && (
+            <div className="flex justify-between font-medium text-emerald-700">
+              <span>Total washing ({totalWashSqft.toLocaleString()} sqft)</span><span>${totalWashCost}</span>
             </div>
           )}
           {fixedAddons > 0 && (
