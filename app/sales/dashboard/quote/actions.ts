@@ -15,7 +15,8 @@ export async function createQuote(prevState: any, formData: FormData) {
   const itemsJson = formData.get('items') as string
   const tier = formData.get('tier') as string || 'mid'
   const contractorPay = parseFloat(formData.get('contractorPay') as string) || 0
-  const ownerCut = parseFloat(formData.get('ownerCut') as string) || 0
+  const repCommission = parseFloat(formData.get('repCommission') as string) || 0
+  const leadSource = (formData.get('leadSource') as string) || 'given'
   const houseAreaSqft = parseInt(formData.get('houseAreaSqft') as string) || 0
   const windowFactor = parseFloat(formData.get('windowFactor') as string) || 1
   const sizeMultiplier = parseFloat(formData.get('sizeMultiplier') as string) || 1
@@ -48,7 +49,8 @@ export async function createQuote(prevState: any, formData: FormData) {
         notes: JSON.stringify({
           tier,
           contractorPay,
-          ownerCut,
+          repCommission,
+          leadSource,
           houseAreaSqft,
           windowFactor,
           sizeMultiplier,

@@ -23,9 +23,9 @@ export default async function SalesDashboard() {
   const todayQuotes = quotes.filter(q => q.createdAt.startsWith(todayStr))
   const totalRevenue = quotes.reduce((sum, q) => sum + q.total, 0)
   const todayRevenue = todayQuotes.reduce((s, q) => s + q.total, 0)
-  const totalOwnerCut = quotes.reduce((sum, q) => {
+  const totalRepCommission = quotes.reduce((sum, q) => {
     const meta = parseMeta(q.notes)
-    return sum + (meta?.ownerCut || q.total * 0.30)
+    return sum + (meta?.repCommission || q.total * 0.10)
   }, 0)
   const avgQuoteValue = quotes.length > 0 ? Math.round(totalRevenue / quotes.length) : 0
 
@@ -90,8 +90,8 @@ export default async function SalesDashboard() {
               <DollarSign className="w-4 h-4 text-blue-600" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-gray-900">${Math.round(totalOwnerCut).toLocaleString()}</p>
-          <p className="text-xs text-gray-500 font-medium mt-0.5">Owner Cut (30%)</p>
+          <p className="text-2xl font-bold text-gray-900">${Math.round(totalRepCommission).toLocaleString()}</p>
+          <p className="text-xs text-gray-500 font-medium mt-0.5">Your Commission</p>
         </div>
         <div className="rounded-2xl bg-white p-4 shadow-sm border border-gray-100">
           <div className="flex items-center gap-2 mb-2">
@@ -164,7 +164,7 @@ export default async function SalesDashboard() {
                         <p className="text-base font-bold text-gray-900">${quote.total.toLocaleString()}</p>
                         {meta?.contractorPay && (
                           <p className="text-[10px] text-gray-400 mt-0.5">
-                            Sub ${meta.contractorPay.toLocaleString()} · You ${meta.ownerCut.toLocaleString()}
+                            Your {meta.leadSource === 'produced' ? '15' : '10'}%: ${(meta.repCommission || Math.round(quote.total * 0.10)).toLocaleString()}
                           </p>
                         )}
                       </div>
@@ -184,7 +184,7 @@ export default async function SalesDashboard() {
                     <th className="text-left px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Date</th>
                     <th className="text-right px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Total</th>
                     <th className="text-right px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Contractor</th>
-                    <th className="text-right px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Owner</th>
+                    <th className="text-right px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Commission</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -195,7 +195,8 @@ export default async function SalesDashboard() {
                     const tierBadge = TIER_BADGES[tierKey]
                     const clientName = client ? `${client.firstName} ${client.lastName}` : 'Unknown'
                     const contractorPay = meta?.contractorPay || Math.round(quote.total * 0.70)
-                    const ownerCut = meta?.ownerCut || Math.round(quote.total * 0.30)
+                    const repCommission = meta?.repCommission || Math.round(quote.total * 0.10)
+                    const leadSource = meta?.leadSource || 'given'
 
                     return (
                       <tr key={quote.id} className="hover:bg-gray-50/50 transition-colors">
@@ -223,7 +224,7 @@ export default async function SalesDashboard() {
                         </td>
                         <td className="px-5 py-3.5 text-right font-bold text-gray-900">${quote.total.toLocaleString()}</td>
                         <td className="px-5 py-3.5 text-right text-gray-500">${contractorPay.toLocaleString()}</td>
-                        <td className="px-5 py-3.5 text-right font-semibold text-green-700">${ownerCut.toLocaleString()}</td>
+                        <td className="px-5 py-3.5 text-right font-semibold text-green-700">${repCommission.toLocaleString()} <span className="text-xs font-normal text-gray-400">({leadSource === 'produced' ? '15' : '10'}%)</span></td>
                       </tr>
                     )
                   })}

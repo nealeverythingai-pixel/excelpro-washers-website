@@ -195,6 +195,7 @@ export function SalesQuoteForm() {
   const [addons, setAddons] = useState({ interiorWindows: false, deckPatio: false, roofMoss: false })
   const [showGuide, setShowGuide] = useState(false)
   const [quoteCopied, setQuoteCopied] = useState(false)
+  const [leadSource, setLeadSource] = useState<'given' | 'produced'>('given')
 
   // --- Calculations ---
   const houseDiagM = parseFloat(houseDiag) || 0
@@ -217,8 +218,9 @@ export function SalesQuoteForm() {
   const basePrice = TIER_CONFIG[tier].base
   const rawPrice = basePrice * sizeMultiplier * storyMultiplier * windowFactor + houseWashCost + drivewayAddon + fixedAddons
   const finalPrice = roundTo5(rawPrice)
+  const commissionRate = leadSource === 'produced' ? 0.15 : 0.10
+  const repCommission = roundTo5(finalPrice * commissionRate)
   const contractorPay = roundTo5(finalPrice * 0.70)
-  const ownerCut = finalPrice - contractorPay
   const windowPct = Math.round((windowFactor - 1) * 100)
   const windowFactorLabel = windowPct === 0 ? 'No windows' : `+${windowPct}%`
 
@@ -313,6 +315,25 @@ export function SalesQuoteForm() {
           </div>
           <input name="address" placeholder="Street Address *" required autoComplete="street-address"
             className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
+
+          {/* Lead Source */}
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-700">Lead Source</label>
+            <div className="grid grid-cols-2 gap-2">
+              <button type="button" onClick={() => setLeadSource('given')}
+                className={cn('py-3 rounded-xl text-sm font-bold border-2 transition-all active:scale-95',
+                  leadSource === 'given' ? 'bg-blue-50 border-blue-500 text-blue-800 shadow-sm' : 'bg-white border-gray-200 text-gray-500')}>
+                📋 Lead Given
+                <span className="block text-xs font-normal mt-0.5 opacity-70">10% commission</span>
+              </button>
+              <button type="button" onClick={() => setLeadSource('produced')}
+                className={cn('py-3 rounded-xl text-sm font-bold border-2 transition-all active:scale-95',
+                  leadSource === 'produced' ? 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-sm' : 'bg-white border-gray-200 text-gray-500')}>
+                🎯 Self-Generated
+                <span className="block text-xs font-normal mt-0.5 opacity-70">15% commission</span>
+              </button>
+            </div>
+          </div>
         </div>
       </StepSection>
 
@@ -560,7 +581,7 @@ export function SalesQuoteForm() {
             </div>
             <div className="text-right">
               <p className="text-xs text-green-200">Sub: ${contractorPay.toLocaleString()}</p>
-              <p className="text-xs text-green-200">You: ${ownerCut.toLocaleString()}</p>
+              <p className="text-xs text-green-200">Your {Math.round(commissionRate * 100)}%: ${repCommission.toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -585,7 +606,8 @@ export function SalesQuoteForm() {
       <input type="hidden" name="items" value={getItemsJSON()} />
       <input type="hidden" name="tier" value={tier} />
       <input type="hidden" name="contractorPay" value={contractorPay} />
-      <input type="hidden" name="ownerCut" value={ownerCut} />
+      <input type="hidden" name="repCommission" value={repCommission} />
+      <input type="hidden" name="leadSource" value={leadSource} />
       <input type="hidden" name="houseAreaSqft" value={houseAreaSqft} />
       <input type="hidden" name="windowFactor" value={windowFactor} />
       <input type="hidden" name="sizeMultiplier" value={sizeMultiplier.toFixed(2)} />
@@ -596,7 +618,7 @@ export function SalesQuoteForm() {
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="text-2xl font-extrabold text-gray-900 tabular-nums">${finalPrice.toLocaleString()}</p>
-            <p className="text-xs text-gray-500 font-medium">Sub ${contractorPay.toLocaleString()} · You ${ownerCut.toLocaleString()}</p>
+            <p className="text-xs text-gray-500 font-medium">Sub ${contractorPay.toLocaleString()} · Your {Math.round(commissionRate * 100)}%: ${repCommission.toLocaleString()}</p>
           </div>
           <button type="submit"
             className="flex items-center gap-2 rounded-xl bg-green-600 hover:bg-green-700 py-3.5 px-6 text-sm font-bold text-white shadow-lg active:scale-[0.96] transition-all whitespace-nowrap">
