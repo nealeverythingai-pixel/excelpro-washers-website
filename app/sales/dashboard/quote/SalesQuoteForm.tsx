@@ -275,7 +275,7 @@ export function SalesQuoteForm() {
   }
 
   return (
-    <form action={formAction} className="space-y-3 pb-28">
+    <form action={formAction} className="space-y-3">
       {/* @ts-ignore */}
       {state?.message && (
         // @ts-ignore
@@ -591,13 +591,12 @@ export function SalesQuoteForm() {
       <input type="hidden" name="sizeMultiplier" value={sizeMultiplier.toFixed(2)} />
       <input type="hidden" name="storyMultiplier" value={storyMultiplier.toFixed(2)} />
 
-      {/* ─── Sticky Bottom: Price + Submit ─── */}
-      <div className="fixed bottom-16 lg:bottom-0 inset-x-0 lg:left-72 z-40 bg-white/90 backdrop-blur-xl border-t border-gray-200/80 shadow-lg"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-        <div className="max-w-4xl mx-auto flex items-center gap-3 px-4 lg:px-8 py-3">
-          <div className="flex-1 min-w-0">
+      {/* ─── Save Quote Button (inline) ─── */}
+      <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-4 lg:p-6">
+        <div className="flex items-center justify-between gap-4">
+          <div className="min-w-0">
             <p className="text-2xl font-extrabold text-gray-900 tabular-nums">${finalPrice.toLocaleString()}</p>
-            <p className="text-[10px] text-gray-500 font-medium">Sub ${contractorPay.toLocaleString()} · You ${ownerCut.toLocaleString()}</p>
+            <p className="text-xs text-gray-500 font-medium">Sub ${contractorPay.toLocaleString()} · You ${ownerCut.toLocaleString()}</p>
           </div>
           <button type="submit"
             className="flex items-center gap-2 rounded-xl bg-green-600 hover:bg-green-700 py-3.5 px-6 text-sm font-bold text-white shadow-lg active:scale-[0.96] transition-all whitespace-nowrap">
