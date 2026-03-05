@@ -107,13 +107,10 @@ export function SalesQuoteForm() {
   // Story multiplier
   const storyMultiplier = STORY_MULTIPLIERS[stories] || 1.0
 
-  // Window factor
+  // Window factor — continuous scaling: +1.5% per weighted window
   const weightedWindows = (windows.small * 1.0) + (windows.medium * 1.5) + (windows.large * 2.5) + (windows.specialty * 3.5)
   const totalWindowCount = windows.small + windows.medium + windows.large + windows.specialty
-  let windowFactor = 1.0
-  if (weightedWindows > 30) windowFactor = 1.45
-  else if (weightedWindows > 20) windowFactor = 1.30
-  else if (weightedWindows > 10) windowFactor = 1.15
+  const windowFactor = 1.0 + (weightedWindows * 0.015)
 
   // Driveway add-on (>30m diagonal)
   let drivewayAddon = 0
@@ -134,7 +131,8 @@ export function SalesQuoteForm() {
   const ownerCut = finalPrice - contractorPay
 
   // Window factor label
-  const windowFactorLabel = weightedWindows <= 10 ? 'Standard' : weightedWindows <= 20 ? '+15%' : weightedWindows <= 30 ? '+30%' : '+45%'
+  const windowPct = Math.round((windowFactor - 1) * 100)
+  const windowFactorLabel = windowPct === 0 ? 'No windows' : `+${windowPct}%`
 
   // Build items JSON for DB
   const getItemsJSON = () => {
@@ -279,9 +277,9 @@ export function SalesQuoteForm() {
           <div className="flex flex-wrap items-center gap-3 text-sm px-1">
             <span className="text-gray-600">{totalWindowCount} windows ({weightedWindows.toFixed(1)} weighted)</span>
             <span className={cn('px-2.5 py-0.5 rounded-full text-xs font-bold',
-              windowFactor === 1.0 ? 'bg-gray-100 text-gray-700' :
-              windowFactor === 1.15 ? 'bg-blue-100 text-blue-700' :
-              windowFactor === 1.30 ? 'bg-amber-100 text-amber-700' :
+              windowPct <= 10 ? 'bg-green-100 text-green-700' :
+              windowPct <= 25 ? 'bg-blue-100 text-blue-700' :
+              windowPct <= 40 ? 'bg-amber-100 text-amber-700' :
               'bg-red-100 text-red-700'
             )}>
               Window factor: {windowFactor.toFixed(2)}× ({windowFactorLabel})
@@ -291,8 +289,8 @@ export function SalesQuoteForm() {
 
         {/* Quick Reference */}
         <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-500 space-y-1">
-          <p className="font-semibold text-gray-700">⚡ Quick Reference for Reps</p>
-          <p>≤ 10 weighted → Standard pricing &nbsp;|&nbsp; 11-20 → +$150-$300 &nbsp;|&nbsp; 21-30 → +$300-$600 &nbsp;|&nbsp; 30+ → +$600-$900+</p>
+          <p className="font-semibold text-gray-700">⚡ Quick Reference for Reps — +1.5% per weighted window</p>
+          <p>5 weighted → +8% &nbsp;|&nbsp; 10 → +15% &nbsp;|&nbsp; 20 → +30% &nbsp;|&nbsp; 30 → +45% &nbsp;|&nbsp; 40+ → +60%+</p>
         </div>
       </section>
 
