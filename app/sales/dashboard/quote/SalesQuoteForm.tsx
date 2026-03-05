@@ -101,8 +101,8 @@ export function SalesQuoteForm() {
   const houseAreaM2 = houseSideM * houseSideM
   const houseAreaSqft = Math.round(houseAreaM2 * 10.764)
 
-  // Size multiplier (baseline 2500 sqft)
-  const sizeMultiplier = houseAreaSqft > 0 ? houseAreaSqft / 2500 : 1
+  // Size multiplier (baseline 2500 sqft) — floor of 1.0 so base price is the minimum
+  const sizeMultiplier = houseAreaSqft > 0 ? Math.max(1.0, houseAreaSqft / 2500) : 1
 
   // Story multiplier
   const storyMultiplier = STORY_MULTIPLIERS[stories] || 1.0
