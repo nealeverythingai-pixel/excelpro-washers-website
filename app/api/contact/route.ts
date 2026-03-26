@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AILeadQualifier } from '@/lib/ai/LeadQualifier';
 import { LeadRouter } from '@/lib/ai/LeadRouter';
 import { NotificationService } from '@/lib/notifications/NotificationService';
+import { EmailService } from '@/lib/email/EmailService';
 import { leadRequests, leadQuotes } from '@/lib/db/leads';
 import { subscribers } from '@/lib/db/subscribers';
 
@@ -39,35 +40,50 @@ export async function POST(request: NextRequest) {
 
     // 2. Store in Supabase
     const requestId = `req_${Date.now()}`;
-    await leadRequests.create({
-      id: requestId,
-      name,
-      first_name: body.firstName || '',
-      last_name: body.lastName || '',
-      email,
-      phone,
-      address,
-      service,
-      message,
-      status: 'new',
-      ai_score: result.score.overall,
-      ai_category: result.score.category,
-      ai_reasoning: result.score.reasoning,
-      estimated_value: result.score.estimatedValue,
-    });
+    try {
+      await leadRequests.create({
+        id: requestId,
+        name,
+        first_name: body.firstName || '',
+        last_name: body.lastName || '',
+        email,
+        phone,
+        address,
+        service,
+        message,
+        status: 'new',
+        ai_score: result.score.overall,
+        ai_category: result.score.category,
+        ai_reasoning: result.score.reasoning,
+        estimated_value: result.score.estimatedValue,
+      });
+    } catch (dbErr) {
+      console.error('DB insert failed (non-critical):', dbErr);
+    }
 
     // 3. Create quote in Supabase
     const quoteId = `quote_${Date.now()}`;
-    await leadQuotes.create({
-      id: quoteId,
-      request_id: requestId,
-      title: `Quote for ${service}`,
-      items: [{ description: service, quantity: 1, unitPrice: result.quote.total }],
-      total: result.quote.total,
-      status: 'draft',
-    });
+    try {
+      await leadQuotes.create({
+        id: quoteId,
+        request_id: requestId,
+        title: `Quote for ${service}`,
+        items: [{ description: service, quantity: 1, unitPrice: result.quote.total }],
+        total: result.quote.total,
+        status: 'draft',
+      });
+    } catch (dbErr) {
+      console.error('Quote insert failed (non-critical):', dbErr);
+    }
 
-    // 4. Route lead — the Router is the single orchestrator for:
+    // 4. Send instant confirmation to customer
+    try {
+      await EmailService.sendConfirmation({ name, email, service });
+    } catch (confirmErr) {
+      console.error('Confirmation email failed (non-critical):', confirmErr);
+    }
+
+    // 5. Route lead — the Router is the single orchestrator for:
     //    - Owner notifications (SMS + email + Slack)
     //    - Customer emails (quote or educational)
     //    - Follow-up scheduling
@@ -91,7 +107,7 @@ export async function POST(request: NextRequest) {
       console.error('Lead routing failed (non-critical):', routeErr);
     }
 
-    // 5. Log AI decision for performance tracking
+    // 6. Log AI decision for performance tracking
     try {
       await NotificationService.logAIDecision({
         leadId: requestId,

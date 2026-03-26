@@ -47,8 +47,8 @@ export class NotificationService {
       await this.sendResendNotification(data);
     }
 
-    // Send SMS notification for hot leads
-    if (data.aiCategory === 'hot' && (process.env.NOTIFICATION_PHONE || process.env.OWNER_PHONE_NUMBER)) {
+    // Send SMS notification for hot and warm leads
+    if (data.aiCategory !== 'cold' && (process.env.NOTIFICATION_PHONE || process.env.OWNER_PHONE_NUMBER)) {
       await this.sendSMSNotification(data);
     }
 
@@ -154,7 +154,7 @@ export class NotificationService {
       const resend = new Resend(process.env.RESEND_API_KEY);
 
       await resend.emails.send({
-        from: 'ExcelPro CRM <onboarding@resend.dev>', // Update this with your verified domain
+        from: process.env.RESEND_FROM_EMAIL || 'ExcelPro CRM <onboarding@resend.dev>',
         to: process.env.NOTIFICATION_EMAIL!,
         subject: `${categoryEmoji} New ${data.aiCategory.toUpperCase()} Lead: ${data.leadName}`,
         html: emailHTML,
@@ -172,12 +172,14 @@ export class NotificationService {
    */
   private static async sendSMSNotification(data: NotificationData): Promise<void> {
     try {
-      const message = `🔥 HOT LEAD ALERT!\n\n` +
+      const leadEmoji = data.aiCategory === 'hot' ? '🔥' : '🌡️';
+      const urgency = data.aiCategory === 'hot' ? 'CALL NOW!' : 'Follow up soon.';
+      const message = `${leadEmoji} ${data.aiCategory.toUpperCase()} LEAD!\n\n` +
                      `${data.leadName}\n` +
                      `${data.phone}\n` +
                      `Score: ${data.aiScore}/100\n` +
                      `Value: $${data.estimatedValue}\n\n` +
-                     `CALL NOW!`;
+                     `${urgency}`;
 
       console.log('📱 Sending SMS notification...');
       console.log(`   To: ${process.env.NOTIFICATION_PHONE || process.env.OWNER_PHONE_NUMBER}`);

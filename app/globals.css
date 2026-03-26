@@ -6,4 +6,16 @@
   body {
     @apply bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300;
   }
+
+  /* Ensure typed text is always visible in dark mode */
+  .dark input,
+  .dark textarea,
+  .dark select {
+    @apply text-white;
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    @apply text-gray-500;
+  }
 }

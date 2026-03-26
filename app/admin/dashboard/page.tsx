@@ -115,8 +115,8 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="flex flex-col justify-between sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-          <p className="mt-1 text-sm text-gray-500">Monitor your business performance and activity</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard Overview</h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Monitor your business performance and activity</p>
         </div>
         <div className="mt-4 flex space-x-3 sm:mt-0">
           <Link 
@@ -135,12 +135,12 @@ export default async function DashboardPage() {
           <Link 
             key={stat.name}
             href={stat.href}
-            className="group overflow-hidden rounded-lg bg-white px-4 py-5 shadow hover:shadow-md transition-shadow sm:p-6"
+            className="group overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 py-5 shadow hover:shadow-md transition-shadow sm:p-6"
           >
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <dt className="truncate text-sm font-medium text-gray-500">{stat.name}</dt>
-                <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{stat.value}</dd>
+                <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">{stat.name}</dt>
+                <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900 dark:text-white">{stat.value}</dd>
               </div>
               <div className={`${stat.color} rounded-lg p-3 text-white group-hover:scale-110 transition-transform`}>
                 <stat.icon className="h-6 w-6" />
@@ -151,75 +151,75 @@ export default async function DashboardPage() {
       </div>
 
       {/* Lead Funnel */}
-      <div className="rounded-lg bg-white shadow p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Lead Funnel</h3>
+      <div className="rounded-lg bg-white dark:bg-gray-800 shadow p-6">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Lead Funnel</h3>
         <div className="grid grid-cols-3 gap-4">
-          <Link 
+          <Link
             href="/admin/dashboard/leads?filter=hot"
-            className="group p-4 rounded-lg border-2 border-red-200 hover:border-red-400 transition-colors"
+            className="group p-4 rounded-lg border-2 border-red-200 dark:border-red-900 hover:border-red-400 transition-colors"
           >
             <div className="flex items-center justify-between mb-2">
               <Flame className="h-5 w-5 text-red-500" />
               <span className="text-2xl font-bold text-red-600">{hotLeads}</span>
             </div>
-            <p className="text-sm text-gray-600">Hot Leads</p>
-            <p className="text-xs text-gray-400 mt-1">Need immediate action</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Hot Leads</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Need immediate action</p>
           </Link>
 
-          <Link 
+          <Link
             href="/admin/dashboard/leads?filter=warm"
-            className="group p-4 rounded-lg border-2 border-orange-200 hover:border-orange-400 transition-colors"
+            className="group p-4 rounded-lg border-2 border-orange-200 dark:border-orange-900 hover:border-orange-400 transition-colors"
           >
             <div className="flex items-center justify-between mb-2">
               <Thermometer className="h-5 w-5 text-orange-500" />
               <span className="text-2xl font-bold text-orange-600">{warmLeads}</span>
             </div>
-            <p className="text-sm text-gray-600">Warm Leads</p>
-            <p className="text-xs text-gray-400 mt-1">In nurture sequence</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Warm Leads</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">In nurture sequence</p>
           </Link>
 
-          <Link 
+          <Link
             href="/admin/dashboard/leads?filter=cold"
-            className="group p-4 rounded-lg border-2 border-blue-200 hover:border-blue-400 transition-colors"
+            className="group p-4 rounded-lg border-2 border-blue-200 dark:border-blue-900 hover:border-blue-400 transition-colors"
           >
             <div className="flex items-center justify-between mb-2">
               <Thermometer className="h-5 w-5 text-blue-400" />
               <span className="text-2xl font-bold text-blue-600">{coldLeads}</span>
             </div>
-            <p className="text-sm text-gray-600">Cold Leads</p>
-            <p className="text-xs text-gray-400 mt-1">Long-term nurture</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Cold Leads</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Long-term nurture</p>
           </Link>
         </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent Leads */}
-        <div className="rounded-lg bg-white shadow">
-          <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-            <h3 className="text-lg font-medium text-gray-900">Recent Leads</h3>
+        <div className="rounded-lg bg-white dark:bg-gray-800 shadow">
+          <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Recent Leads</h3>
             <Link href="/admin/dashboard/leads" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center">
               View all <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </div>
-          <ul className="divide-y divide-gray-200">
+          <ul className="divide-y divide-gray-200 dark:divide-gray-700">
             {recentLeads.length === 0 ? (
-              <li className="px-6 py-4 text-sm text-gray-500">No leads yet.</li>
+              <li className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">No leads yet.</li>
             ) : (
               recentLeads.map((lead) => (
-                <li key={lead.id} className="px-6 py-4 hover:bg-gray-50">
+                <li key={lead.id} className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center flex-1">
                       {getCategoryIcon(lead.aiCategory)}
                       <div className="ml-3 flex-1">
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
                           {lead.name || `${lead.firstName} ${lead.lastName}`}
                         </p>
-                        <p className="text-xs text-gray-500">{lead.service || 'Service inquiry'}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{lead.service || 'Service inquiry'}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
                       {lead.aiScore && (
-                        <span className="text-sm font-semibold text-gray-700">
+                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                           {lead.aiScore}
                         </span>
                       )}
@@ -235,57 +235,57 @@ export default async function DashboardPage() {
         </div>
 
         {/* Action Items */}
-        <div className="rounded-lg bg-white shadow">
-          <div className="border-b border-gray-200 px-6 py-4">
-            <h3 className="text-lg font-medium text-gray-900">Action Items</h3>
+        <div className="rounded-lg bg-white dark:bg-gray-800 shadow">
+          <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Action Items</h3>
           </div>
           <div className="p-6 space-y-4">
             {/* Upcoming Jobs */}
-            <Link 
+            <Link
               href="/admin/dashboard/jobs"
-              className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-colors group"
+              className="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors group"
             >
               <div className="flex items-center">
-                <div className="bg-blue-100 rounded-lg p-2 group-hover:bg-blue-200">
+                <div className="bg-blue-100 dark:bg-blue-900/40 rounded-lg p-2 group-hover:bg-blue-200 dark:group-hover:bg-blue-900/60">
                   <Calendar className="h-5 w-5 text-blue-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-900">Upcoming Jobs</p>
-                  <p className="text-xs text-gray-500">Next 7 days</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">Upcoming Jobs</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Next 7 days</p>
                 </div>
               </div>
               <span className="text-2xl font-bold text-blue-600">{upcomingJobs.length}</span>
             </Link>
 
             {/* Pending Quotes */}
-            <Link 
+            <Link
               href="/admin/dashboard/quotes"
-              className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:border-purple-400 hover:bg-purple-50 transition-colors group"
+              className="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors group"
             >
               <div className="flex items-center">
-                <div className="bg-purple-100 rounded-lg p-2 group-hover:bg-purple-200">
+                <div className="bg-purple-100 dark:bg-purple-900/40 rounded-lg p-2 group-hover:bg-purple-200 dark:group-hover:bg-purple-900/60">
                   <FileText className="h-5 w-5 text-purple-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-900">Pending Quotes</p>
-                  <p className="text-xs text-gray-500">Awaiting response</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">Pending Quotes</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Awaiting response</p>
                 </div>
               </div>
               <span className="text-2xl font-bold text-purple-600">{pendingQuotes}</span>
             </Link>
 
             {/* Outstanding Invoices */}
-            <Link 
+            <Link
               href="/admin/dashboard/invoices"
-              className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:border-green-400 hover:bg-green-50 transition-colors group"
+              className="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors group"
             >
               <div className="flex items-center">
-                <div className="bg-green-100 rounded-lg p-2 group-hover:bg-green-200">
+                <div className="bg-green-100 dark:bg-green-900/40 rounded-lg p-2 group-hover:bg-green-200 dark:group-hover:bg-green-900/60">
                   <DollarSign className="h-5 w-5 text-green-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-900">Outstanding</p>
-                  <p className="text-xs text-gray-500">${outstandingAmount.toLocaleString()} owed</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">Outstanding</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">${outstandingAmount.toLocaleString()} owed</p>
                 </div>
               </div>
               <span className="text-2xl font-bold text-green-600">{outstandingInvoices.length}</span>

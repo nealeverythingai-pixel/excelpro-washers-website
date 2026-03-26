@@ -18,8 +18,7 @@ export interface EmailOptions {
 }
 
 export class EmailService {
-  // Use Resend's onboarding domain for testing, or your verified domain
-  private static readonly DEFAULT_FROM = 'ExcelPro Washers <onboarding@resend.dev>';
+  private static readonly DEFAULT_FROM = process.env.RESEND_FROM_EMAIL || 'ExcelPro Washers <onboarding@resend.dev>';
 
   /**
    * Generate CAN-SPAM compliant footer with unsubscribe link
@@ -496,6 +495,82 @@ export class EmailService {
     const result = await this.send({
       to: params.email,
       subject: `🎉 15% OFF Your ${params.service} - Limited Time!`,
+      html,
+    });
+
+    return result.success;
+  }
+
+  /**
+   * Send instant confirmation email to every customer who submits the contact form
+   */
+  static async sendConfirmation(params: {
+    name: string;
+    email: string;
+    service: string;
+  }): Promise<boolean> {
+    const firstName = params.name.split(' ')[0];
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+    .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+    .checkmark { font-size: 48px; margin-bottom: 10px; }
+    .what-next { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; }
+    .step { display: flex; align-items: flex-start; margin: 12px 0; }
+    .step-icon { font-size: 20px; margin-right: 12px; flex-shrink: 0; }
+    .cta-button { display: inline-block; background: #0ea5e9; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="checkmark">✅</div>
+      <h1 style="margin: 0; font-size: 24px;">We got your request!</h1>
+      <p style="margin: 8px 0 0 0; opacity: 0.9;">ExcelPro Washers</p>
+    </div>
+    <div class="content">
+      <p>Hi <strong>${firstName}</strong>,</p>
+      <p>Thanks for reaching out! We've received your request for <strong>${params.service}</strong> and we'll be in touch with you very shortly.</p>
+
+      <div class="what-next">
+        <p style="font-weight: bold; margin-top: 0;">What happens next:</p>
+        <div class="step">
+          <span class="step-icon">📋</span>
+          <span>We're reviewing your request and preparing a personalized quote</span>
+        </div>
+        <div class="step">
+          <span class="step-icon">📧</span>
+          <span>You'll receive your quote by email shortly</span>
+        </div>
+        <div class="step">
+          <span class="step-icon">📞</span>
+          <span>A team member may call to confirm the details before your appointment</span>
+        </div>
+      </div>
+
+      <p>In the meantime, if you have any questions don't hesitate to reply to this email.</p>
+      <p>Talk soon,<br><strong>The ExcelPro Washers Team</strong></p>
+
+      <div style="text-align: center;">
+        <a href="${SITE_URL}" class="cta-button">Visit Our Website</a>
+      </div>
+
+      ${this.complianceFooter(params.email, true)}
+    </div>
+  </div>
+</body>
+</html>`;
+
+    const result = await this.send({
+      to: params.email,
+      subject: `We received your request — ExcelPro Washers`,
       html,
     });
 
