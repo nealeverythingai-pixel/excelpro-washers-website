@@ -32,7 +32,7 @@ export default function ServicesPage() {
     {
       title: "Window Cleaning",
       description: "Our signature service. We use purified water technology and traditional squeegee methods to ensure your windows are spotless, streak-free, and shining.",
-      price: "From $199",
+      price: "From $200",
       features: [
         "Interior & Exterior Cleaning",
         "Screen & Track Cleaning",
@@ -56,7 +56,7 @@ export default function ServicesPage() {
     {
       title: "Gutter Cleaning",
       description: "Protect your foundation from water damage. We remove debris, flush downspouts, and ensure your water drainage system is flowing freely.",
-      price: "From $149",
+      price: "From $175",
       features: [
         "Debris Removal by Hand",
         "Downspout Flushing",
@@ -68,7 +68,7 @@ export default function ServicesPage() {
     {
       title: "Roof Cleaning",
       description: "Extend the lifespan of your roof. We treat and remove unsightly moss and black streaks (Gloeocapsa Magma) that eat away at your shingles.",
-      price: "From $399",
+      price: "From $450",
       features: [
         "Moss & Lichen Removal",
         "Prevents Shingle Decay",
@@ -80,7 +80,7 @@ export default function ServicesPage() {
     {
       title: "Pressure Washing",
       description: "Revitalize your hardscapes. We blast away grime, oil, and salt from durable surfaces like concrete and interlock to make them look new again.",
-      price: "From $199",
+      price: "From $149",
       features: [
         "Driveways & Walkways",
         "Patios & Pool Decks",

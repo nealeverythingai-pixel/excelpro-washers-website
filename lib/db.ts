@@ -7,7 +7,7 @@ import { supabase } from './supabase';
 import {
   Client, Job, Quote, Invoice, Request, User,
   AIFeedback, ScheduledFollowUp, CallLog, CallConversation,
-  ContractorApplication
+  ContractorApplication, ContractorAvailability, ContractorBlock
 } from './types';
 
 // ── Helper: camelCase ↔ snake_case mappers ──────────────────────────
@@ -526,6 +526,51 @@ export const db = {
     upsert: async (conversation: CallConversation): Promise<CallConversation> => conversation,
     remove: async (_callSid: string): Promise<void> => {},
     cleanup: async (): Promise<void> => {},
+  },
+
+  // ── CONTRACTOR AVAILABILITY ─────────────────────────────────────
+  contractorAvailability: {
+    getAll: async (): Promise<ContractorAvailability[]> => {
+      const { data, error } = await supabase.from('contractor_availability').select('*');
+      if (error) { console.error('db.contractorAvailability.getAll:', error.message); return []; }
+      return (data || []).map((r: any) => ({ id: r.id, contractorId: r.contractor_id, dayOfWeek: r.day_of_week, startTime: r.start_time, endTime: r.end_time }));
+    },
+    getByContractorId: async (contractorId: string): Promise<ContractorAvailability[]> => {
+      const { data, error } = await supabase.from('contractor_availability').select('*').eq('contractor_id', contractorId);
+      if (error) { console.error('db.contractorAvailability.getByContractorId:', error.message); return []; }
+      return (data || []).map((r: any) => ({ id: r.id, contractorId: r.contractor_id, dayOfWeek: r.day_of_week, startTime: r.start_time, endTime: r.end_time }));
+    },
+    setDay: async (contractorId: string, dayOfWeek: number, startTime: string, endTime: string): Promise<void> => {
+      const { error } = await supabase.from('contractor_availability').upsert({ contractor_id: contractorId, day_of_week: dayOfWeek, start_time: startTime, end_time: endTime }, { onConflict: 'contractor_id,day_of_week' });
+      if (error) console.error('db.contractorAvailability.setDay:', error.message);
+    },
+    removeDay: async (contractorId: string, dayOfWeek: number): Promise<void> => {
+      const { error } = await supabase.from('contractor_availability').delete().eq('contractor_id', contractorId).eq('day_of_week', dayOfWeek);
+      if (error) console.error('db.contractorAvailability.removeDay:', error.message);
+    },
+  },
+
+  // ── CONTRACTOR BLOCKS ───────────────────────────────────────────
+  contractorBlocks: {
+    getByContractorId: async (contractorId: string): Promise<ContractorBlock[]> => {
+      const { data, error } = await supabase.from('contractor_blocks').select('*').eq('contractor_id', contractorId).order('block_date', { ascending: true });
+      if (error) { console.error('db.contractorBlocks.getByContractorId:', error.message); return []; }
+      return (data || []).map((r: any) => ({ id: r.id, contractorId: r.contractor_id, blockDate: r.block_date, reason: r.reason || undefined, createdAt: r.created_at }));
+    },
+    getByDate: async (date: string): Promise<ContractorBlock[]> => {
+      const { data, error } = await supabase.from('contractor_blocks').select('*').eq('block_date', date);
+      if (error) { console.error('db.contractorBlocks.getByDate:', error.message); return []; }
+      return (data || []).map((r: any) => ({ id: r.id, contractorId: r.contractor_id, blockDate: r.block_date, reason: r.reason || undefined, createdAt: r.created_at }));
+    },
+    create: async (contractorId: string, blockDate: string, reason?: string): Promise<ContractorBlock> => {
+      const { data, error } = await supabase.from('contractor_blocks').insert({ contractor_id: contractorId, block_date: blockDate, reason: reason || null }).select().single();
+      if (error) { console.error('db.contractorBlocks.create:', error.message); throw error; }
+      return { id: data.id, contractorId: data.contractor_id, blockDate: data.block_date, reason: data.reason || undefined, createdAt: data.created_at };
+    },
+    delete: async (id: string): Promise<void> => {
+      const { error } = await supabase.from('contractor_blocks').delete().eq('id', id);
+      if (error) console.error('db.contractorBlocks.delete:', error.message);
+    },
   },
 
   // ── CONTRACTOR APPLICATIONS ─────────────────────────────────────

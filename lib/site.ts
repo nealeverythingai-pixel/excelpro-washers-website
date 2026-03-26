@@ -60,22 +60,22 @@ export const siteConfig = {
     {
       title: "Pressure Washing",
       description: "High-power cleaning for durable surfaces like driveways, walkways, and patios to remove tough stains, oil, and grime.",
-      price: "Starting at $199",
+      price: "Starting at $149",
     },
     {
       title: "Gutter Cleaning",
       description: "Complete removal of debris from gutters and downspouts to prevent water damage and ensure proper drainage.",
-      price: "Starting at $149",
+      price: "Starting at $175",
     },
     {
       title: "Roof Cleaning",
       description: "Specialized soft wash treatment to remove black streaks, moss, and lichen, extending your roof's lifespan.",
-      price: "Starting at $399",
+      price: "Starting at $450",
     },
     {
       title: "Window Cleaning",
       description: "Professional interior and exterior window cleaning leaving your glass streak-free and crystal clear.",
-      price: "Starting at $199",
+      price: "Starting at $200",
     },
   ],
 };

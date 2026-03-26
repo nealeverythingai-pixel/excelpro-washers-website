@@ -2,7 +2,7 @@
 
 import { db } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
-import { Job } from '@/lib/types'
+
 import { cookies } from 'next/headers'
 import { verifyPortalSession } from '@/lib/session'
 
@@ -113,6 +113,51 @@ export async function submitClientSignoff(formData: FormData) {
     clientSignoffAt: new Date().toISOString(),
     clientSignoffNotes: notes || undefined,
   })
+  revalidatePath('/contractor/dashboard')
+}
+
+export async function getMyAvailability() {
+  const cookieStore = await cookies()
+  const contractorId = getContractorId(cookieStore)
+  if (!contractorId) return { availability: [], blocks: [] }
+  const [availability, blocks] = await Promise.all([
+    db.contractorAvailability.getByContractorId(contractorId),
+    db.contractorBlocks.getByContractorId(contractorId),
+  ])
+  return { availability, blocks }
+}
+
+export async function setAvailabilityDay(formData: FormData) {
+  const cookieStore = await cookies()
+  const contractorId = getContractorId(cookieStore)
+  if (!contractorId) return
+  const dayOfWeek = parseInt(formData.get('dayOfWeek') as string)
+  const enabled = formData.get('enabled') === 'true'
+  const startTime = (formData.get('startTime') as string) || '08:00'
+  const endTime = (formData.get('endTime') as string) || '17:00'
+  if (enabled) {
+    await db.contractorAvailability.setDay(contractorId, dayOfWeek, startTime, endTime)
+  } else {
+    await db.contractorAvailability.removeDay(contractorId, dayOfWeek)
+  }
+  revalidatePath('/contractor/dashboard')
+}
+
+export async function addBlock(formData: FormData) {
+  const cookieStore = await cookies()
+  const contractorId = getContractorId(cookieStore)
+  if (!contractorId) return
+  const blockDate = formData.get('blockDate') as string
+  const reason = (formData.get('reason') as string) || ''
+  if (!blockDate) return
+  await db.contractorBlocks.create(contractorId, blockDate, reason || undefined)
+  revalidatePath('/contractor/dashboard')
+}
+
+export async function removeBlock(formData: FormData) {
+  const blockId = formData.get('blockId') as string
+  if (!blockId) return
+  await db.contractorBlocks.delete(blockId)
   revalidatePath('/contractor/dashboard')
 }
 

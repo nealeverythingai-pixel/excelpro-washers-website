@@ -175,6 +175,22 @@ export interface ContractorApplication {
   submittedAt: string;
 }
 
+export interface ContractorAvailability {
+  id: string
+  contractorId: string
+  dayOfWeek: number // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+  startTime: string // '08:00'
+  endTime: string   // '17:00'
+}
+
+export interface ContractorBlock {
+  id: string
+  contractorId: string
+  blockDate: string // 'YYYY-MM-DD'
+  reason?: string
+  createdAt: string
+}
+
 export interface DbSchema {
   clients: Client[]
   jobs: Job[]

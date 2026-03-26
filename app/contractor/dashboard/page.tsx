@@ -1,10 +1,13 @@
-import { getJobs } from './actions'
+import { getJobs, getMyAvailability } from './actions'
 import ContractorView from './ContractorView'
 
 export const dynamic = 'force-dynamic'
 
 export default async function ContractorDashboard() {
-  const jobs = await getJobs()
+  const [jobs, { availability, blocks }] = await Promise.all([
+    getJobs(),
+    getMyAvailability(),
+  ])
 
   return (
     <div className="space-y-6">
@@ -15,8 +18,8 @@ export default async function ContractorDashboard() {
           </h2>
         </div>
       </div>
-      
-      <ContractorView jobs={jobs} />
+
+      <ContractorView jobs={jobs} availability={availability} blocks={blocks} />
     </div>
   )
 }

@@ -1,17 +1,172 @@
 'use client'
 
-import { useState } from 'react'
-import { Job } from '@/lib/types'
-import { acceptJob, completeJob, uploadBeforePhotos, uploadAfterPhotos, submitClientSignoff } from './actions'
-import { CheckCircle, Clock, MapPin, User, Upload, Camera, FileText, Briefcase, AlertTriangle, Shield, ChevronDown, ChevronUp } from 'lucide-react'
+import { useState, useTransition } from 'react'
+import { Job, ContractorAvailability, ContractorBlock } from '@/lib/types'
+import { acceptJob, completeJob, uploadBeforePhotos, uploadAfterPhotos, submitClientSignoff, setAvailabilityDay, addBlock, removeBlock } from './actions'
+import { CheckCircle, Clock, MapPin, User, Upload, Camera, FileText, Briefcase, AlertTriangle, Shield, ChevronDown, ChevronUp, CalendarDays, Ban, Plus, Trash2 } from 'lucide-react'
 
 type JobWithClient = Job & {
   clientName: string
   clientAddress: string
 }
 
-export default function ContractorView({ jobs }: { jobs: JobWithClient[] }) {
-  const [activeTab, setActiveTab] = useState<'available' | 'active' | 'completed'>('available')
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+function AvailabilityTab({
+  availability,
+  blocks,
+}: {
+  availability: ContractorAvailability[]
+  blocks: ContractorBlock[]
+}) {
+  const [isPending, startTransition] = useTransition()
+  const [localAvail, setLocalAvail] = useState<ContractorAvailability[]>(availability)
+  const [localBlocks, setLocalBlocks] = useState<ContractorBlock[]>(blocks)
+
+  const getDay = (dow: number) => localAvail.find(a => a.dayOfWeek === dow)
+
+  const toggleDay = (dow: number) => {
+    const existing = getDay(dow)
+    const fd = new FormData()
+    fd.set('dayOfWeek', String(dow))
+    if (existing) {
+      fd.set('enabled', 'false')
+      setLocalAvail(p => p.filter(a => a.dayOfWeek !== dow))
+    } else {
+      fd.set('enabled', 'true')
+      fd.set('startTime', '08:00')
+      fd.set('endTime', '17:00')
+      setLocalAvail(p => [...p, { id: 'temp', contractorId: '', dayOfWeek: dow, startTime: '08:00', endTime: '17:00' }])
+    }
+    startTransition(() => setAvailabilityDay(fd))
+  }
+
+  const updateTime = (dow: number, field: 'startTime' | 'endTime', value: string) => {
+    setLocalAvail(p => p.map(a => a.dayOfWeek === dow ? { ...a, [field]: value } : a))
+    const day = localAvail.find(a => a.dayOfWeek === dow)
+    if (!day) return
+    const fd = new FormData()
+    fd.set('dayOfWeek', String(dow))
+    fd.set('enabled', 'true')
+    fd.set('startTime', field === 'startTime' ? value : day.startTime)
+    fd.set('endTime', field === 'endTime' ? value : day.endTime)
+    startTransition(() => setAvailabilityDay(fd))
+  }
+
+  const handleAddBlock = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    const date = fd.get('blockDate') as string
+    const reason = fd.get('reason') as string
+    if (!date) return
+    setLocalBlocks(p => [...p, { id: 'temp-' + date, contractorId: '', blockDate: date, reason: reason || undefined, createdAt: new Date().toISOString() }])
+    ;(e.currentTarget as HTMLFormElement).reset()
+    startTransition(() => addBlock(fd))
+  }
+
+  const handleRemoveBlock = (blockId: string) => {
+    setLocalBlocks(p => p.filter(b => b.id !== blockId))
+    const fd = new FormData()
+    fd.set('blockId', blockId)
+    startTransition(() => removeBlock(fd))
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Weekly schedule */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 space-y-3">
+        <h3 className="font-bold text-gray-900 flex items-center gap-2">
+          <CalendarDays className="w-4 h-4 text-orange-500" /> Weekly Availability
+        </h3>
+        <p className="text-xs text-gray-500">Set the days and hours you're available for ExcelPro jobs each week.</p>
+        <div className="space-y-2">
+          {DAYS.map((label, dow) => {
+            const slot = getDay(dow)
+            return (
+              <div key={dow} className={`rounded-xl border-2 p-3 transition-all ${slot ? 'border-green-300 bg-green-50' : 'border-gray-200 bg-white'}`}>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => toggleDay(dow)}
+                    disabled={isPending}
+                    className={`w-11 h-6 rounded-full transition-colors flex-shrink-0 relative ${slot ? 'bg-green-500' : 'bg-gray-200'}`}
+                  >
+                    <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${slot ? 'left-[22px]' : 'left-0.5'}`} />
+                  </button>
+                  <span className={`text-sm font-bold w-8 ${slot ? 'text-green-800' : 'text-gray-400'}`}>{label}</span>
+                  {slot && (
+                    <div className="flex items-center gap-2 ml-1">
+                      <input type="time" value={slot.startTime} onChange={e => updateTime(dow, 'startTime', e.target.value)}
+                        className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-green-500 bg-white" />
+                      <span className="text-xs text-gray-400">to</span>
+                      <input type="time" value={slot.endTime} onChange={e => updateTime(dow, 'endTime', e.target.value)}
+                        className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-green-500 bg-white" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Block dates */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 space-y-3">
+        <h3 className="font-bold text-gray-900 flex items-center gap-2">
+          <Ban className="w-4 h-4 text-red-500" /> Block a Date
+        </h3>
+        <p className="text-xs text-gray-500">Mark a specific date as unavailable — e.g. you have your own job or personal time.</p>
+        <form onSubmit={handleAddBlock} className="flex flex-col sm:flex-row gap-2">
+          <input type="date" name="blockDate" required min={new Date().toISOString().slice(0, 10)}
+            className="flex-1 rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-red-400 focus:border-red-400 bg-gray-50" />
+          <input type="text" name="reason" placeholder="Reason (optional)"
+            className="flex-1 rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-red-400 focus:border-red-400 bg-gray-50" />
+          <button type="submit" disabled={isPending}
+            className="flex items-center justify-center gap-1.5 rounded-xl bg-red-500 text-white px-4 py-2.5 text-sm font-bold hover:bg-red-600 transition-colors">
+            <Plus className="w-4 h-4" /> Block
+          </button>
+        </form>
+
+        {localBlocks.length > 0 && (
+          <div className="space-y-2 mt-1">
+            {localBlocks
+              .slice()
+              .sort((a, b) => a.blockDate.localeCompare(b.blockDate))
+              .map(block => (
+                <div key={block.id} className="flex items-center justify-between bg-red-50 border border-red-200 rounded-xl px-3 py-2">
+                  <div>
+                    <span className="text-sm font-semibold text-red-800">
+                      {new Date(block.blockDate + 'T12:00:00').toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric' })}
+                    </span>
+                    {block.reason && <span className="text-xs text-red-500 ml-2">— {block.reason}</span>}
+                  </div>
+                  {!block.id.startsWith('temp') && (
+                    <button onClick={() => handleRemoveBlock(block.id)} className="text-red-400 hover:text-red-600 transition-colors p-1">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+          </div>
+        )}
+        {localBlocks.length === 0 && (
+          <p className="text-xs text-gray-400 text-center py-2">No blocked dates.</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export default function ContractorView({
+  jobs,
+  availability,
+  blocks,
+}: {
+  jobs: JobWithClient[]
+  availability: ContractorAvailability[]
+  blocks: ContractorBlock[]
+}) {
+  const [activeTab, setActiveTab] = useState<'available' | 'active' | 'completed' | 'availability'>('available')
 
   // Available jobs: No assignedContractorId yet (unassigned)
   const availableJobs = jobs.filter(j => !j.assignedContractorId && j.availableToContractors)
@@ -59,6 +214,17 @@ export default function ContractorView({ jobs }: { jobs: JobWithClient[] }) {
             <CheckCircle className="w-4 h-4" />
             History ({completedJobs.length})
           </button>
+          <button
+            onClick={() => setActiveTab('availability')}
+            className={`${
+              activeTab === 'availability'
+                ? 'border-orange-500 text-orange-600'
+                : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+            } whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium flex items-center gap-2`}
+          >
+            <CalendarDays className="w-4 h-4" />
+            My Availability
+          </button>
         </nav>
       </div>
 
@@ -86,7 +252,7 @@ export default function ContractorView({ jobs }: { jobs: JobWithClient[] }) {
         {activeTab === 'completed' && completedJobs.map(job => (
             <JobCard key={job.id} job={job} type="completed" />
         ))}
-        
+
         {activeTab === 'available' && availableJobs.length === 0 && (
             <div className="col-span-full text-center py-12 text-gray-500">No scheduled jobs available at the moment.</div>
         )}
@@ -94,6 +260,10 @@ export default function ContractorView({ jobs }: { jobs: JobWithClient[] }) {
             <div className="col-span-full text-center py-12 text-gray-500">You have no active jobs. Accept a scheduled job to get started.</div>
         )}
       </div>
+
+      {activeTab === 'availability' && (
+        <AvailabilityTab availability={availability} blocks={blocks} />
+      )}
     </div>
   )
 }

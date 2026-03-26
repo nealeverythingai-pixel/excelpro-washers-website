@@ -48,10 +48,6 @@ export const metadata: Metadata = {
     images: [siteConfig.ogImage],
     creator: "@excelprowashers",
   },
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
   verification: {
     google: "google-site-verification=YOUR_VERIFICATION_CODE",
   },

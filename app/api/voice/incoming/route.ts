@@ -1,84 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server';
-import twilio from 'twilio';
 
-const VoiceResponse = twilio.twiml.VoiceResponse;
-
-/** Speak text via ElevenLabs or Twilio TTS */
-function speakText(twiml: any, text: string, baseUrl: string) {
-  if (process.env.ELEVENLABS_API_KEY) {
-    twiml.play(`${baseUrl}/api/voice/elevenlabs-audio?text=${encodeURIComponent(text)}`);
-  } else {
-    twiml.say({ voice: 'Polly.Joanna', language: 'en-US' }, text);
-  }
-}
-
-function speakInGather(gather: any, text: string, baseUrl: string) {
-  if (process.env.ELEVENLABS_API_KEY) {
-    gather.play(`${baseUrl}/api/voice/elevenlabs-audio?text=${encodeURIComponent(text)}`);
-  } else {
-    gather.say({ voice: 'Polly.Joanna', language: 'en-US' }, text);
-  }
-}
-
+/**
+ * Voice incoming — proxied to Railway voice microservice.
+ * The real handler runs on Railway for zero cold starts and no timeouts.
+ * If VOICE_SERVICE_URL is not set, returns a basic Polly TwiML fallback.
+ */
 export async function POST(request: NextRequest) {
+  const voiceServiceUrl = process.env.VOICE_SERVICE_URL;
+
+  if (!voiceServiceUrl) {
+    // Fallback: basic Polly greeting if Railway isn't configured yet
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Joanna" language="en-US">Thank you for calling ExcelPro Washers. Please visit excelprowashers.com or call back shortly.</Say>
+  <Hangup/>
+</Response>`;
+    return new NextResponse(xml, { headers: { 'Content-Type': 'text/xml' } });
+  }
+
+  // Proxy to Railway
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://excelprowashers.com';
+    const url = new URL('/api/voice/incoming', voiceServiceUrl);
+    // Forward query params (retry count)
+    request.nextUrl.searchParams.forEach((value, key) => url.searchParams.set(key, value));
 
-    // ── Track retry count via query param to prevent infinite loop ──
-    const retryParam = request.nextUrl.searchParams.get('retry');
-    const retryCount = retryParam ? parseInt(retryParam, 10) : 0;
-
-    const twiml = new VoiceResponse();
-
-    if (retryCount >= 2) {
-      // Max retries reached — offer voicemail and hang up
-      speakText(twiml, "It seems like you may be busy. If you'd like to leave a message, please do so after the beep. Otherwise, feel free to call us back anytime.", baseUrl);
-      twiml.record({
-        maxLength: 120,
-        transcribe: true,
-        playBeep: true,
-        action: `${baseUrl}/api/voice/status`,
-      });
-      speakText(twiml, 'Thanks for calling ExcelPro Washers. Goodbye!', baseUrl);
-      twiml.hangup();
-      return new NextResponse(twiml.toString(), {
-        headers: { 'Content-Type': 'text/xml' },
-      });
-    }
-
-    // ── First contact or retry ──────────────────────────────
-    const greeting = retryCount === 0
-      ? 'Hello! Thank you for calling ExcelPro Washers. How can I help you today?'
-      : "I'm still here whenever you're ready. You can ask about our services, pricing, or schedule an appointment.";
-
-    const gather = twiml.gather({
-      input: ['speech', 'dtmf'],
-      action: `${baseUrl}/api/voice/respond`,
+    const body = await request.text();
+    const proxyRes = await fetch(url.toString(), {
       method: 'POST',
-      speechTimeout: '3',
-      numDigits: 1,
-      language: 'en-US',
-      hints: 'window cleaning, pressure washing, gutter cleaning, appointment, pricing, schedule, estimate, quote',
+      headers: {
+        'Content-Type': request.headers.get('Content-Type') || 'application/x-www-form-urlencoded',
+        ...(request.headers.get('x-twilio-signature') && {
+          'x-twilio-signature': request.headers.get('x-twilio-signature')!,
+        }),
+      },
+      body,
     });
 
-    speakInGather(gather, greeting, baseUrl);
-
-    // No input → retry with incremented counter
-    twiml.redirect(`${baseUrl}/api/voice/incoming?retry=${retryCount + 1}`);
-
-    return new NextResponse(twiml.toString(), {
-      headers: { 'Content-Type': 'text/xml' },
+    const responseBody = await proxyRes.text();
+    return new NextResponse(responseBody, {
+      status: proxyRes.status,
+      headers: { 'Content-Type': proxyRes.headers.get('Content-Type') || 'text/xml' },
     });
   } catch (error) {
-    console.error('Voice incoming error:', error);
-    const twiml = new VoiceResponse();
-    twiml.say(
-      { voice: 'Polly.Joanna', language: 'en-US' },
-      'Thank you for calling ExcelPro Washers. We are temporarily unable to take your call. Please try again shortly or visit us at excelprowashers.com.'
-    );
-    twiml.hangup();
-    return new NextResponse(twiml.toString(), {
-      headers: { 'Content-Type': 'text/xml' },
-    });
+    console.error('[Voice Proxy] incoming error:', error);
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Joanna" language="en-US">We are experiencing a technical issue. Please try again shortly.</Say>
+  <Hangup/>
+</Response>`;
+    return new NextResponse(xml, { headers: { 'Content-Type': 'text/xml' } });
   }
 }
