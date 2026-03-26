@@ -186,7 +186,10 @@ export interface ContractorAvailability {
 export interface ContractorBlock {
   id: string
   contractorId: string
-  blockDate: string // 'YYYY-MM-DD'
+  blockDate: string   // 'YYYY-MM-DD'
+  blockType: 'full' | 'partial' // full = busy all day, partial = available during a window
+  availableFrom?: string // '08:00' — only set when blockType='partial'
+  availableTo?: string   // '17:00' — only set when blockType='partial'
   reason?: string
   createdAt: string
 }

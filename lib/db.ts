@@ -552,24 +552,43 @@ export const db = {
 
   // ── CONTRACTOR BLOCKS ───────────────────────────────────────────
   contractorBlocks: {
+    _map: (r: any): ContractorBlock => ({
+      id: r.id,
+      contractorId: r.contractor_id,
+      blockDate: r.block_date,
+      blockType: r.block_type || 'full',
+      availableFrom: r.available_from || undefined,
+      availableTo: r.available_to || undefined,
+      reason: r.reason || undefined,
+      createdAt: r.created_at,
+    }),
     getByContractorId: async (contractorId: string): Promise<ContractorBlock[]> => {
       const { data, error } = await supabase.from('contractor_blocks').select('*').eq('contractor_id', contractorId).order('block_date', { ascending: true });
       if (error) { console.error('db.contractorBlocks.getByContractorId:', error.message); return []; }
-      return (data || []).map((r: any) => ({ id: r.id, contractorId: r.contractor_id, blockDate: r.block_date, reason: r.reason || undefined, createdAt: r.created_at }));
+      return (data || []).map((r: any) => db.contractorBlocks._map(r));
     },
     getByDate: async (date: string): Promise<ContractorBlock[]> => {
       const { data, error } = await supabase.from('contractor_blocks').select('*').eq('block_date', date);
       if (error) { console.error('db.contractorBlocks.getByDate:', error.message); return []; }
-      return (data || []).map((r: any) => ({ id: r.id, contractorId: r.contractor_id, blockDate: r.block_date, reason: r.reason || undefined, createdAt: r.created_at }));
+      return (data || []).map((r: any) => db.contractorBlocks._map(r));
     },
-    create: async (contractorId: string, blockDate: string, reason?: string): Promise<ContractorBlock> => {
-      const { data, error } = await supabase.from('contractor_blocks').insert({ contractor_id: contractorId, block_date: blockDate, reason: reason || null }).select().single();
+    create: async (contractorId: string, blockDate: string, blockType: 'full' | 'partial' = 'full', availableFrom?: string, availableTo?: string, reason?: string): Promise<ContractorBlock> => {
+      const { data, error } = await supabase.from('contractor_blocks').insert({ contractor_id: contractorId, block_date: blockDate, block_type: blockType, available_from: availableFrom || null, available_to: availableTo || null, reason: reason || null }).select().single();
       if (error) { console.error('db.contractorBlocks.create:', error.message); throw error; }
-      return { id: data.id, contractorId: data.contractor_id, blockDate: data.block_date, reason: data.reason || undefined, createdAt: data.created_at };
+      return db.contractorBlocks._map(data);
+    },
+    upsert: async (contractorId: string, blockDate: string, blockType: 'full' | 'partial', availableFrom?: string, availableTo?: string, reason?: string): Promise<ContractorBlock> => {
+      // Delete existing block for this date first, then insert fresh
+      await supabase.from('contractor_blocks').delete().eq('contractor_id', contractorId).eq('block_date', blockDate);
+      return db.contractorBlocks.create(contractorId, blockDate, blockType, availableFrom, availableTo, reason);
     },
     delete: async (id: string): Promise<void> => {
       const { error } = await supabase.from('contractor_blocks').delete().eq('id', id);
       if (error) console.error('db.contractorBlocks.delete:', error.message);
+    },
+    deleteByDate: async (contractorId: string, blockDate: string): Promise<void> => {
+      const { error } = await supabase.from('contractor_blocks').delete().eq('contractor_id', contractorId).eq('block_date', blockDate);
+      if (error) console.error('db.contractorBlocks.deleteByDate:', error.message);
     },
   },
 

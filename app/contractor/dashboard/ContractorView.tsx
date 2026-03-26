@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import { Job, ContractorAvailability, ContractorBlock } from '@/lib/types'
-import { acceptJob, completeJob, uploadBeforePhotos, uploadAfterPhotos, submitClientSignoff, setAvailabilityDay, addBlock, removeBlock } from './actions'
-import { CheckCircle, Clock, MapPin, User, Upload, Camera, FileText, Briefcase, AlertTriangle, Shield, ChevronDown, ChevronUp, CalendarDays, Ban, Plus, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { acceptJob, completeJob, uploadBeforePhotos, uploadAfterPhotos, submitClientSignoff, setAvailabilityDay, saveBlock, removeBlock } from './actions'
+import { CheckCircle, Clock, MapPin, User, Upload, Camera, Briefcase, AlertTriangle, Shield, ChevronDown, ChevronUp, CalendarDays, ChevronLeft, ChevronRight, X } from 'lucide-react'
 
 type JobWithClient = Job & {
   clientName: string
@@ -12,6 +12,8 @@ type JobWithClient = Job & {
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const DAY_HEADERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+
+type ModalChoice = 'available' | 'partial' | 'busy'
 
 function AvailabilityTab({
   availability,
@@ -26,44 +28,81 @@ function AvailabilityTab({
   const [viewDate, setViewDate] = useState(() => new Date())
   const [showSchedule, setShowSchedule] = useState(false)
 
-  // ── Calendar helpers ──────────────────────────────────────────────────────
+  // Modal state
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [modalChoice, setModalChoice] = useState<ModalChoice>('available')
+  const [partialFrom, setPartialFrom] = useState('08:00')
+  const [partialTo, setPartialTo] = useState('17:00')
+
+  const pad = (n: number) => String(n).padStart(2, '0')
   const year = viewDate.getFullYear()
   const month = viewDate.getMonth()
   const todayStr = new Date().toISOString().slice(0, 10)
 
-  const pad = (n: number) => String(n).padStart(2, '0')
-  const toDateStr = (y: number, m: number, d: number) => `${y}-${pad(m + 1)}-${pad(d)}`
-
   const firstDow = new Date(year, month, 1).getDay()
   const daysInMonth = new Date(year, month + 1, 0).getDate()
-
-  // Build flat array: null = empty leading cell, string = YYYY-MM-DD
   const calCells: (string | null)[] = [
     ...Array(firstDow).fill(null),
-    ...Array.from({ length: daysInMonth }, (_, i) => toDateStr(year, month, i + 1)),
+    ...Array.from({ length: daysInMonth }, (_, idx) =>
+      `${year}-${pad(month + 1)}-${pad(idx + 1)}`
+    ),
   ]
 
-  const isBlocked = (d: string) => localBlocks.some(b => b.blockDate === d)
+  const getBlock = (d: string) => localBlocks.find(b => b.blockDate === d)
   const isPast = (d: string) => d < todayStr
+  const monthLabel = viewDate.toLocaleDateString('en-CA', { month: 'long', year: 'numeric' })
 
-  const toggleCalDay = (dateStr: string) => {
-    if (isPast(dateStr) || isPending) return
-    if (isBlocked(dateStr)) {
-      const block = localBlocks.find(b => b.blockDate === dateStr)
-      if (!block || block.id.startsWith('temp')) return
-      setLocalBlocks(p => p.filter(b => b.blockDate !== dateStr))
-      const fd = new FormData()
-      fd.set('blockId', block.id)
-      startTransition(() => removeBlock(fd))
+  // Open modal for a date
+  const openDay = (dateStr: string) => {
+    if (isPast(dateStr)) return
+    const existing = getBlock(dateStr)
+    if (existing) {
+      setModalChoice(existing.blockType === 'partial' ? 'partial' : 'busy')
+      setPartialFrom(existing.availableFrom || '08:00')
+      setPartialTo(existing.availableTo || '17:00')
     } else {
-      setLocalBlocks(p => [...p, { id: 'temp-' + dateStr, contractorId: '', blockDate: dateStr, reason: undefined, createdAt: new Date().toISOString() }])
-      const fd = new FormData()
-      fd.set('blockDate', dateStr)
-      startTransition(() => addBlock(fd))
+      setModalChoice('available')
+      setPartialFrom('08:00')
+      setPartialTo('17:00')
     }
+    setSelectedDate(dateStr)
   }
 
-  // ── Weekly schedule helpers ───────────────────────────────────────────────
+  const closeModal = () => setSelectedDate(null)
+
+  const confirmDay = () => {
+    if (!selectedDate) return
+    if (modalChoice === 'available') {
+      // Clear any block for this date
+      setLocalBlocks(p => p.filter(b => b.blockDate !== selectedDate))
+      const fd = new FormData()
+      fd.set('blockDate', selectedDate)
+      startTransition(() => removeBlock(fd))
+    } else {
+      const isPartial = modalChoice === 'partial'
+      const newBlock: ContractorBlock = {
+        id: 'temp-' + selectedDate,
+        contractorId: '',
+        blockDate: selectedDate,
+        blockType: isPartial ? 'partial' : 'full',
+        availableFrom: isPartial ? partialFrom : undefined,
+        availableTo: isPartial ? partialTo : undefined,
+        createdAt: new Date().toISOString(),
+      }
+      setLocalBlocks(p => [...p.filter(b => b.blockDate !== selectedDate), newBlock])
+      const fd = new FormData()
+      fd.set('blockDate', selectedDate)
+      fd.set('blockType', isPartial ? 'partial' : 'full')
+      if (isPartial) {
+        fd.set('availableFrom', partialFrom)
+        fd.set('availableTo', partialTo)
+      }
+      startTransition(() => saveBlock(fd))
+    }
+    closeModal()
+  }
+
+  // Weekly schedule helpers
   const getDay = (dow: number) => localAvail.find(a => a.dayOfWeek === dow)
 
   const toggleWeekDay = (dow: number) => {
@@ -94,8 +133,9 @@ function AvailabilityTab({
     startTransition(() => setAvailabilityDay(fd))
   }
 
-  const monthLabel = viewDate.toLocaleDateString('en-CA', { month: 'long', year: 'numeric' })
-  const busyThisMonth = localBlocks.filter(b => b.blockDate.startsWith(`${year}-${pad(month + 1)}`))
+  const markedCount = localBlocks.filter(b =>
+    b.blockDate.startsWith(`${year}-${pad(month + 1)}`)
+  ).length
 
   return (
     <div className="space-y-4 pb-6">
@@ -113,9 +153,10 @@ function AvailabilityTab({
           </button>
           <div className="text-center">
             <p className="font-bold text-gray-900">{monthLabel}</p>
-            {busyThisMonth.length > 0 && (
-              <p className="text-xs text-red-500 font-medium">{busyThisMonth.length} busy day{busyThisMonth.length > 1 ? 's' : ''}</p>
-            )}
+            {markedCount > 0
+              ? <p className="text-xs text-red-500 font-medium">{markedCount} day{markedCount > 1 ? 's' : ''} marked</p>
+              : <p className="text-xs text-green-600 font-medium">All clear</p>
+            }
           </div>
           <button
             onClick={() => setViewDate(d => new Date(d.getFullYear(), d.getMonth() + 1, 1))}
@@ -127,50 +168,52 @@ function AvailabilityTab({
 
         {/* Day-of-week headers */}
         <div className="grid grid-cols-7 px-3 pt-3 pb-1">
-          {DAY_HEADERS.map((h, i) => (
-            <div key={i} className="text-center text-xs font-bold text-gray-400 py-1">{h}</div>
+          {DAY_HEADERS.map((h, idx) => (
+            <div key={idx} className="text-center text-xs font-bold text-gray-400 py-1">{h}</div>
           ))}
         </div>
 
         {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-1 px-3 pb-4">
-          {calCells.map((dateStr, i) => {
-            if (!dateStr) return <div key={`e-${i}`} />
-            const blocked = isBlocked(dateStr)
+        <div className="grid grid-cols-7 gap-1 px-3 pb-3">
+          {calCells.map((dateStr, idx) => {
+            if (!dateStr) return <div key={`e-${idx}`} />
+            const block = getBlock(dateStr)
             const past = isPast(dateStr)
             const isToday = dateStr === todayStr
             return (
               <button
                 key={dateStr}
-                onClick={() => toggleCalDay(dateStr)}
+                onClick={() => openDay(dateStr)}
                 disabled={past}
-                className={`
-                  aspect-square rounded-xl flex items-center justify-center text-sm font-semibold
-                  transition-all active:scale-90 select-none
-                  ${blocked
+                className={[
+                  'aspect-square rounded-xl flex flex-col items-center justify-center text-sm font-semibold transition-all active:scale-90 select-none relative',
+                  block?.blockType === 'full'
                     ? 'bg-red-500 text-white shadow-sm'
+                    : block?.blockType === 'partial'
+                    ? 'bg-amber-400 text-white shadow-sm'
                     : isToday
                     ? 'bg-orange-100 text-orange-700 ring-2 ring-orange-400'
                     : past
                     ? 'text-gray-200 cursor-default'
-                    : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'}
-                `}
+                    : 'text-gray-700 hover:bg-gray-100',
+                ].join(' ')}
               >
                 {new Date(dateStr + 'T12:00:00').getDate()}
+                {block?.blockType === 'partial' && (
+                  <span className="text-[8px] leading-none opacity-90 mt-0.5">
+                    {block.availableFrom?.slice(0, 5)}
+                  </span>
+                )}
               </button>
             )
           })}
         </div>
 
-        {/* Legend + hint */}
-        <div className="flex items-center gap-4 px-4 pb-4 text-xs text-gray-400">
-          <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-red-500 inline-block" /> Busy
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-orange-100 ring-1 ring-orange-400 inline-block" /> Today
-          </span>
-          <span className="ml-auto italic">Tap to toggle</span>
+        {/* Legend */}
+        <div className="flex items-center gap-4 px-4 pb-4 pt-1 text-xs text-gray-400 border-t border-gray-50">
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-red-500 inline-block" /> Busy all day</span>
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-400 inline-block" /> Partial hours</span>
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-orange-100 ring-1 ring-orange-400 inline-block" /> Today</span>
         </div>
       </div>
 
@@ -184,7 +227,7 @@ function AvailabilityTab({
           <CalendarDays className="w-5 h-5 text-orange-500 flex-shrink-0" />
           <div className="flex-1 text-left">
             <p className="font-bold text-gray-900 text-sm">Weekly Hours Template</p>
-            <p className="text-xs text-gray-400">Set your default working hours per day of week</p>
+            <p className="text-xs text-gray-400">Default working hours per day of week</p>
           </div>
           {showSchedule ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
         </button>
@@ -227,6 +270,99 @@ function AvailabilityTab({
           </div>
         )}
       </div>
+
+      {/* ── Day modal (bottom sheet) ────────────────────────────────────────── */}
+      {selectedDate && (
+        <div className="fixed inset-0 z-50 flex flex-col justify-end">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/40" onClick={closeModal} />
+
+          {/* Sheet */}
+          <div className="relative bg-white rounded-t-3xl shadow-2xl px-4 pt-2 pb-8 space-y-4 animate-in slide-in-from-bottom duration-200">
+            {/* Drag handle */}
+            <div className="w-10 h-1 rounded-full bg-gray-300 mx-auto mb-2" />
+
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-bold text-gray-900 text-lg">
+                  {new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric' })}
+                </p>
+                <p className="text-sm text-gray-400">Choose your availability for this day</p>
+              </div>
+              <button onClick={closeModal} className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 active:scale-90 transition-all">
+                <X className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
+
+            {/* Option buttons */}
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                { id: 'available', emoji: '✅', label: 'Available', sub: 'All day', color: 'green' },
+                { id: 'partial',   emoji: '🕐', label: 'Partial',   sub: 'Set hours', color: 'amber' },
+                { id: 'busy',      emoji: '🚫', label: 'Busy',      sub: 'All day', color: 'red' },
+              ] as { id: ModalChoice; emoji: string; label: string; sub: string; color: string }[]).map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => setModalChoice(opt.id)}
+                  className={[
+                    'flex flex-col items-center gap-1 rounded-2xl py-4 px-2 border-2 transition-all active:scale-95',
+                    modalChoice === opt.id
+                      ? opt.color === 'green'  ? 'border-green-500 bg-green-50'
+                      : opt.color === 'amber'  ? 'border-amber-400 bg-amber-50'
+                      : 'border-red-500 bg-red-50'
+                      : 'border-gray-200 bg-white',
+                  ].join(' ')}
+                >
+                  <span className="text-2xl">{opt.emoji}</span>
+                  <span className="text-sm font-bold text-gray-800">{opt.label}</span>
+                  <span className="text-xs text-gray-400">{opt.sub}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Time pickers — only shown for partial */}
+            {modalChoice === 'partial' && (
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Available from</label>
+                  <input
+                    type="time"
+                    value={partialFrom}
+                    onChange={e => setPartialFrom(e.target.value)}
+                    className="w-full rounded-xl border border-gray-200 px-4 py-3.5 text-base font-semibold focus:ring-2 focus:ring-amber-400 focus:border-amber-400 bg-gray-50"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Available until</label>
+                  <input
+                    type="time"
+                    value={partialTo}
+                    onChange={e => setPartialTo(e.target.value)}
+                    className="w-full rounded-xl border border-gray-200 px-4 py-3.5 text-base font-semibold focus:ring-2 focus:ring-amber-400 focus:border-amber-400 bg-gray-50"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Confirm button */}
+            <button
+              onClick={confirmDay}
+              disabled={isPending}
+              className={[
+                'w-full py-4 rounded-2xl text-white font-bold text-base shadow-sm active:scale-[0.98] transition-all',
+                modalChoice === 'available' ? 'bg-green-500'
+                : modalChoice === 'partial' ? 'bg-amber-400'
+                : 'bg-red-500',
+              ].join(' ')}
+            >
+              {modalChoice === 'available' ? 'Mark as Available'
+                : modalChoice === 'partial' ? `Set Hours ${partialFrom} – ${partialTo}`
+                : 'Mark as Busy'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

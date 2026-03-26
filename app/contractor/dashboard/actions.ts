@@ -143,21 +143,34 @@ export async function setAvailabilityDay(formData: FormData) {
   revalidatePath('/contractor/dashboard')
 }
 
-export async function addBlock(formData: FormData) {
+export async function saveBlock(formData: FormData) {
   const cookieStore = await cookies()
   const contractorId = getContractorId(cookieStore)
   if (!contractorId) return
   const blockDate = formData.get('blockDate') as string
-  const reason = (formData.get('reason') as string) || ''
+  const blockType = (formData.get('blockType') as 'full' | 'partial') || 'full'
+  const availableFrom = (formData.get('availableFrom') as string) || undefined
+  const availableTo = (formData.get('availableTo') as string) || undefined
   if (!blockDate) return
-  await db.contractorBlocks.create(contractorId, blockDate, reason || undefined)
+  await db.contractorBlocks.upsert(contractorId, blockDate, blockType, availableFrom, availableTo)
   revalidatePath('/contractor/dashboard')
+}
+
+// Keep old name for backward compat
+export async function addBlock(formData: FormData) {
+  return saveBlock(formData)
 }
 
 export async function removeBlock(formData: FormData) {
   const blockId = formData.get('blockId') as string
-  if (!blockId) return
-  await db.contractorBlocks.delete(blockId)
+  const blockDate = formData.get('blockDate') as string
+  const cookieStore = await cookies()
+  const contractorId = getContractorId(cookieStore)
+  if (blockId) {
+    await db.contractorBlocks.delete(blockId)
+  } else if (blockDate && contractorId) {
+    await db.contractorBlocks.deleteByDate(contractorId, blockDate)
+  }
   revalidatePath('/contractor/dashboard')
 }
 

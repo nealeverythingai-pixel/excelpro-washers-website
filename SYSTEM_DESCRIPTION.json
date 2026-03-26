@@ -1,0 +1,1469 @@
+{
+  "project": {
+    "name": "ExcelPro Washers Website",
+    "packageName": "excelpro-washers",
+    "version": "0.1.0",
+    "description": "Full-stack Next.js 16 business website and CRM for ExcelPro Washers — an exterior cleaning company in Ottawa, Ontario, Canada. Includes AI lead qualification, multi-portal architecture (Admin/Sales/Contractor), Stripe payments, Twilio voice/SMS, Resend email automation, semantic search with pgvector, and automated follow-up sequences.",
+    "businessInfo": {
+      "name": "ExcelPro Washers",
+      "tagline": "Ottawa's Trusted Exterior Cleaning Experts",
+      "phone": "+1-343-321-5300",
+      "email": "info@excelprowashers.com",
+      "location": {
+        "city": "Ottawa",
+        "province": "Ontario",
+        "country": "Canada"
+      },
+      "currency": "CAD",
+      "services": [
+        { "name": "Soft Washing", "startingPrice": 299, "description": "Premium cleaning for siding, stucco, and brick" },
+        { "name": "Pressure Washing", "startingPrice": 149, "description": "Driveways, patios, decks, and walkways" },
+        { "name": "Gutter Cleaning", "startingPrice": 175, "description": "Clean and flush gutters and downspouts" },
+        { "name": "Roof Cleaning", "startingPrice": 450, "description": "Soft wash roof treatment for moss, algae & lichen" },
+        { "name": "Window Cleaning", "startingPrice": 200, "description": "Interior and exterior residential window cleaning" }
+      ],
+      "serviceAreas": [
+        "Kanata", "Barrhaven", "Orleans", "Nepean", "Stittsville",
+        "Manotick", "Riverside South", "Findlay Creek", "Westboro",
+        "The Glebe", "Old Ottawa South", "Alta Vista"
+      ],
+      "contractorEarningsRate": 0.70,
+      "companyRetentionRate": 0.30
+    }
+  },
+
+  "techStack": {
+    "framework": "Next.js 16.1.6 (App Router)",
+    "runtime": "Node.js",
+    "language": "TypeScript 5",
+    "ui": {
+      "react": "React 18",
+      "styling": "Tailwind CSS 3.3.0",
+      "animations": "Framer Motion",
+      "darkMode": "next-themes (class strategy)",
+      "icons": "Lucide React",
+      "fonts": "Inter (Google Fonts via next/font)"
+    },
+    "database": {
+      "provider": "Supabase (PostgreSQL + pgvector)",
+      "client": "@supabase/supabase-js",
+      "embeddingDimensions": 1536,
+      "vectorIndex": "IVFFlat (cosine similarity, lists=50)"
+    },
+    "ai": {
+      "leadQualification": {
+        "provider": "Anthropic",
+        "model": "claude-haiku-4-5-20251001",
+        "purpose": "Score and categorize leads 0-100"
+      },
+      "businessAdvisor": {
+        "provider": "Anthropic",
+        "model": "Claude (tool_use)",
+        "purpose": "Admin chat assistant with 20+ CRM tools"
+      },
+      "embeddings": {
+        "provider": "OpenAI",
+        "model": "text-embedding-ada-002",
+        "dimensions": 1536,
+        "purpose": "Semantic search across CRM data"
+      },
+      "voiceTTS": {
+        "provider": "ElevenLabs (optional, fallback to Amazon Polly via Twilio)",
+        "defaultVoice": "Rachel (21m00Tcm4TlvDq8ikWAM)",
+        "purpose": "Natural-sounding AI phone receptionist"
+      }
+    },
+    "payments": {
+      "provider": "Stripe",
+      "apiVersion": "2026-01-28.clover",
+      "features": ["Checkout Sessions", "Webhooks", "Invoice Payments"]
+    },
+    "email": {
+      "provider": "Resend",
+      "features": ["Transactional emails", "Marketing campaigns", "HTML templates", "CAN-SPAM compliance", "Unsubscribe links"]
+    },
+    "sms": {
+      "provider": "Twilio",
+      "features": ["Hot lead alerts", "Job notifications to contractors", "Payment confirmations"]
+    },
+    "voice": {
+      "provider": "Twilio (TwiML)",
+      "features": ["AI phone receptionist", "Speech recognition", "DTMF input", "Call recording/voicemail", "ElevenLabs TTS integration"]
+    },
+    "pdf": {
+      "provider": "@react-pdf/renderer",
+      "features": ["Server-side invoice PDF generation", "Branded templates", "Status banners"]
+    },
+    "deployment": {
+      "platform": "Vercel",
+      "cronJobs": true
+    }
+  },
+
+  "dependencies": {
+    "core": {
+      "next": "16.1.6",
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0",
+      "typescript": "^5"
+    },
+    "ai": {
+      "@anthropic-ai/sdk": "AI lead qualification and business advisor",
+      "openai": "Text embeddings for semantic search"
+    },
+    "database": {
+      "@supabase/supabase-js": "PostgreSQL client with pgvector support"
+    },
+    "payments": {
+      "stripe": "Payment processing",
+      "@stripe/stripe-js": "Client-side Stripe integration"
+    },
+    "email": {
+      "resend": "Transactional and marketing email service"
+    },
+    "sms_and_voice": {
+      "twilio": "SMS notifications and voice receptionist",
+      "@twilio/voice-sdk": "Voice SDK",
+      "@elevenlabs/elevenlabs-js": "Premium AI voice synthesis"
+    },
+    "ui": {
+      "tailwindcss": "Utility-first CSS",
+      "framer-motion": "Animations and transitions",
+      "lucide-react": "Icon library",
+      "next-themes": "Dark/light mode",
+      "clsx": "Conditional classnames",
+      "tailwind-merge": "Tailwind class merging"
+    },
+    "pdf": {
+      "@react-pdf/renderer": "Server-side PDF generation"
+    },
+    "other": {
+      "qrcode": "QR code generation",
+      "uuid": "Unique ID generation"
+    }
+  },
+
+  "pages": {
+    "public": [
+      {
+        "path": "/",
+        "file": "app/page.tsx",
+        "description": "Homepage with Hero, Trust Bar, Services Preview, Gallery, Testimonials, ServiceAreas, How It Works, Why Choose Us, FAQ, and CTA sections",
+        "components": ["Hero", "Gallery", "Testimonials", "ServiceAreas", "FAQ", "CTA"]
+      },
+      {
+        "path": "/about",
+        "file": "app/about/page.tsx",
+        "description": "Company story, stats (500+ homes, 4.9/5 rating, 5 years), why choose us, 9 service area neighborhoods"
+      },
+      {
+        "path": "/services",
+        "file": "app/services/page.tsx",
+        "description": "6 services with detailed features and pricing, PricingCalculator, commercial plans CTA, ServiceSchema structured data"
+      },
+      {
+        "path": "/contact",
+        "file": "app/contact/page.tsx",
+        "description": "Contact form with business info, uses ContactForm component which posts to /api/contact for AI lead qualification"
+      },
+      {
+        "path": "/blog",
+        "file": "app/blog/page.tsx",
+        "description": "Blog listing with 3 hardcoded posts covering window cleaning, soft wash vs pressure wash, and pressure washing guide"
+      },
+      {
+        "path": "/blog/[slug]",
+        "file": "app/blog/[slug]/page.tsx",
+        "description": "Individual blog post page with dynamic routing"
+      },
+      {
+        "path": "/careers",
+        "file": "app/careers/page.tsx",
+        "description": "Door-to-door sales representative recruitment page with compensation details, role description, and application CTA"
+      },
+      {
+        "path": "/invoice/[id]",
+        "file": "app/invoice/[id]/page.tsx",
+        "description": "Public invoice view page with Stripe 'Pay Now' button for unpaid invoices",
+        "components": ["CustomerInvoice"]
+      },
+      {
+        "path": "/unsubscribe",
+        "file": "app/unsubscribe/page.tsx",
+        "description": "Email unsubscribe page for newsletter and marketing emails"
+      }
+    ],
+    "admin": [
+      {
+        "path": "/admin/login",
+        "file": "app/admin/login/page.tsx",
+        "description": "Admin login page using ADMIN_PASSWORD + ADMIN_EMAIL env vars"
+      },
+      {
+        "path": "/admin/dashboard",
+        "file": "app/admin/dashboard/page.tsx",
+        "description": "Main admin dashboard with stats cards: leads this month, hot leads, revenue, conversion rate, upcoming jobs, pending quotes, outstanding invoices, recent leads table",
+        "layout": "AdminDashboardShell with AdminSidebar"
+      },
+      {
+        "path": "/admin/dashboard/leads",
+        "file": "app/admin/dashboard/leads/page.tsx",
+        "description": "Lead management with AI score display, category filters (hot/warm/cold), status management"
+      },
+      {
+        "path": "/admin/dashboard/clients",
+        "file": "app/admin/dashboard/clients/page.tsx",
+        "description": "Client list and management"
+      },
+      {
+        "path": "/admin/dashboard/clients/[id]",
+        "file": "app/admin/dashboard/clients/[id]/page.tsx",
+        "description": "Individual client detail view"
+      },
+      {
+        "path": "/admin/dashboard/quotes",
+        "file": "app/admin/dashboard/quotes/page.tsx",
+        "description": "Quote list and management"
+      },
+      {
+        "path": "/admin/dashboard/quotes/new",
+        "file": "app/admin/dashboard/quotes/new/page.tsx",
+        "description": "Create new quote form"
+      },
+      {
+        "path": "/admin/dashboard/quotes/[id]",
+        "file": "app/admin/dashboard/quotes/[id]/page.tsx",
+        "description": "Individual quote view"
+      },
+      {
+        "path": "/admin/dashboard/quotes/[id]/edit",
+        "file": "app/admin/dashboard/quotes/[id]/edit/page.tsx",
+        "description": "Edit existing quote"
+      },
+      {
+        "path": "/admin/dashboard/jobs",
+        "file": "app/admin/dashboard/jobs/page.tsx",
+        "description": "Job list and management"
+      },
+      {
+        "path": "/admin/dashboard/invoices",
+        "file": "app/admin/dashboard/invoices/page.tsx",
+        "description": "Invoice list and management"
+      },
+      {
+        "path": "/admin/dashboard/invoices/new",
+        "file": "app/admin/dashboard/invoices/new/page.tsx",
+        "description": "Create new invoice form"
+      },
+      {
+        "path": "/admin/dashboard/invoices/[id]",
+        "file": "app/admin/dashboard/invoices/[id]/page.tsx",
+        "description": "Individual invoice view with send/remind/mark-paid actions"
+      },
+      {
+        "path": "/admin/dashboard/contractors",
+        "file": "app/admin/dashboard/contractors/page.tsx",
+        "description": "Contractor management and performance overview"
+      },
+      {
+        "path": "/admin/dashboard/users",
+        "file": "app/admin/dashboard/users/page.tsx",
+        "description": "User management (admins, sales reps, contractors)"
+      },
+      {
+        "path": "/admin/dashboard/schedule",
+        "file": "app/admin/dashboard/schedule/page.tsx",
+        "description": "Job scheduling calendar/view"
+      },
+      {
+        "path": "/admin/dashboard/calls",
+        "file": "app/admin/dashboard/calls/page.tsx",
+        "description": "Voice call logs and conversation history"
+      },
+      {
+        "path": "/admin/dashboard/email-marketing",
+        "file": "app/admin/dashboard/email-marketing/page.tsx",
+        "description": "Email marketing campaign management with subscriber stats"
+      },
+      {
+        "path": "/admin/dashboard/ai-advisor",
+        "file": "app/admin/dashboard/ai-advisor/page.tsx",
+        "description": "AI Business Advisor chat interface using Claude with CRM tool access"
+      },
+      {
+        "path": "/admin/dashboard/ai-performance",
+        "file": "app/admin/dashboard/ai-performance/page.tsx",
+        "description": "AI lead qualification performance dashboard with accuracy tracking, feedback system, and CSV export"
+      },
+      {
+        "path": "/admin/dashboard/analytics",
+        "file": "app/admin/dashboard/analytics/page.tsx",
+        "description": "Business analytics and reporting"
+      },
+      {
+        "path": "/admin/dashboard/route-optimizer",
+        "file": "app/admin/dashboard/route-optimizer/page.tsx",
+        "description": "Route optimization for service scheduling"
+      },
+      {
+        "path": "/admin/dashboard/test-cron",
+        "file": "app/admin/dashboard/test-cron/page.tsx",
+        "description": "Manual cron job testing interface"
+      },
+      {
+        "path": "/admin/dashboard/test-notifications",
+        "file": "app/admin/dashboard/test-notifications/page.tsx",
+        "description": "Notification system testing interface"
+      }
+    ],
+    "sales": [
+      {
+        "path": "/sales/login",
+        "file": "app/sales/login/page.tsx",
+        "description": "Sales rep login using email + PIN from users table (role=SALES)"
+      },
+      {
+        "path": "/sales/dashboard",
+        "file": "app/sales/dashboard/page.tsx",
+        "description": "Sales dashboard with lead viewing, client management, quote creation — no access to invoices/payments"
+      },
+      {
+        "path": "/sales/dashboard/quote",
+        "file": "app/sales/dashboard/quote/page.tsx",
+        "description": "Sales quote creation page"
+      }
+    ],
+    "contractor": [
+      {
+        "path": "/contractor/login",
+        "file": "app/contractor/login/page.tsx",
+        "description": "Contractor login using email + PIN from users table (role=CONTRACTOR)"
+      },
+      {
+        "path": "/contractor/dashboard",
+        "file": "app/contractor/dashboard/page.tsx",
+        "description": "Contractor dashboard with 'Available Jobs' (unassigned) and 'My Jobs' (assigned) tabs, job acceptance, earnings tracking"
+      }
+    ]
+  },
+
+  "apiEndpoints": {
+    "contact": [
+      {
+        "path": "/api/contact",
+        "method": "POST",
+        "description": "Contact form submission handler. Runs AI lead qualification (Claude Haiku), stores in Supabase, creates quote, routes lead through LeadRouter (notifications + emails + follow-ups), logs AI decision, optionally subscribes to newsletter.",
+        "auth": "none (public)",
+        "rateLimit": false
+      }
+    ],
+    "ai": [
+      {
+        "path": "/api/ai/business-advisor",
+        "method": "POST",
+        "description": "AI Business Advisor chat endpoint using Anthropic tool_use. Supports 20+ CRM tools for managing clients, jobs, quotes, invoices, leads, semantic search, email, and analytics. 8-message conversation history.",
+        "auth": "admin session cookie",
+        "rateLimit": "10 req/min"
+      },
+      {
+        "path": "/api/ai/business-insights",
+        "method": "POST",
+        "description": "AI-powered business insights and analytics generation",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/ai/qualify-lead",
+        "methods": ["POST", "GET"],
+        "description": "Standalone lead qualification endpoint. POST to qualify a new lead, GET to retrieve qualification history.",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/ai/sync-embeddings",
+        "method": "POST",
+        "description": "Sync CRM data embeddings to pgvector for semantic search. Processes clients, jobs, leads, and quotes.",
+        "auth": "admin session cookie"
+      }
+    ],
+    "admin": [
+      {
+        "path": "/api/admin/leads",
+        "method": "GET",
+        "description": "Get all leads with optional filters",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/leads/[id]",
+        "method": "PATCH",
+        "description": "Update lead status/details",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/leads/[id]/convert",
+        "method": "POST",
+        "description": "Convert lead to client record",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/quotes",
+        "method": "POST",
+        "description": "Create new quote",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/quotes/[id]",
+        "methods": ["GET", "PATCH", "PUT"],
+        "description": "Get, update status, or fully replace a quote",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/quotes/[id]/send",
+        "method": "POST",
+        "description": "Send quote to client via email",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/quotes/[id]/convert",
+        "method": "POST",
+        "description": "Convert accepted quote to job",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/jobs",
+        "method": "POST",
+        "description": "Create new job (auto-sets availableToContractors, calculates contractor earnings at 70%)",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/jobs/[id]",
+        "methods": ["GET", "PUT"],
+        "description": "Get or update job details",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/invoices",
+        "method": "POST",
+        "description": "Create new invoice",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/invoices/[id]",
+        "method": "PUT",
+        "description": "Update invoice details",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/invoices/[id]/mark-paid",
+        "method": "POST",
+        "description": "Manually mark invoice as paid",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/invoices/[id]/remind",
+        "method": "POST",
+        "description": "Send payment reminder email to client",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/email-marketing",
+        "method": "GET",
+        "description": "Get email marketing stats (subscribers, campaigns)",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/ai-performance",
+        "method": "GET",
+        "description": "Get AI lead qualification performance metrics",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/ai-feedback",
+        "method": "POST",
+        "description": "Submit human feedback (accurate/inaccurate) on AI lead qualification decisions",
+        "auth": "admin session cookie"
+      },
+      {
+        "path": "/api/admin/notifications/preferences",
+        "methods": ["GET", "POST"],
+        "description": "Get or update admin notification preferences",
+        "auth": "admin session cookie"
+      }
+    ],
+    "jobs": [
+      {
+        "path": "/api/jobs/notify-contractors",
+        "method": "POST",
+        "description": "Send SMS and email notifications to all active contractors about a new available job",
+        "auth": "internal"
+      },
+      {
+        "path": "/api/jobs/accept",
+        "method": "POST",
+        "description": "Contractor accepts an available job. First-come-first-served with race condition handling (409 Conflict if already assigned). Assigns contractor, sends confirmation SMS/email, notifies admin.",
+        "auth": "contractor session"
+      }
+    ],
+    "invoices": [
+      {
+        "path": "/api/invoices/[id]/pdf",
+        "method": "GET",
+        "description": "Generate and download invoice PDF using @react-pdf/renderer",
+        "auth": "none (public, accessed via invoice link)"
+      }
+    ],
+    "payments": [
+      {
+        "path": "/api/create-checkout-session",
+        "method": "POST",
+        "description": "Create Stripe Checkout session for invoice payment in CAD. Redirects to Stripe-hosted payment page.",
+        "auth": "none (public, requires valid invoiceId)"
+      }
+    ],
+    "webhooks": [
+      {
+        "path": "/api/webhooks/stripe",
+        "method": "POST",
+        "description": "Stripe webhook handler. Processes checkout.session.completed (marks invoice as Paid), payment_intent.succeeded, payment_intent.payment_failed events. Verifies webhook signature.",
+        "auth": "Stripe webhook signature"
+      }
+    ],
+    "voice": [
+      {
+        "path": "/api/voice/incoming",
+        "method": "POST",
+        "description": "Twilio webhook for incoming phone calls. Returns TwiML with greeting, speech/DTMF gather, ElevenLabs or Amazon Polly TTS, retry logic (max 2 attempts), voicemail recording fallback.",
+        "auth": "Twilio webhook"
+      },
+      {
+        "path": "/api/voice/respond",
+        "method": "POST",
+        "description": "Twilio webhook for processing caller speech input. Uses Claude AI to generate conversational responses about services, pricing, and scheduling.",
+        "auth": "Twilio webhook"
+      },
+      {
+        "path": "/api/voice/status",
+        "method": "POST",
+        "description": "Twilio call status callback. Logs call completion, duration, and status to database.",
+        "auth": "Twilio webhook"
+      },
+      {
+        "path": "/api/voice/elevenlabs-audio",
+        "method": "GET",
+        "description": "Proxy endpoint to stream ElevenLabs TTS audio for Twilio playback",
+        "auth": "none (internal use)"
+      },
+      {
+        "path": "/api/voice/analytics",
+        "method": "GET",
+        "description": "Get voice call analytics and statistics",
+        "auth": "admin session cookie"
+      }
+    ],
+    "newsletter": [
+      {
+        "path": "/api/newsletter/subscribe",
+        "method": "POST",
+        "description": "Subscribe email to newsletter via Supabase email_subscribers table",
+        "auth": "none (public)"
+      },
+      {
+        "path": "/api/newsletter/unsubscribe",
+        "methods": ["GET", "POST"],
+        "description": "Unsubscribe from newsletter. GET renders confirmation page, POST processes unsubscription.",
+        "auth": "none (public, token-based)"
+      },
+      {
+        "path": "/api/newsletter/send",
+        "method": "POST",
+        "description": "Send email campaign to all active subscribers via Resend",
+        "auth": "admin session cookie"
+      }
+    ],
+    "contractor": [
+      {
+        "path": "/api/contractor/register",
+        "method": "POST",
+        "description": "Contractor application submission with personal info, skills, insurance documentation, terms agreement, and digital signature",
+        "auth": "none (public)"
+      }
+    ],
+    "cron": [
+      {
+        "path": "/api/cron/follow-ups",
+        "method": "GET",
+        "description": "Daily cron job (2PM UTC via vercel.json). Executes pending warm/cold lead follow-up emails: Day 3/7/14 for warm leads, Day 7/30/90 for cold leads.",
+        "auth": "CRON_SECRET bearer token",
+        "schedule": "0 14 * * * (daily at 2PM UTC)"
+      },
+      {
+        "path": "/api/cron/check-stale-leads",
+        "method": "GET",
+        "description": "Daily cron job (11PM UTC via vercel.json). Finds leads older than 30 days with status 'new' for admin review.",
+        "auth": "CRON_SECRET bearer token",
+        "schedule": "0 23 * * * (daily at 11PM UTC)"
+      }
+    ],
+    "testing": [
+      {
+        "path": "/api/test-notification",
+        "methods": ["POST", "GET"],
+        "description": "Test notification system. POST sends test notifications via all channels. GET returns system status.",
+        "auth": "admin session cookie"
+      }
+    ]
+  },
+
+  "components": {
+    "marketing": [
+      {
+        "name": "Hero",
+        "file": "components/Hero.tsx",
+        "description": "Animated hero section with PerspectiveGrid, FloatingBubbles, TextGenerateEffect, Unsplash background image, and dual CTA buttons (Get Free Quote + Call Now)"
+      },
+      {
+        "name": "Gallery",
+        "file": "components/Gallery.tsx",
+        "description": "3-image gallery with Unsplash images and hover overlay effect"
+      },
+      {
+        "name": "Testimonials",
+        "file": "components/Testimonials.tsx",
+        "description": "6 testimonials with star ratings and 4.9/5 average trust badge"
+      },
+      {
+        "name": "ServiceAreas",
+        "file": "components/ServiceAreas.tsx",
+        "description": "12 Ottawa neighborhoods displayed in grid with map placeholder"
+      },
+      {
+        "name": "ServiceCard",
+        "file": "components/ServiceCard.tsx",
+        "description": "Individual service card with SpotlightCard wrapper, features list, and price display"
+      },
+      {
+        "name": "FAQ",
+        "file": "components/FAQ.tsx",
+        "description": "6 frequently asked questions with accordion-style disclosure panels"
+      },
+      {
+        "name": "CTA",
+        "file": "components/CTA.tsx",
+        "description": "Call-to-action section with 'Get a Quote' link"
+      },
+      {
+        "name": "AnnouncementBanner",
+        "file": "components/AnnouncementBanner.tsx",
+        "description": "Dismissible top banner promoting Winter Special (15% off)"
+      },
+      {
+        "name": "FloatingCTA",
+        "file": "components/FloatingCTA.tsx",
+        "description": "Mobile-only sticky floating 'Get a Quote Now' button that appears on scroll >300px"
+      }
+    ],
+    "forms": [
+      {
+        "name": "ContactForm",
+        "file": "components/ContactForm.tsx",
+        "description": "480-line multi-step contact form with progress bar, service toggle cards, auto phone formatting, estimated quote calculation, multi-service discounts (5-10%), posts to /api/contact"
+      },
+      {
+        "name": "PricingCalculator",
+        "file": "components/PricingCalculator.tsx",
+        "description": "497-line interactive pricing calculator for 5 services (window cleaning, soft wash, pressure washing, gutter, roof) with home type selection, window counts, $200 minimum"
+      },
+      {
+        "name": "NewsletterSignup",
+        "file": "components/NewsletterSignup.tsx",
+        "description": "Email newsletter signup with compact and full display modes, posts to /api/newsletter/subscribe"
+      }
+    ],
+    "layout": [
+      {
+        "name": "Navbar",
+        "file": "components/Navbar.tsx",
+        "description": "Sticky navigation with logo, links (Home/About/Services/Blog/Contact), ThemeToggle, Call Now button, mobile hamburger menu. Auto-hidden on /admin paths."
+      },
+      {
+        "name": "Footer",
+        "file": "components/Footer.tsx",
+        "description": "4-column footer with company info, service links, contact details, NewsletterSignup, and portal login links (Admin/Sales/Contractor). Hidden on /admin paths."
+      },
+      {
+        "name": "Breadcrumbs",
+        "file": "components/Breadcrumbs.tsx",
+        "description": "Navigation breadcrumb trail component"
+      }
+    ],
+    "interactive": [
+      {
+        "name": "ChatWidget",
+        "file": "components/ChatWidget.tsx",
+        "description": "Floating chat bot bubble with predefined quick-action options (Get a Quote, Our Services, Contact Info), animated with Framer Motion"
+      },
+      {
+        "name": "QRCodeGenerator",
+        "file": "components/QRCodeGenerator.tsx",
+        "description": "QR code canvas rendering with download functionality using qrcode library"
+      },
+      {
+        "name": "ThemeToggle",
+        "file": "components/ThemeToggle.tsx",
+        "description": "Animated sun/moon dark mode toggle with spring animation"
+      }
+    ],
+    "seo": [
+      {
+        "name": "JsonLd",
+        "file": "components/JsonLd.tsx",
+        "description": "LocalBusiness schema.org structured data (name, phone, address, geo coordinates, services, rating)"
+      },
+      {
+        "name": "StructuredData",
+        "file": "components/StructuredData.tsx",
+        "description": "Reusable structured data components: ArticleSchema, BreadcrumbSchema, ServiceSchema"
+      }
+    ],
+    "providers": [
+      {
+        "name": "ThemeProvider",
+        "file": "components/ThemeProvider.tsx",
+        "description": "next-themes ThemeProvider wrapper with system default"
+      }
+    ],
+    "ui_primitives": [
+      {
+        "name": "FadeIn",
+        "file": "components/ui/FadeIn.tsx",
+        "description": "Framer Motion fade-in animation wrapper"
+      },
+      {
+        "name": "FloatingBubbles",
+        "file": "components/ui/FloatingBubbles.tsx",
+        "description": "Animated floating bubble particles for hero background"
+      },
+      {
+        "name": "PerspectiveGrid",
+        "file": "components/ui/PerspectiveGrid.tsx",
+        "description": "3D perspective grid background effect"
+      },
+      {
+        "name": "SpotlightCard",
+        "file": "components/ui/SpotlightCard.tsx",
+        "description": "Card with mouse-following spotlight highlight effect"
+      },
+      {
+        "name": "SqueegeeTransition",
+        "file": "components/ui/SqueegeeTransition.tsx",
+        "description": "Custom page transition animation themed around window squeegee"
+      },
+      {
+        "name": "TextGenerateEffect",
+        "file": "components/ui/TextGenerateEffect.tsx",
+        "description": "Animated text reveal effect, word by word"
+      },
+      {
+        "name": "badge",
+        "file": "components/ui/badge.tsx",
+        "description": "Badge/label component"
+      },
+      {
+        "name": "button",
+        "file": "components/ui/button.tsx",
+        "description": "Button component with variants"
+      },
+      {
+        "name": "card",
+        "file": "components/ui/card.tsx",
+        "description": "Card container component"
+      },
+      {
+        "name": "tabs",
+        "file": "components/ui/tabs.tsx",
+        "description": "Tab navigation component"
+      }
+    ],
+    "admin": [
+      {
+        "name": "AdminDashboardShell",
+        "file": "app/admin/dashboard/AdminDashboardShell.tsx",
+        "description": "Admin dashboard layout shell with sidebar and content area"
+      },
+      {
+        "name": "AdminSidebar",
+        "file": "app/admin/dashboard/AdminSidebar.tsx",
+        "description": "Admin sidebar navigation with links to all dashboard sections"
+      },
+      {
+        "name": "CustomerInvoice",
+        "file": "app/invoice/[id]/CustomerInvoice.tsx",
+        "description": "Public-facing invoice view component with Stripe Pay Now integration"
+      }
+    ]
+  },
+
+  "libraries": {
+    "database": {
+      "db.ts": {
+        "file": "lib/db.ts",
+        "description": "562-line Supabase-backed database layer. Provides CRUD operations for all entities (clients, jobs, quotes, invoices, requests, users, contractorApplications) with automatic camelCase↔snake_case field mapping. Uses Supabase JS client.",
+        "exports": ["db"]
+      },
+      "supabase.ts": {
+        "file": "lib/supabase.ts",
+        "description": "Supabase client initialization with SUPABASE_URL and SUPABASE_ANON_KEY environment variables. Falls back to placeholder key during build.",
+        "exports": ["supabase"]
+      },
+      "leads.ts": {
+        "file": "lib/db/leads.ts",
+        "description": "Lead-specific database layer for lead_requests, lead_quotes, lead_follow_ups, and lead_ai_feedback tables. Provides getAll, getById, create, update, getStats, getStale operations.",
+        "exports": ["leadsDb"]
+      },
+      "subscribers.ts": {
+        "file": "lib/db/subscribers.ts",
+        "description": "Subscriber and campaign management for email marketing. Tables: email_subscribers, email_campaigns. Operations: subscribe, unsubscribe, getActive, getStats + campaign CRUD.",
+        "exports": ["subscribersDb"]
+      },
+      "voice.ts": {
+        "file": "lib/db/voice.ts",
+        "description": "Voice system database layer for call_conversations, call_logs, and voice_bookings tables with CRUD + stats.",
+        "exports": ["voiceDb"]
+      }
+    },
+    "ai": {
+      "LeadQualifier.ts": {
+        "file": "lib/ai/LeadQualifier.ts",
+        "description": "424-line AI lead qualification engine using Anthropic Claude Haiku. Weighted scoring: urgency (35%), budget fit (25%), authority (25%), project value (15%). Categories: HOT (80-100), WARM (50-79), COLD (<50). Includes fallback rule-based scoring if API fails. Generates personalized price-range quotes.",
+        "exports": ["LeadQualifier"]
+      },
+      "LeadRouter.ts": {
+        "file": "lib/ai/LeadRouter.ts",
+        "description": "Orchestrator that routes qualified leads to appropriate automation sequences. HOT → instant quote + 24h follow-up. WARM → instant quote + Day 3/7/14 nurture emails. COLD → educational email + Day 7/30/90 nurture + auto-newsletter-subscribe.",
+        "exports": ["LeadRouter"]
+      },
+      "WarmLeadSequence.ts": {
+        "file": "lib/ai/WarmLeadSequence.ts",
+        "description": "Warm lead email nurture sequence manager. Executes Day 3 (check-in), Day 7 (special offer with 10% discount code WARMBACK10), Day 14 (final reminder) follow-ups.",
+        "exports": ["WarmLeadSequence"]
+      },
+      "ColdLeadSequence.ts": {
+        "file": "lib/ai/ColdLeadSequence.ts",
+        "description": "Cold lead nurture sequence manager. Executes Day 7 (case study), Day 30 (seasonal offer with SAVE15), Day 90 (re-engagement) follow-ups. Auto-subscribes cold leads to newsletter.",
+        "exports": ["ColdLeadSequence"]
+      },
+      "embeddings.ts": {
+        "file": "lib/ai/embeddings.ts",
+        "description": "303-line semantic search system with pgvector. Uses OpenAI text-embedding-ada-002 for 1536-dim embeddings. Functions: generateEmbedding, upsertEmbedding, semanticSearch, syncAllEmbeddings. Builds searchable text for clients, jobs, leads, and quotes.",
+        "exports": ["generateEmbedding", "upsertEmbedding", "semanticSearch", "syncAllEmbeddings"]
+      },
+      "mcp-tools.ts": {
+        "file": "lib/ai/mcp-tools.ts",
+        "description": "867-line tool definitions for AI Business Advisor. Defines 20+ tools: list_clients, get_client, create_client, update_client, list_jobs, get_job, create_job, update_job, list_quotes, create_quote, list_invoices, create_invoice, list_leads, get_lead, update_lead, convert_lead, search_crm (semantic search), send_email, get_revenue_analytics. Each tool has name, description, input_schema, and execute function.",
+        "exports": ["mcpTools", "executeTool"]
+      }
+    },
+    "email": {
+      "EmailService.ts": {
+        "file": "lib/email/EmailService.ts",
+        "description": "505-line email service using Resend API. Methods: send() (generic), sendInstantQuote() (rich HTML with price range, timeline, and discount code QUICK10), sendEducationalEmail() (soft washing tips), sendFollowUp() (customizable follow-up), sendSpecialOffer() (discount promotion). All emails include CAN-SPAM footer with physical address and unsubscribe link.",
+        "exports": ["emailService"]
+      }
+    },
+    "notifications": {
+      "NotificationService.ts": {
+        "file": "lib/notifications/NotificationService.ts",
+        "description": "Multi-channel notification hub. notifyNewLead() sends: console log with detailed breakdown, Resend email (HTML with color-coded priority), Twilio SMS (hot leads only), and Slack webhook (optional). logAIDecision() records AI qualification decisions for performance tracking.",
+        "exports": ["notificationService"]
+      },
+      "notifications.ts": {
+        "file": "lib/notifications.ts",
+        "description": "230-line standalone hot lead notification utilities: sendHotLeadSMS() via Twilio and sendHotLeadEmail() via Resend with HTML template.",
+        "exports": ["sendHotLeadSMS", "sendHotLeadEmail"]
+      }
+    },
+    "pdf": {
+      "InvoicePDF.tsx": {
+        "file": "lib/pdf/InvoicePDF.tsx",
+        "description": "353-line React-PDF document for invoice generation. Includes company header with branding, status banners (Paid=green, Overdue=red, Pending=yellow), bill-to section, itemized service details, totals, payment instructions, and footer.",
+        "exports": ["InvoicePDF"]
+      }
+    },
+    "auth": {
+      "session.ts": {
+        "file": "lib/session.ts",
+        "description": "106-line HMAC-SHA256 session management. signSession() creates base64-encoded payload with hex signature. verifySession() validates signature integrity. verifyAdminSession() checks for ADMIN role. verifyPortalSession() checks for SALES or CONTRACTOR role. Uses SESSION_SECRET env var (falls back to ADMIN_PASSWORD).",
+        "exports": ["signSession", "verifySession", "verifyAdminSession", "verifyPortalSession"]
+      }
+    },
+    "utilities": {
+      "rateLimit.ts": {
+        "file": "lib/rateLimit.ts",
+        "description": "In-memory rate limiter with configurable window and max requests. isRateLimited() checks by IP, getClientIp() extracts from headers (x-forwarded-for), rateLimitResponse() returns 429 JSON. Auto-cleanup of expired entries every 5 minutes.",
+        "exports": ["isRateLimited", "getClientIp", "rateLimitResponse"]
+      },
+      "validateEnv.ts": {
+        "file": "lib/validateEnv.ts",
+        "description": "Environment variable validation at startup. Required: NEXT_PUBLIC_SITE_URL, ANTHROPIC_API_KEY, RESEND_API_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER, STRIPE_SECRET_KEY, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, CRON_SECRET. Recommended: OWNER_EMAIL, STRIPE_WEBHOOK_SECRET, DISCORD_WEBHOOK_URL.",
+        "exports": ["validateEnv"]
+      },
+      "utils.ts": {
+        "file": "lib/utils.ts",
+        "description": "cn() utility using clsx + tailwind-merge for conditional Tailwind class composition.",
+        "exports": ["cn"]
+      },
+      "logger.ts": {
+        "file": "lib/logger.ts",
+        "description": "147-line structured logger with levels (debug/info/success/warn/error), ISO timestamps, colored console output. Includes logApi() and logDb() helper methods.",
+        "exports": ["logger"]
+      },
+      "site.ts": {
+        "file": "lib/site.ts",
+        "description": "Centralized business configuration. Exports siteConfig with business name, phone, email, location (Ottawa ON), 5 services with prices, and metadata.",
+        "exports": ["siteConfig"]
+      },
+      "types.ts": {
+        "file": "lib/types.ts",
+        "description": "Complete TypeScript interfaces: Client, Job (with contractor assignment, before/after photos, client signoff), Quote (with line items), Invoice, Request (with AI scoring fields), User, ContractorApplication, AIFeedback, ScheduledFollowUp, CallLog, CallConversation, DbSchema.",
+        "exports": ["Client", "Job", "Quote", "Invoice", "Request", "User", "ContractorApplication", "AIFeedback", "ScheduledFollowUp", "CallLog", "CallConversation", "DbSchema"]
+      }
+    }
+  },
+
+  "aiFeatures": {
+    "leadQualification": {
+      "description": "Every contact form submission is analyzed by Claude Haiku AI. Scores leads 0-100 using weighted criteria (urgency 35%, budget 25%, authority 25%, value 15%). Categorizes as HOT (80-100), WARM (50-79), or COLD (<50). Has fallback rule-based scoring if API fails.",
+      "trigger": "Contact form submission → /api/contact",
+      "model": "claude-haiku-4-5-20251001",
+      "output": {
+        "score": "0-100 integer",
+        "category": "hot | warm | cold",
+        "reasoning": "Text explanation of score",
+        "estimatedValue": "Dollar estimate of potential revenue",
+        "suggestedQuote": { "items": "Array of line items", "total": "Quote total" },
+        "nextSteps": "Recommended follow-up actions"
+      }
+    },
+    "leadRouting": {
+      "description": "After AI scoring, leads are automatically routed to sequences: HOT → instant quote email + 24h follow-up + admin SMS alert. WARM → instant quote + Day 3/7/14 nurture emails. COLD → educational content + Day 7/30/90 re-engagement + auto-subscribe to newsletter.",
+      "trigger": "Post-qualification in /api/contact",
+      "sequences": {
+        "hot": ["Instant quote email", "24-hour follow-up", "SMS alert to admin"],
+        "warm": ["Instant quote email", "Day 3 check-in", "Day 7 special offer (WARMBACK10)", "Day 14 final reminder"],
+        "cold": ["Educational email", "Day 7 case study", "Day 30 seasonal offer (SAVE15)", "Day 90 re-engagement", "Newsletter auto-subscribe"]
+      }
+    },
+    "businessAdvisor": {
+      "description": "Interactive AI chat assistant for admin dashboard. Uses Claude with tool_use to access 20+ CRM operations. Can list/create/update clients, jobs, quotes, invoices, leads. Can perform semantic search across CRM data, send emails, and analyze revenue.",
+      "trigger": "Admin chat at /admin/dashboard/ai-advisor → /api/ai/business-advisor",
+      "model": "Claude (tool_use)",
+      "tools": [
+        "list_clients", "get_client", "create_client", "update_client",
+        "list_jobs", "get_job", "create_job", "update_job",
+        "list_quotes", "create_quote",
+        "list_invoices", "create_invoice",
+        "list_leads", "get_lead", "update_lead", "convert_lead",
+        "search_crm", "send_email", "get_revenue_analytics"
+      ]
+    },
+    "semanticSearch": {
+      "description": "Vector similarity search across CRM data using pgvector. All clients, jobs, leads, and quotes are embedded as 1536-dim vectors using OpenAI ada-002. search_crm SQL function finds most similar records by cosine distance.",
+      "embeddingModel": "text-embedding-ada-002",
+      "dimensions": 1536,
+      "storage": "crm_embeddings table with IVFFlat index",
+      "entityTypes": ["client", "job", "quote", "lead", "request"],
+      "syncEndpoint": "/api/ai/sync-embeddings"
+    },
+    "voiceReceptionist": {
+      "description": "AI-powered phone receptionist that answers calls 24/7. Greets callers, understands speech via Twilio ASR, responds using Claude AI for natural conversation about services/pricing/scheduling. Uses ElevenLabs for natural-sounding voice (falls back to Amazon Polly). Supports DTMF input, retry logic (max 2 attempts), and voicemail recording.",
+      "trigger": "Incoming phone call → Twilio webhook → /api/voice/incoming",
+      "conversationFlow": "/api/voice/respond",
+      "statusTracking": "/api/voice/status",
+      "voiceSynthesis": "ElevenLabs (Rachel voice) or Amazon Polly (Joanna, neural)",
+      "features": ["Speech recognition", "DTMF digit input", "Conversational AI", "Voicemail recording", "Call logging"]
+    },
+    "aiPerformanceMonitoring": {
+      "description": "Dashboard for tracking AI lead qualification accuracy. Admins can rate each AI decision as accurate/inaccurate. Shows total leads analyzed, accuracy rate, average score, hot lead conversion rate, category distribution. Supports CSV export of all decisions.",
+      "dashboard": "/admin/dashboard/ai-performance",
+      "feedbackEndpoint": "/api/admin/ai-feedback",
+      "metricsEndpoint": "/api/admin/ai-performance"
+    }
+  },
+
+  "database": {
+    "provider": "Supabase (PostgreSQL)",
+    "extensions": ["pgvector"],
+    "migrationFiles": ["supabase-migration.sql", "supabase-pgvector.sql"],
+    "tables": {
+      "clients": {
+        "description": "Customer records",
+        "columns": ["id (TEXT PK)", "first_name", "last_name", "company_name", "email", "phone", "address", "created_at"],
+        "indexes": []
+      },
+      "jobs": {
+        "description": "Service jobs with contractor assignment",
+        "columns": ["id (TEXT PK)", "client_id (FK→clients)", "title", "description", "status", "start_date", "end_date", "total", "created_at", "proof_of_work", "contractor_notes", "contractor_id", "assigned_contractor_id", "assigned_contractor_name", "assigned_at", "contractor_earnings", "available_to_contractors", "before_photos (JSONB)", "before_photos_uploaded_at", "after_photos (JSONB)", "after_photos_uploaded_at", "client_signoff", "client_signoff_name", "client_signoff_at", "client_signoff_notes"],
+        "indexes": ["idx_jobs_client_id", "idx_jobs_status", "idx_jobs_assigned_contractor"],
+        "statuses": ["Scheduled", "Active", "Completed", "Cancelled"]
+      },
+      "quotes": {
+        "description": "Price quotes with line items",
+        "columns": ["id (TEXT PK)", "client_id (FK→clients)", "title", "items (JSONB)", "total", "status", "created_at", "sales_rep_id"],
+        "indexes": ["idx_quotes_client_id"],
+        "statuses": ["Draft", "Sent", "Accepted", "Rejected"]
+      },
+      "invoices": {
+        "description": "Payment invoices",
+        "columns": ["id (TEXT PK)", "client_id (FK→clients)", "job_id", "total", "status", "due_date", "created_at"],
+        "indexes": ["idx_invoices_client_id"],
+        "statuses": ["Draft", "Sent", "Paid", "Overdue"]
+      },
+      "users": {
+        "description": "System users (admins, sales reps, contractors)",
+        "columns": ["id (TEXT PK)", "name", "email", "pin", "role", "active", "phone", "skills (JSONB)", "completed_jobs", "total_earnings"],
+        "indexes": ["idx_users_role", "idx_users_email"],
+        "roles": ["ADMIN", "SALES", "CONTRACTOR"]
+      },
+      "requests": {
+        "description": "Contact form submissions with AI qualification",
+        "columns": ["id (TEXT PK)", "name", "first_name", "last_name", "email", "phone", "address", "service", "message", "details", "status", "created_at", "ai_score", "ai_category", "ai_reasoning", "estimated_value", "next_follow_up"],
+        "indexes": ["idx_requests_status"],
+        "aiCategories": ["hot", "warm", "cold"]
+      },
+      "contractor_applications": {
+        "description": "Contractor registration applications",
+        "columns": ["id (TEXT PK)", "first_name", "last_name", "email", "phone", "address", "city", "postal_code", "emergency_contact", "emergency_phone", "skills (JSONB)", "experience", "has_own_equipment", "vehicle_type", "insurance_provider", "policy_number", "insurance_expiry", "insurance_file_name", "insurance_file_data", "agreed_to_terms_at", "signature", "status", "reviewed_by", "reviewed_at", "rejection_reason", "submitted_at"],
+        "statuses": ["pending", "approved", "rejected"]
+      },
+      "crm_embeddings": {
+        "description": "Vector embeddings for semantic search",
+        "columns": ["id (BIGSERIAL PK)", "entity_type", "entity_id", "content", "embedding (vector(1536))", "metadata (JSONB)", "created_at", "updated_at"],
+        "indexes": ["idx_crm_embeddings_vector (IVFFlat cosine)", "idx_crm_embeddings_type", "idx_crm_embeddings_entity"],
+        "uniqueConstraint": "(entity_type, entity_id)"
+      },
+      "lead_requests": {
+        "description": "Lead tracking (via lib/db/leads.ts)",
+        "managedBy": "lib/db/leads.ts"
+      },
+      "lead_quotes": {
+        "description": "Quotes associated with leads",
+        "managedBy": "lib/db/leads.ts"
+      },
+      "lead_follow_ups": {
+        "description": "Scheduled follow-up emails for leads",
+        "managedBy": "lib/db/leads.ts"
+      },
+      "lead_ai_feedback": {
+        "description": "Human feedback on AI qualification decisions",
+        "managedBy": "lib/db/leads.ts"
+      },
+      "email_subscribers": {
+        "description": "Newsletter subscribers",
+        "managedBy": "lib/db/subscribers.ts"
+      },
+      "email_campaigns": {
+        "description": "Email marketing campaigns",
+        "managedBy": "lib/db/subscribers.ts"
+      },
+      "call_conversations": {
+        "description": "AI phone receptionist conversation logs",
+        "managedBy": "lib/db/voice.ts"
+      },
+      "call_logs": {
+        "description": "Phone call metadata and status",
+        "managedBy": "lib/db/voice.ts"
+      },
+      "voice_bookings": {
+        "description": "Appointments booked via phone",
+        "managedBy": "lib/db/voice.ts"
+      }
+    },
+    "rlsPolicy": "Row Level Security enabled on all tables. Open 'Allow all for anon' policy — auth handled at application level via HMAC-signed session cookies.",
+    "functions": {
+      "search_crm": {
+        "description": "Similarity search over crm_embeddings using cosine distance",
+        "params": ["query_embedding vector(1536)", "match_count INT DEFAULT 5", "filter_type TEXT DEFAULT NULL"],
+        "returns": "TABLE (entity_type, entity_id, content, metadata, similarity)"
+      }
+    }
+  },
+
+  "authentication": {
+    "method": "HMAC-SHA256 signed session cookies (custom implementation, no NextAuth)",
+    "sessionFormat": "base64(JSON payload).hexHMAC(SHA256)",
+    "signingKey": "SESSION_SECRET env var (fallback: ADMIN_PASSWORD)",
+    "portals": {
+      "admin": {
+        "loginPage": "/admin/login",
+        "dashboardPage": "/admin/dashboard",
+        "cookieName": "admin_session",
+        "authMethod": "ADMIN_PASSWORD env var + ADMIN_EMAIL env var",
+        "role": "ADMIN",
+        "access": "Full CRM access — clients, jobs, quotes, invoices, leads, users, contractors, analytics, AI tools"
+      },
+      "sales": {
+        "loginPage": "/sales/login",
+        "dashboardPage": "/sales/dashboard",
+        "cookieName": "sales_session",
+        "authMethod": "Email + PIN from users table (role=SALES)",
+        "role": "SALES",
+        "access": "Leads, clients, quotes, jobs — NO access to invoices or payments"
+      },
+      "contractor": {
+        "loginPage": "/contractor/login",
+        "dashboardPage": "/contractor/dashboard",
+        "cookieName": "contractor_session",
+        "authMethod": "Email + PIN from users table (role=CONTRACTOR)",
+        "role": "CONTRACTOR",
+        "access": "Available jobs (unassigned), assigned jobs (my jobs), job acceptance, earnings tracking"
+      }
+    },
+    "middleware": {
+      "file": "middleware.ts",
+      "runtime": "Edge Runtime",
+      "protectedRoutes": [
+        { "path": "/admin/dashboard/*", "requiredRole": "ADMIN" },
+        { "path": "/contractor/dashboard/*", "requiredRole": "CONTRACTOR" },
+        { "path": "/sales/dashboard/*", "requiredRole": "SALES" }
+      ],
+      "redirects": [
+        { "from": "/admin", "to": "/admin/dashboard" },
+        { "from": "/contractor", "to": "/contractor/dashboard" },
+        { "from": "/sales", "to": "/sales/dashboard" }
+      ]
+    }
+  },
+
+  "emailSystem": {
+    "provider": "Resend",
+    "service": "lib/email/EmailService.ts",
+    "fromAddress": "ExcelPro Washers <noreply@excelprowashers.com>",
+    "emailTypes": [
+      {
+        "name": "Instant Quote",
+        "trigger": "HOT or WARM lead detected",
+        "template": "Rich HTML with price range, timeline, included services, and discount code QUICK10 (10% off)",
+        "method": "emailService.sendInstantQuote()"
+      },
+      {
+        "name": "Educational Email",
+        "trigger": "COLD lead detected",
+        "template": "Soft washing educational content with tips and benefits",
+        "method": "emailService.sendEducationalEmail()"
+      },
+      {
+        "name": "Follow-Up",
+        "trigger": "Scheduled via cron (/api/cron/follow-ups)",
+        "template": "Customizable follow-up with subject and body",
+        "method": "emailService.sendFollowUp()"
+      },
+      {
+        "name": "Special Offer",
+        "trigger": "Warm Day 7, Cold Day 30",
+        "template": "Discount promotion with code and CTA",
+        "method": "emailService.sendSpecialOffer()"
+      },
+      {
+        "name": "Quote Email",
+        "trigger": "Admin sends quote via /api/admin/quotes/[id]/send",
+        "template": "Professional quote with line items and accept button"
+      },
+      {
+        "name": "Invoice Email",
+        "trigger": "Admin sends invoice",
+        "template": "Invoice with total and Stripe payment link"
+      },
+      {
+        "name": "Payment Reminder",
+        "trigger": "Admin clicks Remind via /api/admin/invoices/[id]/remind",
+        "template": "Gentle payment reminder"
+      },
+      {
+        "name": "Lead Notification (Admin)",
+        "trigger": "Every new contact form submission",
+        "template": "HTML email with color-coded priority badge, contact info, AI score, reasoning, estimated value"
+      },
+      {
+        "name": "Newsletter Campaign",
+        "trigger": "Admin sends via /api/newsletter/send",
+        "template": "Bulk campaign to all active subscribers"
+      }
+    ],
+    "discountCodes": [
+      { "code": "QUICK10", "discount": "10%", "context": "Instant quote for hot/warm leads" },
+      { "code": "WARMBACK10", "discount": "10%", "context": "Warm lead Day 7 special offer" },
+      { "code": "SAVE15", "discount": "15%", "context": "Cold lead Day 30 seasonal offer" }
+    ],
+    "compliance": {
+      "canSpam": true,
+      "unsubscribeLink": "Included in every email",
+      "physicalAddress": "Included in email footer",
+      "unsubscribeEndpoint": "/api/newsletter/unsubscribe"
+    }
+  },
+
+  "paymentSystem": {
+    "provider": "Stripe",
+    "currency": "CAD",
+    "flow": [
+      "1. Admin creates invoice linked to job/client",
+      "2. Customer views invoice at /invoice/[id]",
+      "3. Customer clicks 'Pay Now' → POST /api/create-checkout-session",
+      "4. Redirected to Stripe Checkout (hosted payment page)",
+      "5. Customer completes payment",
+      "6. Stripe webhook (POST /api/webhooks/stripe) fires checkout.session.completed",
+      "7. Invoice status auto-updated to 'Paid' in database",
+      "8. Customer redirected back to invoice page showing paid status"
+    ],
+    "webhookEvents": [
+      "checkout.session.completed",
+      "payment_intent.succeeded",
+      "payment_intent.payment_failed"
+    ],
+    "revenueDistribution": {
+      "contractor": "70% of job total",
+      "company": "30% of job total"
+    },
+    "invoicePDF": {
+      "endpoint": "/api/invoices/[id]/pdf",
+      "renderer": "@react-pdf/renderer",
+      "features": ["Company branding", "Status banners", "Itemized services", "Payment instructions"]
+    }
+  },
+
+  "voicePhoneSystem": {
+    "provider": "Twilio",
+    "endpoints": {
+      "incoming": "/api/voice/incoming",
+      "respond": "/api/voice/respond",
+      "status": "/api/voice/status",
+      "elevenlabsAudio": "/api/voice/elevenlabs-audio",
+      "analytics": "/api/voice/analytics"
+    },
+    "flow": [
+      "1. Caller dials Twilio phone number",
+      "2. Twilio webhook hits /api/voice/incoming",
+      "3. TwiML greeting played via ElevenLabs or Polly TTS",
+      "4. Speech recognition gathers caller input (+ DTMF fallback)",
+      "5. Caller speech sent to /api/voice/respond",
+      "6. Claude AI processes speech and generates response",
+      "7. Response played back to caller",
+      "8. Loop continues for conversation (max 2 retries on no input)",
+      "9. Falls back to voicemail recording if no response",
+      "10. Call status logged via /api/voice/status webhook"
+    ],
+    "voiceOptions": {
+      "primary": "ElevenLabs (Rachel voice, ID: 21m00Tcm4TlvDq8ikWAM)",
+      "fallback": "Amazon Polly (Joanna, neural engine) via Twilio"
+    },
+    "features": [
+      "24/7 automated answering",
+      "Natural language conversation",
+      "Service and pricing information",
+      "Appointment scheduling",
+      "Voicemail recording",
+      "Call logging and analytics",
+      "DTMF (keypad) input support"
+    ]
+  },
+
+  "automationAndCronJobs": {
+    "cronJobs": [
+      {
+        "name": "Follow-ups Executor",
+        "endpoint": "/api/cron/follow-ups",
+        "schedule": "Daily at 2PM UTC (0 14 * * *)",
+        "description": "Checks database for pending follow-ups. Executes Day 3/7/14 emails for warm leads and Day 7/30/90 emails for cold leads. Marks completed follow-ups as done.",
+        "auth": "CRON_SECRET bearer token"
+      },
+      {
+        "name": "Stale Leads Checker",
+        "endpoint": "/api/cron/check-stale-leads",
+        "schedule": "Daily at 11PM UTC (0 23 * * *)",
+        "description": "Scans all leads with status 'new' that are older than 30 days. Logs stale leads for admin review.",
+        "auth": "CRON_SECRET bearer token"
+      }
+    ],
+    "automatedWorkflows": [
+      {
+        "name": "Lead Qualification Pipeline",
+        "trigger": "Contact form submission",
+        "steps": ["Receive form data", "AI scores lead (Claude Haiku)", "Store in Supabase", "Generate quote", "Route via LeadRouter", "Send notifications (email/SMS)", "Schedule follow-ups", "Log AI decision"]
+      },
+      {
+        "name": "Job Distribution",
+        "trigger": "Job created by admin/sales",
+        "steps": ["Set availableToContractors=true", "Calculate contractor earnings (70%)", "SMS + email all active contractors", "First contractor to accept wins (race condition handling)", "Assign and confirm", "Notify admin"]
+      },
+      {
+        "name": "Payment Processing",
+        "trigger": "Customer pays invoice",
+        "steps": ["Stripe Checkout", "Webhook confirmation", "Invoice marked as Paid", "Notifications sent"]
+      },
+      {
+        "name": "Warm Lead Nurture",
+        "trigger": "Lead scored 50-79",
+        "steps": ["Instant quote email", "Day 3: Check-in email", "Day 7: Special offer (WARMBACK10)", "Day 14: Final reminder"]
+      },
+      {
+        "name": "Cold Lead Nurture",
+        "trigger": "Lead scored <50",
+        "steps": ["Educational email", "Day 7: Case study", "Day 30: Seasonal offer (SAVE15)", "Day 90: Re-engagement", "Auto-subscribe to newsletter"]
+      }
+    ]
+  },
+
+  "seoFeatures": {
+    "metadata": {
+      "title": "ExcelPro Washers | Professional Exterior Cleaning in Ottawa",
+      "description": "Ottawa's trusted exterior cleaning experts. Professional soft washing, pressure washing, gutter cleaning, roof cleaning & window cleaning. Free quotes! ⭐ 4.9/5 Rating",
+      "openGraph": true,
+      "twitterCards": true,
+      "locale": "en_CA"
+    },
+    "structuredData": [
+      {
+        "type": "LocalBusiness",
+        "component": "JsonLd",
+        "data": "Business name, phone, email, address, geo coordinates, services, aggregate rating"
+      },
+      {
+        "type": "Service",
+        "component": "StructuredData → ServiceSchema",
+        "data": "Individual service schema with name, description, provider, area served, price"
+      },
+      {
+        "type": "Article",
+        "component": "StructuredData → ArticleSchema",
+        "data": "Blog post schema with headline, author, datePublished, image"
+      },
+      {
+        "type": "BreadcrumbList",
+        "component": "StructuredData → BreadcrumbSchema",
+        "data": "Navigation breadcrumb trail"
+      }
+    ],
+    "sitemap": {
+      "file": "app/sitemap.ts",
+      "urls": ["/", "/about", "/services", "/contact", "/blog", "/careers"],
+      "changeFrequency": "weekly",
+      "priority": "0.5-1.0"
+    },
+    "robots": {
+      "file": "app/robots.ts",
+      "rules": "Allow all, Sitemap URL included"
+    },
+    "manifest": {
+      "file": "app/manifest.ts",
+      "name": "ExcelPro Washers",
+      "themeColor": "#0ea5e9",
+      "display": "standalone"
+    },
+    "securityHeaders": {
+      "file": "next.config.mjs",
+      "headers": [
+        "Strict-Transport-Security (max-age=63072000)",
+        "X-Frame-Options: DENY",
+        "X-Content-Type-Options: nosniff",
+        "X-XSS-Protection: 1; mode=block",
+        "Referrer-Policy: origin-when-cross-origin",
+        "Permissions-Policy: camera=(), microphone=(), geolocation=()"
+      ]
+    }
+  },
+
+  "environmentVariables": {
+    "required": [
+      { "name": "NEXT_PUBLIC_SITE_URL", "purpose": "Public site URL for links and callbacks" },
+      { "name": "ANTHROPIC_API_KEY", "purpose": "Claude AI for lead qualification and business advisor" },
+      { "name": "RESEND_API_KEY", "purpose": "Resend email service" },
+      { "name": "TWILIO_ACCOUNT_SID", "purpose": "Twilio SMS and voice" },
+      { "name": "TWILIO_AUTH_TOKEN", "purpose": "Twilio authentication" },
+      { "name": "TWILIO_PHONE_NUMBER", "purpose": "Twilio phone number for calls/SMS" },
+      { "name": "STRIPE_SECRET_KEY", "purpose": "Stripe payment processing" },
+      { "name": "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", "purpose": "Stripe client-side key" },
+      { "name": "CRON_SECRET", "purpose": "Bearer token for cron job authentication" },
+      { "name": "SUPABASE_URL", "purpose": "Supabase project URL" },
+      { "name": "SUPABASE_ANON_KEY", "purpose": "Supabase anonymous/public key" }
+    ],
+    "recommended": [
+      { "name": "OWNER_EMAIL", "purpose": "Admin email for notifications" },
+      { "name": "OWNER_PHONE_NUMBER", "purpose": "Admin phone for SMS alerts" },
+      { "name": "ADMIN_PASSWORD", "purpose": "Admin portal login password" },
+      { "name": "ADMIN_EMAIL", "purpose": "Admin portal login email" },
+      { "name": "SESSION_SECRET", "purpose": "HMAC signing key for sessions" },
+      { "name": "STRIPE_WEBHOOK_SECRET", "purpose": "Stripe webhook signature verification" },
+      { "name": "DISCORD_WEBHOOK_URL", "purpose": "Discord notification webhook" },
+      { "name": "NOTIFICATION_EMAIL", "purpose": "Email address to receive lead notifications" },
+      { "name": "OPENAI_API_KEY", "purpose": "OpenAI embeddings for semantic search" },
+      { "name": "ELEVENLABS_API_KEY", "purpose": "ElevenLabs voice synthesis" },
+      { "name": "ELEVENLABS_VOICE_ID", "purpose": "ElevenLabs voice selection (default: Rachel)" }
+    ]
+  },
+
+  "deploymentConfig": {
+    "platform": "Vercel",
+    "framework": "Next.js",
+    "configFile": "vercel.json",
+    "crons": [
+      { "path": "/api/cron/follow-ups", "schedule": "0 14 * * *" },
+      { "path": "/api/cron/check-stale-leads", "schedule": "0 23 * * *" }
+    ],
+    "buildCommand": "next build",
+    "devCommand": "next dev --turbopack",
+    "outputDirectory": ".next",
+    "nodeVersion": "18+",
+    "remotePatterns": [
+      { "protocol": "https", "hostname": "images.unsplash.com" }
+    ]
+  },
+
+  "serverActions": {
+    "admin": {
+      "file": "app/admin/actions.ts",
+      "description": "Admin server actions for login (verifies ADMIN_PASSWORD) and logout (clears admin_session cookie)"
+    },
+    "adminCRUD": {
+      "files": [
+        "app/admin/actions/clients.ts",
+        "app/admin/actions/invoices.ts",
+        "app/admin/actions/jobs.ts",
+        "app/admin/actions/quotes.ts",
+        "app/admin/actions/requests.ts"
+      ],
+      "description": "Server actions for CRUD operations on clients, invoices, jobs, quotes, and requests from admin dashboard"
+    },
+    "sales": {
+      "file": "app/sales/actions.ts",
+      "description": "Sales server actions for login (verifies email + PIN against users table with role=SALES) and logout"
+    },
+    "contractor": {
+      "file": "app/contractor/actions.ts",
+      "description": "Contractor server actions for login (verifies email + PIN against users table with role=CONTRACTOR) and logout"
+    }
+  },
+
+  "documentationFiles": [
+    { "file": "PROJECT_OVERVIEW.md", "description": "High-level project overview and architecture summary" },
+    { "file": "README.md", "description": "Project readme with setup and deployment instructions" },
+    { "file": "AUTOMATION_SYSTEM_GUIDE.md", "description": "693-line comprehensive guide covering multi-portal architecture, all 6+ AI agents, job distribution workflow, data flow diagrams, database schema, testing sequences, and future AI agent roadmap" },
+    { "file": "AI_RECEPTIONIST_SETUP.md", "description": "Step-by-step setup for Twilio voice receptionist with ElevenLabs TTS" },
+    { "file": "AI_MONITORING_GUIDE.md", "description": "460-line guide for AI performance monitoring, console notifications, dashboard, email/SMS/Slack alert setup" },
+    { "file": "STRIPE_SETUP.md", "description": "Stripe API key setup, webhook configuration, payment flow, and testing guide" },
+    { "file": "EMAIL_SETUP_GUIDE.md", "description": "Gmail App Password + Resend email notification setup" },
+    { "file": "VERCEL_EMAIL_SETUP.md", "description": "Quick Resend email setup for Vercel deployment" },
+    { "file": "CRON_SETUP.md", "description": "Vercel cron job setup for follow-ups and stale lead checking" },
+    { "file": "PRODUCTION_CHECKLIST.md", "description": "429-line deployment checklist: env var security, database migration, Vercel config, Stripe go-live" },
+    { "file": "QUICK_TEST.md", "description": "Quick test guide for AI notification system" },
+    { "file": "supabase-migration.sql", "description": "Main database migration SQL — creates all 7 core tables with RLS and indexes" },
+    { "file": "supabase-pgvector.sql", "description": "pgvector extension setup — creates crm_embeddings table, IVFFlat index, and search_crm function" }
+  ],
+
+  "fileStructureSummary": {
+    "totalApiRoutes": 39,
+    "totalPages": "~35 (9 public + 24 admin + 2 sales + 1 contractor)",
+    "totalComponents": "~25 (marketing + forms + layout + interactive + SEO + UI primitives)",
+    "totalLibraryModules": "~20 (database + AI + email + notifications + PDF + auth + utilities)",
+    "totalServerActions": 8,
+    "totalDocumentationFiles": 13,
+    "totalSQLMigrations": 2
+  }
+}
