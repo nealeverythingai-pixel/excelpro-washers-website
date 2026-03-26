@@ -12,8 +12,9 @@ const initialState = { message: '' }
 const STORY_MULTIPLIERS: Record<number, number> = { 1: 1.0, 2: 1.15, 3: 1.30 }
 
 // Per-service rates
-const EXT_WINDOW_RATE  = 10    // $10 per weighted window unit (exterior)
-const INT_WINDOW_RATE  = 10    // base rate — 20% off when bundled with exterior
+const WINDOW_RATES   = { tiny: 2.50, small: 5.00, medium: 7.50, large: 10.00 } // flat $/window
+const WINDOW_FLOORS  = { tiny: 2.00, small: 3.50, medium: 5.50, large:  7.00 } // best-price floor
+const INT_BUNDLE_DISCOUNT = 0.80  // 20% off interior when exterior also selected
 const SIDING_RATE      = 0.35  // $0.35/sqft
 const DRIVEWAY_RATE    = 0.25  // $0.25/sqft
 const GUTTER_RATE      = 5     // $5 per linear meter of perimeter × story multiplier
@@ -23,18 +24,16 @@ const ROOF_RATE        = 0.60  // $0.60/sqft (premium)
 const ROOF_MIN         = 400   // minimum $400
 
 // Floor rates — Ottawa market minimum (rep's negotiation floor, best price offer)
-const EXT_WINDOW_FLOOR  = 7    // $7/weighted unit
-const INT_WINDOW_FLOOR  = 6    // $6/weighted unit (bundle 20% still applies on top)
 const SIDING_FLOOR      = 0.30 // $0.30/sqft
 const DRIVEWAY_FLOOR    = 0.20 // $0.20/sqft
 const DECK_FLOOR        = 0.30 // $0.30/sqft
 const ROOF_FLOOR        = 0.45 // $0.45/sqft, min $400
 
 const WINDOW_TYPES = [
-  { key: 'small', label: 'Small', weight: 1.0, size: '~2ft × 2ft', locations: 'Bathroom, basement, garage, transom above doors' },
-  { key: 'medium', label: 'Medium', weight: 1.5, size: '~3ft × 4ft', locations: 'Bedrooms, kitchen, dining room, hallways' },
-  { key: 'large', label: 'Large', weight: 2.5, size: '~5ft × 6ft+', locations: 'Living room picture windows, sliding patio doors, bay windows' },
-  { key: 'specialty', label: 'Specialty', weight: 3.5, size: 'Varies', locations: 'Skylights, French doors, floor-to-ceiling, arched/custom shapes' },
+  { key: 'tiny',   label: 'Tiny / Transom', price: 2.50, size: '~1ft × 2ft',  locations: 'Above garage doors, horizontal slit windows, narrow transoms above entries' },
+  { key: 'small',  label: 'Small',          price: 5.00, size: '~2ft × 2ft',  locations: 'Bathroom, basement, small casement windows' },
+  { key: 'medium', label: 'Medium',         price: 7.50, size: '~3ft × 4ft',  locations: 'Bedroom, kitchen, dining room, hallways' },
+  { key: 'large',  label: 'Large',          price: 10.00, size: '~5ft × 6ft+', locations: 'Living room picture windows, sliding patio doors, bay windows, tall sidelights' },
 ] as const
 
 // SVG Window Illustrations
@@ -46,6 +45,22 @@ function WindowSVG({ type }: { type: string }) {
   const sill = '#a8a29e'
   const sky = '#e0f2fe'
   const sun = '#fbbf24'
+
+  if (type === 'tiny') {
+    // Wide horizontal transom / slit window
+    return (
+      <svg viewBox="0 0 160 60" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="160" height="60" rx="4" fill="#f5f5f4" />
+        <rect x="8" y="14" width="144" height="32" rx="3" fill={frameDark} />
+        <rect x="12" y="18" width="62" height="24" rx="2" fill={glass} stroke={glassStroke} strokeWidth="0.5" />
+        <rect x="86" y="18" width="62" height="24" rx="2" fill={glass} stroke={glassStroke} strokeWidth="0.5" />
+        <rect x="76" y="14" width="8" height="32" rx="1" fill={frameDark} />
+        <circle cx="35" cy="28" r="5" fill="white" opacity="0.3" />
+        <circle cx="110" cy="26" r="4" fill="white" opacity="0.25" />
+        <rect x="4" y="44" width="152" height="5" rx="2" fill={sill} />
+      </svg>
+    )
+  }
 
   if (type === 'small') {
     return (
@@ -197,7 +212,7 @@ export function SalesQuoteForm() {
   const [houseDiag, setHouseDiag] = useState<string>('')
   const [drivewayDiag, setDrivewayDiag] = useState<string>('')
   const [stories, setStories] = useState<number>(2)
-  const [windows, setWindows] = useState({ small: 0, medium: 0, large: 0, specialty: 0 })
+  const [windows, setWindows] = useState({ tiny: 0, small: 0, medium: 0, large: 0 })
   const [services, setServices] = useState({
     exteriorWindows: false,
     interiorWindows: false,
@@ -226,12 +241,12 @@ export function SalesQuoteForm() {
   const drivewayAreaSqft = Math.round(drivewaySideM * drivewaySideM * 10.764)
   const deckDiagM = parseFloat(deckDiag) || 0
   const deckAreaSqft = Math.round((deckDiagM / Math.SQRT2) ** 2 * 10.764)
-  const weightedWindows = (windows.small * 1.0) + (windows.medium * 1.5) + (windows.large * 2.5) + (windows.specialty * 3.5)
-  const totalWindowCount = windows.small + windows.medium + windows.large + windows.specialty
+  const totalWindowCount = windows.tiny + windows.small + windows.medium + windows.large
+  const extWindowBase = windows.tiny * WINDOW_RATES.tiny + windows.small * WINDOW_RATES.small + windows.medium * WINDOW_RATES.medium + windows.large * WINDOW_RATES.large
 
   // --- Per-service price estimates (shown even before toggling) ---
-  const extWindowPrice  = roundTo5(weightedWindows * EXT_WINDOW_RATE)
-  const intWindowPrice  = roundTo5(weightedWindows * INT_WINDOW_RATE * (services.exteriorWindows ? 0.80 : 1.0))
+  const extWindowPrice  = roundTo5(extWindowBase * storyMultiplier)
+  const intWindowPrice  = roundTo5(extWindowBase * storyMultiplier * (services.exteriorWindows ? INT_BUNDLE_DISCOUNT : 1.0))
   const sidingPrice     = houseAreaSqft > 0 ? roundTo5(houseAreaSqft * SIDING_RATE) : 0
   const drivewayPrice   = drivewayAreaSqft > 0 ? roundTo5(drivewayAreaSqft * DRIVEWAY_RATE) : 0
   const gutterPrice     = houseAreaSqft > 0 ? roundTo5(Math.max(GUTTER_MIN, housePerimeterM * GUTTER_RATE * storyMultiplier)) : GUTTER_MIN
@@ -239,8 +254,9 @@ export function SalesQuoteForm() {
   const roofPrice       = houseAreaSqft > 0 ? roundTo5(Math.max(ROOF_MIN, houseAreaSqft * ROOF_RATE)) : ROOF_MIN
 
   // --- Floor prices (best price / negotiation offer) ---
-  const extWindowFloor  = roundTo5(weightedWindows * EXT_WINDOW_FLOOR)
-  const intWindowFloor  = roundTo5(weightedWindows * INT_WINDOW_FLOOR * (services.exteriorWindows ? 0.80 : 1.0))
+  const extWindowFloorBase = windows.tiny * WINDOW_FLOORS.tiny + windows.small * WINDOW_FLOORS.small + windows.medium * WINDOW_FLOORS.medium + windows.large * WINDOW_FLOORS.large
+  const extWindowFloor  = roundTo5(extWindowFloorBase * storyMultiplier)
+  const intWindowFloor  = roundTo5(extWindowFloorBase * storyMultiplier * (services.exteriorWindows ? INT_BUNDLE_DISCOUNT : 1.0))
   const sidingFloor     = houseAreaSqft > 0 ? roundTo5(houseAreaSqft * SIDING_FLOOR) : 0
   const drivewayFloor   = drivewayAreaSqft > 0 ? roundTo5(drivewayAreaSqft * DRIVEWAY_FLOOR) : 0
   const gutterFloor     = houseAreaSqft > 0 ? roundTo5(Math.max(GUTTER_MIN, housePerimeterM * GUTTER_RATE * storyMultiplier * 0.85)) : GUTTER_MIN
@@ -282,7 +298,13 @@ export function SalesQuoteForm() {
   const repCommission = roundTo5(activePrice * commissionRate)
   const contractorPay = roundTo5(activePrice * 0.70)
   const selectedCount = Object.values(services).filter(Boolean).length
-  const windowFactorLabel = totalWindowCount === 0 ? 'No windows' : `${totalWindowCount} windows`
+  const windowBreakdown = [
+    windows.tiny   > 0 && `${windows.tiny} tiny`,
+    windows.small  > 0 && `${windows.small} small`,
+    windows.medium > 0 && `${windows.medium} medium`,
+    windows.large  > 0 && `${windows.large} large`,
+  ].filter(Boolean).join(' · ')
+  const windowFactorLabel = totalWindowCount === 0 ? 'No windows' : windowBreakdown
 
   const getItemsJSON = () => {
     const items: { description: string; quantity: number; unitPrice: number }[] = []
@@ -505,7 +527,7 @@ export function SalesQuoteForm() {
                       <p className="font-bold text-gray-900 text-sm">{wt.label}</p>
                       <p className="text-[10px] text-gray-400 font-medium">{wt.size}</p>
                     </div>
-                    <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-lg">{wt.weight}×</span>
+                    <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-lg">${wt.price}</span>
                   </div>
                   <p className="text-[10px] text-gray-500 leading-snug">
                     <span className="font-semibold text-gray-600">📍 </span>{wt.locations}
@@ -520,7 +542,7 @@ export function SalesQuoteForm() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {WINDOW_TYPES.map(wt => (
             <div key={wt.key} className="bg-gray-50 border border-gray-200 rounded-2xl p-4 text-center">
-              <p className="text-xs font-semibold text-gray-700 mb-2">{wt.label} <span className="text-gray-400">({wt.weight}×)</span></p>
+              <p className="text-xs font-semibold text-gray-700 mb-2">{wt.label} <span className="text-green-600">${wt.price} ea.</span></p>
               <div className="flex items-center justify-center gap-3">
                 <button type="button" onClick={() => setWindows(p => ({ ...p, [wt.key]: Math.max(0, p[wt.key as keyof typeof p] - 1) }))}
                   className="w-11 h-11 rounded-full bg-white border-2 border-gray-200 text-gray-600 font-bold text-xl flex items-center justify-center active:scale-90 active:bg-gray-100 transition-all shadow-sm">−</button>
@@ -534,7 +556,7 @@ export function SalesQuoteForm() {
 
         {totalWindowCount > 0 && (
           <div className="rounded-xl bg-green-50 border border-green-200 px-3 py-2.5 flex items-center justify-between">
-            <span className="text-sm text-gray-700">{totalWindowCount} windows · {weightedWindows.toFixed(1)} weighted units</span>
+            <span className="text-sm text-gray-700">{totalWindowCount} windows · {windowBreakdown}</span>
             <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
               Ext: ${extWindowPrice} · Int: ${intWindowPrice}
             </span>
@@ -553,21 +575,21 @@ export function SalesQuoteForm() {
             {
               key: 'exteriorWindows' as const,
               label: 'Exterior Window Cleaning',
-              sub: `${totalWindowCount > 0 ? `${totalWindowCount} windows · ${weightedWindows.toFixed(1)} weighted units` : 'Enter window count in Step 3'}`,
-              rate: '$10/weighted unit',
+              sub: totalWindowCount > 0 ? windowBreakdown : 'Enter window count in Step 3',
+              rate: '$2.50 / $5 / $7.50 / $10 per window',
               price: extWindowPrice,
               available: totalWindowCount > 0,
-              detail: totalWindowCount > 0 ? `${weightedWindows.toFixed(1)} units × $10` : null,
+              detail: totalWindowCount > 0 ? `${windowBreakdown}${storyMultiplier > 1 ? ` × ${storyMultiplier}× (${stories}F)` : ''}` : null,
               color: 'green' as const,
             },
             {
               key: 'interiorWindows' as const,
               label: 'Interior Window Cleaning',
               sub: services.exteriorWindows ? '20% bundle discount applied' : 'Same window count as exterior',
-              rate: services.exteriorWindows ? '$8/weighted unit (bundled)' : '$10/weighted unit',
+              rate: services.exteriorWindows ? 'Bundle discount (20% off)' : '$2.50 / $5 / $7.50 / $10 per window',
               price: intWindowPrice,
               available: totalWindowCount > 0,
-              detail: totalWindowCount > 0 ? `${weightedWindows.toFixed(1)} units × $${services.exteriorWindows ? 8 : 10}` : null,
+              detail: totalWindowCount > 0 ? `${windowBreakdown}${services.exteriorWindows ? ' — 20% bundle' : ''}` : null,
               color: 'sky' as const,
             },
             {
