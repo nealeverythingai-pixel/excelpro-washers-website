@@ -227,7 +227,8 @@ export function SalesQuoteForm() {
     setServices(p => ({ ...p, [key]: !p[key] }))
   const [showGuide, setShowGuide] = useState(false)
   const [quoteCopied, setQuoteCopied] = useState(false)
-  const [bestPriceMode, setBestPriceMode] = useState(false)
+  const [pricingMode, setPricingMode] = useState<'standard' | 'negotiate' | 'best'>('standard')
+  const [negotiatedTotal, setNegotiatedTotal] = useState(0)
   const [leadSource, setLeadSource] = useState<'given' | 'produced'>('given')
 
   // --- Measurements ---
@@ -263,16 +264,16 @@ export function SalesQuoteForm() {
   const deckFloor       = deckAreaSqft > 0 ? roundTo5(deckAreaSqft * DECK_FLOOR) : 0
   const roofFloor       = houseAreaSqft > 0 ? roundTo5(Math.max(ROOF_MIN, houseAreaSqft * ROOF_FLOOR)) : ROOF_MIN
 
-  // Active prices — switches between standard and floor based on toggle
-  const activeExtWindow  = bestPriceMode ? extWindowFloor  : extWindowPrice
-  const activeIntWindow  = bestPriceMode ? intWindowFloor  : intWindowPrice
-  const activeSiding     = bestPriceMode ? sidingFloor     : sidingPrice
-  const activeDriveway   = bestPriceMode ? drivewayFloor   : drivewayPrice
-  const activeGutter     = bestPriceMode ? gutterFloor     : gutterPrice
-  const activeDeck       = bestPriceMode ? deckFloor       : deckPrice
-  const activeRoof       = bestPriceMode ? roofFloor       : roofPrice
+  // Active line-item prices — used for display in summary (best mode shows floor rates)
+  const activeExtWindow  = pricingMode === 'best' ? extWindowFloor  : extWindowPrice
+  const activeIntWindow  = pricingMode === 'best' ? intWindowFloor  : intWindowPrice
+  const activeSiding     = pricingMode === 'best' ? sidingFloor     : sidingPrice
+  const activeDriveway   = pricingMode === 'best' ? drivewayFloor   : drivewayPrice
+  const activeGutter     = pricingMode === 'best' ? gutterFloor     : gutterPrice
+  const activeDeck       = pricingMode === 'best' ? deckFloor       : deckPrice
+  const activeRoof       = pricingMode === 'best' ? roofFloor       : roofPrice
 
-  // --- Final price: only selected services ---
+  // --- Final price: only selected services at standard rates ---
   const selectedTotal =
     (services.exteriorWindows ? extWindowPrice : 0) +
     (services.interiorWindows ? intWindowPrice : 0) +
@@ -283,16 +284,28 @@ export function SalesQuoteForm() {
     (services.roofMoss        ? roofPrice      : 0)
   const finalPrice = roundTo5(selectedTotal)
 
-  const activeTotal =
-    (services.exteriorWindows ? activeExtWindow : 0) +
-    (services.interiorWindows ? activeIntWindow : 0) +
-    (services.houseSiding     ? activeSiding    : 0) +
-    (services.drivewayWash    ? activeDriveway  : 0) +
-    (services.gutterCleaning  ? activeGutter    : 0) +
-    (services.deckPatio       ? activeDeck      : 0) +
-    (services.roofMoss        ? activeRoof      : 0)
-  const activePrice = roundTo5(activeTotal)
+  // --- Floor total (hard minimum — rep cannot go below this) ---
+  const floorTotal = roundTo5(
+    (services.exteriorWindows ? extWindowFloor : 0) +
+    (services.interiorWindows ? intWindowFloor : 0) +
+    (services.houseSiding     ? sidingFloor    : 0) +
+    (services.drivewayWash    ? drivewayFloor  : 0) +
+    (services.gutterCleaning  ? gutterFloor    : 0) +
+    (services.deckPatio       ? deckFloor      : 0) +
+    (services.roofMoss        ? roofFloor      : 0)
+  )
+
+  // Clamp negotiated price: must be >= floorTotal and <= finalPrice
+  const safeNegotiated = Math.max(floorTotal, Math.min(finalPrice, negotiatedTotal > 0 ? negotiatedTotal : finalPrice))
+
+  const activePrice =
+    pricingMode === 'best'      ? floorTotal :
+    pricingMode === 'negotiate' ? safeNegotiated :
+    finalPrice
+
   const savings = finalPrice - activePrice
+  // In negotiate mode, show the discount from standard as a separate line
+  const negotiateDiscount = pricingMode === 'negotiate' ? finalPrice - safeNegotiated : 0
 
   const commissionRate = leadSource === 'produced' ? 0.15 : 0.10
   const repCommission = roundTo5(activePrice * commissionRate)
@@ -329,7 +342,7 @@ export function SalesQuoteForm() {
   ].filter(Boolean).join(', ')
 
   const quoteText = selectedCount > 0
-    ? `Based on your property, the total for ${selectedServiceNames} would be $${activePrice.toLocaleString()}${bestPriceMode ? ` — that's our best offer, exclusively for you today` : ''}. Our team can start as soon as you're ready!`
+    ? `Based on your property, the total for ${selectedServiceNames} would be $${activePrice.toLocaleString()}${pricingMode === 'best' ? ` — that's our best offer, exclusively for you today` : pricingMode === 'negotiate' ? ` — we were able to work out a special rate just for you` : ''}. Our team can start as soon as you're ready!`
     : `We'd love to help! Let us know which services you're interested in and we'll get you a custom quote.`
 
   const handleCopyQuote = () => {
@@ -714,19 +727,71 @@ export function SalesQuoteForm() {
           <p className="text-sm text-amber-600 font-medium text-center py-2">⚠ No services selected — go back to Step 4 to choose services.</p>
         )}
 
-        {/* Best Price Toggle */}
+        {/* Pricing Mode Tabs */}
         {selectedCount > 0 && (
-          <div className="space-y-1.5">
-            <button type="button" onClick={() => setBestPriceMode(p => !p)}
-              className={cn('w-full py-3.5 rounded-xl font-bold text-sm transition-all active:scale-[0.98] border-2',
-                bestPriceMode
-                  ? 'bg-orange-500 border-orange-500 text-white shadow-md'
-                  : 'bg-white border-orange-400 text-orange-600 hover:bg-orange-50')}>
-              {bestPriceMode ? '🔥 Best Price Applied — Tap to Revert' : '🤝 Offer Best Price'}
-            </button>
-            {bestPriceMode && savings > 0 && (
+          <div className="space-y-3">
+            {/* Three-tab selector */}
+            <div className="grid grid-cols-3 gap-1.5 bg-gray-100 rounded-2xl p-1">
+              {([
+                { id: 'standard',  label: 'Standard',  emoji: '📋' },
+                { id: 'negotiate', label: 'Negotiate',  emoji: '🤝' },
+                { id: 'best',      label: 'Best Price', emoji: '🔥' },
+              ] as const).map(tab => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => {
+                    setPricingMode(tab.id)
+                    if (tab.id === 'negotiate' && negotiatedTotal === 0) setNegotiatedTotal(finalPrice)
+                  }}
+                  className={cn(
+                    'py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95',
+                    pricingMode === tab.id
+                      ? tab.id === 'best'      ? 'bg-orange-500 text-white shadow-sm'
+                      : tab.id === 'negotiate' ? 'bg-blue-500 text-white shadow-sm'
+                      : 'bg-white text-gray-800 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  )}
+                >
+                  <span className="block text-base leading-none mb-0.5">{tab.emoji}</span>
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Negotiate slider */}
+            {pricingMode === 'negotiate' && finalPrice > floorTotal && (
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-bold text-blue-900">Negotiated Price</p>
+                  <p className="text-xl font-extrabold text-blue-700">${safeNegotiated.toLocaleString()}</p>
+                </div>
+                <input
+                  type="range"
+                  min={floorTotal}
+                  max={finalPrice}
+                  step={5}
+                  value={safeNegotiated}
+                  onChange={e => setNegotiatedTotal(Number(e.target.value))}
+                  className="w-full accent-blue-500"
+                />
+                <div className="flex justify-between text-xs font-semibold">
+                  <span className="text-orange-600">Floor: ${floorTotal.toLocaleString()}</span>
+                  <span className="text-gray-500">Standard: ${finalPrice.toLocaleString()}</span>
+                </div>
+                {negotiateDiscount > 0 && (
+                  <div className="flex justify-between text-xs pt-1 border-t border-blue-200">
+                    <span className="text-blue-700 font-medium">Client saves</span>
+                    <span className="font-bold text-blue-800">-${negotiateDiscount.toLocaleString()} ({Math.round(negotiateDiscount / finalPrice * 100)}% off)</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Best price info */}
+            {pricingMode === 'best' && savings > 0 && (
               <p className="text-center text-xs text-orange-600 font-semibold">
-                Client saves ${savings.toLocaleString()} ({Math.round(savings / finalPrice * 100)}% off standard rate)
+                Client saves ${savings.toLocaleString()} ({Math.round(savings / finalPrice * 100)}% off standard)
               </p>
             )}
           </div>
@@ -739,7 +804,7 @@ export function SalesQuoteForm() {
               <div className="flex justify-between text-gray-700">
                 <span>Exterior windows ({totalWindowCount})</span>
                 <span className="font-semibold flex items-center gap-1.5">
-                  {bestPriceMode && extWindowFloor !== extWindowPrice && <s className="text-gray-400 text-xs">${extWindowPrice}</s>}
+                  {pricingMode === 'best' && extWindowFloor !== extWindowPrice && <s className="text-gray-400 text-xs">${extWindowPrice}</s>}
                   ${activeExtWindow}
                 </span>
               </div>
@@ -748,7 +813,7 @@ export function SalesQuoteForm() {
               <div className="flex justify-between text-gray-700">
                 <span>Interior windows{services.exteriorWindows ? ' (bundle)' : ''}</span>
                 <span className="font-semibold flex items-center gap-1.5">
-                  {bestPriceMode && intWindowFloor !== intWindowPrice && <s className="text-gray-400 text-xs">${intWindowPrice}</s>}
+                  {pricingMode === 'best' && intWindowFloor !== intWindowPrice && <s className="text-gray-400 text-xs">${intWindowPrice}</s>}
                   ${activeIntWindow}
                 </span>
               </div>
@@ -757,7 +822,7 @@ export function SalesQuoteForm() {
               <div className="flex justify-between text-gray-700">
                 <span>House siding ({houseAreaSqft.toLocaleString()} sqft)</span>
                 <span className="font-semibold flex items-center gap-1.5">
-                  {bestPriceMode && sidingFloor !== sidingPrice && <s className="text-gray-400 text-xs">${sidingPrice}</s>}
+                  {pricingMode === 'best' && sidingFloor !== sidingPrice && <s className="text-gray-400 text-xs">${sidingPrice}</s>}
                   ${activeSiding}
                 </span>
               </div>
@@ -766,7 +831,7 @@ export function SalesQuoteForm() {
               <div className="flex justify-between text-gray-700">
                 <span>Driveway wash ({drivewayAreaSqft.toLocaleString()} sqft)</span>
                 <span className="font-semibold flex items-center gap-1.5">
-                  {bestPriceMode && drivewayFloor !== drivewayPrice && <s className="text-gray-400 text-xs">${drivewayPrice}</s>}
+                  {pricingMode === 'best' && drivewayFloor !== drivewayPrice && <s className="text-gray-400 text-xs">${drivewayPrice}</s>}
                   ${activeDriveway}
                 </span>
               </div>
@@ -775,7 +840,7 @@ export function SalesQuoteForm() {
               <div className="flex justify-between text-gray-700">
                 <span>Gutter cleaning ({stories}F)</span>
                 <span className="font-semibold flex items-center gap-1.5">
-                  {bestPriceMode && gutterFloor !== gutterPrice && <s className="text-gray-400 text-xs">${gutterPrice}</s>}
+                  {pricingMode === 'best' && gutterFloor !== gutterPrice && <s className="text-gray-400 text-xs">${gutterPrice}</s>}
                   ${activeGutter}
                 </span>
               </div>
@@ -784,7 +849,7 @@ export function SalesQuoteForm() {
               <div className="flex justify-between text-gray-700">
                 <span>Deck / patio ({deckAreaSqft.toLocaleString()} sqft)</span>
                 <span className="font-semibold flex items-center gap-1.5">
-                  {bestPriceMode && deckFloor !== deckPrice && <s className="text-gray-400 text-xs">${deckPrice}</s>}
+                  {pricingMode === 'best' && deckFloor !== deckPrice && <s className="text-gray-400 text-xs">${deckPrice}</s>}
                   ${activeDeck}
                 </span>
               </div>
@@ -793,16 +858,22 @@ export function SalesQuoteForm() {
               <div className="flex justify-between text-purple-700 font-semibold">
                 <span>Roof moss treatment ✦</span>
                 <span className="flex items-center gap-1.5">
-                  {bestPriceMode && roofFloor !== roofPrice && <s className="text-purple-300 text-xs font-normal">${roofPrice}</s>}
+                  {pricingMode === 'best' && roofFloor !== roofPrice && <s className="text-purple-300 text-xs font-normal">${roofPrice}</s>}
                   ${activeRoof}
                 </span>
+              </div>
+            )}
+            {pricingMode === 'negotiate' && negotiateDiscount > 0 && (
+              <div className="flex justify-between text-blue-700 font-semibold">
+                <span>Negotiated discount</span>
+                <span>-${negotiateDiscount.toLocaleString()}</span>
               </div>
             )}
             {selectedCount > 0 && (
               <div className="border-t border-gray-200 pt-2 flex justify-between font-bold text-gray-900">
                 <span>Total</span>
                 <span className="flex items-center gap-2">
-                  {bestPriceMode && savings > 0 && <s className="text-gray-400 text-sm font-normal">${finalPrice.toLocaleString()}</s>}
+                  {savings > 0 && <s className="text-gray-400 text-sm font-normal">${finalPrice.toLocaleString()}</s>}
                   ${activePrice.toLocaleString()}
                 </span>
               </div>
@@ -811,23 +882,33 @@ export function SalesQuoteForm() {
 
           {/* Total card + copy */}
           <div className="space-y-4 mt-4 lg:mt-0">
-            <div className={cn('rounded-2xl p-4 lg:p-6 text-white transition-all', bestPriceMode ? 'bg-gradient-to-r from-orange-500 to-amber-500' : 'bg-gradient-to-r from-green-600 to-emerald-600')}>
+            <div className={cn('rounded-2xl p-4 lg:p-6 text-white transition-all',
+              pricingMode === 'best'      ? 'bg-gradient-to-r from-orange-500 to-amber-500' :
+              pricingMode === 'negotiate' ? 'bg-gradient-to-r from-blue-600 to-blue-500' :
+              'bg-gradient-to-r from-green-600 to-emerald-600'
+            )}>
               <div className="flex items-end justify-between">
                 <div>
-                  <p className={cn('text-xs font-medium', bestPriceMode ? 'text-orange-100' : 'text-green-100')}>
-                    {bestPriceMode ? 'Best Price Offer' : 'Client Quote'}
+                  <p className={cn('text-xs font-medium',
+                    pricingMode === 'best'      ? 'text-orange-100' :
+                    pricingMode === 'negotiate' ? 'text-blue-100' :
+                    'text-green-100'
+                  )}>
+                    {pricingMode === 'best' ? 'Best Price Offer' : pricingMode === 'negotiate' ? 'Negotiated Price' : 'Client Quote'}
                   </p>
                   <div className="flex items-end gap-2">
-                    {bestPriceMode && savings > 0 && <s className="text-white/50 text-lg font-semibold">${finalPrice.toLocaleString()}</s>}
+                    {savings > 0 && <s className="text-white/50 text-lg font-semibold">${finalPrice.toLocaleString()}</s>}
                     <p className="text-3xl font-extrabold tracking-tight">${activePrice.toLocaleString()}</p>
                   </div>
-                  {bestPriceMode && savings > 0 && (
-                    <p className="text-orange-100 text-xs font-semibold mt-0.5">You save ${savings.toLocaleString()}</p>
+                  {savings > 0 && (
+                    <p className={cn('text-xs font-semibold mt-0.5',
+                      pricingMode === 'best' ? 'text-orange-100' : 'text-blue-100'
+                    )}>You save ${savings.toLocaleString()}</p>
                   )}
                 </div>
                 <div className="text-right">
-                  <p className={cn('text-xs', bestPriceMode ? 'text-orange-200' : 'text-green-200')}>Sub: ${contractorPay.toLocaleString()}</p>
-                  <p className={cn('text-xs', bestPriceMode ? 'text-orange-200' : 'text-green-200')}>Your {Math.round(commissionRate * 100)}%: ${repCommission.toLocaleString()}</p>
+                  <p className="text-xs text-white/70">Sub: ${contractorPay.toLocaleString()}</p>
+                  <p className="text-xs text-white/70">Your {Math.round(commissionRate * 100)}%: ${repCommission.toLocaleString()}</p>
                 </div>
               </div>
             </div>
