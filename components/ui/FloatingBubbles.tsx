@@ -49,8 +49,8 @@ export function FloatingBubbles() {
               : "radial-gradient(120% 120% at 30% 30%, rgba(14, 165, 233, 0.1) 0%, rgba(56, 189, 248, 0.1) 30%, rgba(232, 121, 249, 0.1) 60%, rgba(14, 165, 233, 0.05) 100%)",
           }}
           initial={{ y: "120vh", opacity: 0 }}
-          animate={{ 
-            y: "-20vh", 
+          animate={{
+            y: "-20vh",
             opacity: [0, 1, 1, 0],
             x: ["0px", `${Math.random() * 50 - 25}px`, "0px"] // Slight wobble
           }}

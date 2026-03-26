@@ -45,7 +45,7 @@ export function AdminSidebar({ onClose }: { onClose?: () => void }) {
   return (
     <div className="flex h-full w-64 flex-col bg-slate-900 text-white">
       <div className="flex h-16 items-center justify-between border-b border-slate-800 bg-slate-950 px-4">
-        <h1 className="text-xl font-bold tracking-wider text-green-500">ExcelProCRM</h1>
+        <h1 className="text-xl font-bold tracking-wider text-green-500">ExcelPro Washers OS</h1>
         {onClose && (
           <button onClick={onClose} className="lg:hidden text-slate-400 hover:text-white">
             <X className="h-5 w-5" />

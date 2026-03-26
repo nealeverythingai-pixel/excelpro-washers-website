@@ -25,7 +25,7 @@ export function Hero() {
                   </span>
                 </div>
                 <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl">
-                  <span className="block xl:inline">Ottawa's #1 Rated</span>{" "}
+                  <span className="block xl:inline">Ottawa's #1 Rated</span>
                   <span className="block text-primary-600 dark:text-primary-400 xl:inline">
                     <TextGenerateEffect words="Exterior Cleaning Experts" />
                   </span>
@@ -33,7 +33,7 @@ export function Hero() {
               </FadeIn>
               <FadeIn delay={0.2}>
                 <p className="mt-3 text-base text-gray-500 dark:text-gray-300 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                  Professional soft washing, pressure washing, and streak-free window cleaning. 
+                  Professional soft washing, pressure washing, and streak-free window cleaning.
                   <strong className="text-gray-900 dark:text-white"> Same-day response guaranteed.</strong> Fully insured with $2M liability coverage.
                 </p>
               </FadeIn>
@@ -71,7 +71,7 @@ export function Hero() {
         </div>
       </div>
       <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 bg-gray-50 dark:bg-gray-800 transition-colors duration-300">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
