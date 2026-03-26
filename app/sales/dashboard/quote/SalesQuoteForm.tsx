@@ -230,18 +230,24 @@ export function SalesQuoteForm() {
   const [pricingMode, setPricingMode] = useState<'standard' | 'negotiate' | 'best'>('standard')
   const [negotiatedTotal, setNegotiatedTotal] = useState(0)
   const [leadSource, setLeadSource] = useState<'given' | 'produced'>('given')
+  const [measureUnit, setMeasureUnit] = useState<'m' | 'ft'>('m')
 
   // --- Measurements ---
-  const houseDiagM = parseFloat(houseDiag) || 0
-  const drivewayDiagM = parseFloat(drivewayDiag) || 0
-  const houseSideM = houseDiagM / Math.SQRT2
-  const houseAreaSqft = Math.round(houseSideM * houseSideM * 10.764)
-  const housePerimeterM = houseSideM * 4
+  // sqftFactor: m² → sqft needs ×10.764; ft² is already sqft
+  const sqftFactor = measureUnit === 'm' ? 10.764 : 1
+  // perimeterFactor: gutter rate is per linear metre, so convert ft → m when needed
+  const perimeterFactor = measureUnit === 'm' ? 1 : 0.3048
+
+  const houseDiagVal  = parseFloat(houseDiag)    || 0
+  const drivewayDiagVal = parseFloat(drivewayDiag) || 0
+  const houseSide     = houseDiagVal / Math.SQRT2
+  const houseAreaSqft = Math.round(houseSide * houseSide * sqftFactor)
+  const housePerimeterM = houseSide * 4 * perimeterFactor   // always metres for gutter calc
   const storyMultiplier = STORY_MULTIPLIERS[stories] || 1.0
-  const drivewaySideM = drivewayDiagM / Math.SQRT2
-  const drivewayAreaSqft = Math.round(drivewaySideM * drivewaySideM * 10.764)
-  const deckDiagM = parseFloat(deckDiag) || 0
-  const deckAreaSqft = Math.round((deckDiagM / Math.SQRT2) ** 2 * 10.764)
+  const drivewaySide  = drivewayDiagVal / Math.SQRT2
+  const drivewayAreaSqft = Math.round(drivewaySide * drivewaySide * sqftFactor)
+  const deckDiagVal   = parseFloat(deckDiag) || 0
+  const deckAreaSqft  = Math.round((deckDiagVal / Math.SQRT2) ** 2 * sqftFactor)
   const totalWindowCount = windows.tiny + windows.small + windows.medium + windows.large
   const extWindowBase = windows.tiny * WINDOW_RATES.tiny + windows.small * WINDOW_RATES.small + windows.medium * WINDOW_RATES.medium + windows.large * WINDOW_RATES.large
 
@@ -450,16 +456,31 @@ export function SalesQuoteForm() {
       {/* ═══════ STEP 2: MEASUREMENTS ═══════ */}
       <StepSection step={1} title="Property Measurements"
         badge={houseAreaSqft > 0 ? `${houseAreaSqft.toLocaleString()} sqft house` : undefined}>
-        <p className="text-sm text-gray-500">Measure the diagonal in Google Earth (meters).</p>
+        <p className="text-sm text-gray-500">Measure the diagonal in Google Earth, then pick your unit.</p>
+
+        {/* Unit toggle */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-gray-500">Unit:</span>
+          <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
+            {(['m', 'ft'] as const).map(u => (
+              <button key={u} type="button" onClick={() => { setMeasureUnit(u); setHouseDiag(''); setDrivewayDiag(''); setDeckDiag('') }}
+                className={cn('px-4 py-1.5 rounded-lg text-sm font-bold transition-all',
+                  measureUnit === u ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600')}>
+                {u === 'm' ? 'Metres (m)' : 'Feet (ft)'}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* House */}
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
-              <Ruler className="w-4 h-4 text-green-600" /> House Diagonal (m)
+              <Ruler className="w-4 h-4 text-green-600" /> House Diagonal ({measureUnit})
             </label>
-            <input type="number" step="0.1" min="0" inputMode="decimal" placeholder="e.g. 18.5"
+            <input type="number" step={measureUnit === 'm' ? '0.1' : '1'} min="0" inputMode="decimal"
+              placeholder={measureUnit === 'm' ? 'e.g. 18.5' : 'e.g. 61'}
               value={houseDiag} onChange={e => setHouseDiag(e.target.value)}
               className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50" />
             {houseAreaSqft > 0 && (
@@ -473,9 +494,10 @@ export function SalesQuoteForm() {
           {/* Driveway */}
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
-              <Ruler className="w-4 h-4 text-blue-600" /> Driveway Diagonal (m)
+              <Ruler className="w-4 h-4 text-blue-600" /> Driveway Diagonal ({measureUnit})
             </label>
-            <input type="number" step="0.1" min="0" inputMode="decimal" placeholder="e.g. 12"
+            <input type="number" step={measureUnit === 'm' ? '0.1' : '1'} min="0" inputMode="decimal"
+              placeholder={measureUnit === 'm' ? 'e.g. 12' : 'e.g. 40'}
               value={drivewayDiag} onChange={e => setDrivewayDiag(e.target.value)}
               className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50" />
             {drivewayAreaSqft > 0 && (
@@ -703,9 +725,9 @@ export function SalesQuoteForm() {
                 {isOn && svc.key === 'deckPatio' && (
                   <div className="px-4 pb-4 space-y-2">
                     <label className="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
-                      <Ruler className="w-3.5 h-3.5 text-orange-600" /> Deck / Patio Diagonal (m)
+                      <Ruler className="w-3.5 h-3.5 text-orange-600" /> Deck / Patio Diagonal ({measureUnit})
                     </label>
-                    <input type="number" step="0.1" min="0" inputMode="decimal" placeholder="e.g. 8.5"
+                    <input type="number" step="0.1" min="0" inputMode="decimal" placeholder={measureUnit === 'm' ? 'e.g. 8.5' : 'e.g. 28'}
                       value={deckDiag} onChange={e => setDeckDiag(e.target.value)}
                       className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base font-semibold focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white" />
                     {deckAreaSqft > 0 && (
