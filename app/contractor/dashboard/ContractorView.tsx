@@ -392,10 +392,10 @@ export default function ContractorView({
       <div className="border-b border-gray-200 -mx-4 px-4 sm:mx-0 sm:px-0">
         <nav className="-mb-px flex overflow-x-auto scrollbar-none gap-1" aria-label="Tabs">
           {([
-            { id: 'available', icon: <Clock className="w-4 h-4 flex-shrink-0" />, label: 'Available', count: availableJobs.length },
-            { id: 'active',    icon: <Briefcase className="w-4 h-4 flex-shrink-0" />, label: 'Active', count: activeJobs.length },
-            { id: 'completed', icon: <CheckCircle className="w-4 h-4 flex-shrink-0" />, label: 'History', count: completedJobs.length },
+            { id: 'available',    icon: <Clock className="w-4 h-4 flex-shrink-0" />,       label: 'Job Board',   count: availableJobs.length },
+            { id: 'active',       icon: <Briefcase className="w-4 h-4 flex-shrink-0" />,   label: 'Active',      count: activeJobs.length },
             { id: 'availability', icon: <CalendarDays className="w-4 h-4 flex-shrink-0" />, label: 'Availability', count: null },
+            { id: 'completed',    icon: <CheckCircle className="w-4 h-4 flex-shrink-0" />,  label: 'History',     count: completedJobs.length },
           ] as const).map(tab => (
             <button
               key={tab.id}
