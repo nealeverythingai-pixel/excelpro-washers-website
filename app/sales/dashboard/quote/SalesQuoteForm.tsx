@@ -302,7 +302,10 @@ export function SalesQuoteForm() {
   )
 
   // Clamp negotiated price: must be >= floorTotal and <= finalPrice
-  const safeNegotiated = Math.max(floorTotal, Math.min(finalPrice, negotiatedTotal > 0 ? negotiatedTotal : finalPrice))
+  // Raw clamped value for smooth slider (step=1), displayed value snapped to nearest $5
+  const rawNegotiated = Math.max(floorTotal, Math.min(finalPrice, negotiatedTotal > 0 ? negotiatedTotal : finalPrice))
+  const safeNegotiated = Math.round(rawNegotiated / 5) * 5 === 0 ? rawNegotiated : Math.round(rawNegotiated / 5) * 5
+  const sliderPct = finalPrice > floorTotal ? ((rawNegotiated - floorTotal) / (finalPrice - floorTotal)) * 100 : 100
 
   const activePrice =
     pricingMode === 'best'      ? floorTotal :
@@ -786,19 +789,34 @@ export function SalesQuoteForm() {
               <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-bold text-blue-900">Negotiated Price</p>
-                  <p className="text-xl font-extrabold text-blue-700">${safeNegotiated.toLocaleString()}</p>
+                  <p className="text-2xl font-extrabold text-blue-700 tabular-nums">${safeNegotiated.toLocaleString()}</p>
                 </div>
-                <input
-                  type="range"
-                  min={floorTotal}
-                  max={finalPrice}
-                  step={5}
-                  value={safeNegotiated}
-                  onChange={e => setNegotiatedTotal(Number(e.target.value))}
-                  className="w-full accent-blue-500"
-                />
+                {/* Custom slider with fill track */}
+                <div className="relative py-1">
+                  <div className="h-2 rounded-full bg-blue-200 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-blue-500 transition-none"
+                      style={{ width: `${sliderPct}%` }}
+                    />
+                  </div>
+                  <input
+                    type="range"
+                    min={floorTotal}
+                    max={finalPrice}
+                    step={1}
+                    value={rawNegotiated}
+                    onChange={e => setNegotiatedTotal(Number(e.target.value))}
+                    className="absolute inset-0 w-full opacity-0 cursor-pointer h-full"
+                    style={{ touchAction: 'none' }}
+                  />
+                  {/* Thumb */}
+                  <div
+                    className="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white border-2 border-blue-500 shadow-md pointer-events-none"
+                    style={{ left: `calc(${sliderPct}% - ${sliderPct * 0.24}px)` }}
+                  />
+                </div>
                 <div className="flex justify-between text-xs font-semibold">
-                  <span className="text-orange-600">Floor: ${floorTotal.toLocaleString()}</span>
+                  <span className="text-orange-600">🔥 Floor: ${floorTotal.toLocaleString()}</span>
                   <span className="text-gray-500">Standard: ${finalPrice.toLocaleString()}</span>
                 </div>
                 {negotiateDiscount > 0 && (
