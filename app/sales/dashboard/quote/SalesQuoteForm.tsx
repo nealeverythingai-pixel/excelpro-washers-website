@@ -1,12 +1,51 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useFormState } from 'react-dom'
 import { createQuote } from './actions'
 import { Save, Ruler, Building2, Eye, ChevronDown, ChevronUp, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const initialState = { message: '' }
+
+// Defined outside SalesQuoteForm so its identity is stable across re-renders.
+// If defined inside, React remounts the entire section on every keystroke (kills focus).
+function StepSection({
+  step, title, children, badge, activeStep, setActiveStep,
+}: {
+  step: number; title: string; children: React.ReactNode; badge?: string
+  activeStep: number; setActiveStep: (s: number) => void
+}) {
+  const isOpen = activeStep === step
+  const isCompleted = activeStep > step
+  return (
+    <section className="rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden transition-all">
+      <button type="button" onClick={() => setActiveStep(isOpen ? -1 : step)}
+        className="w-full flex items-center gap-3 p-4 text-left active:bg-gray-50 transition-colors">
+        <div className={cn('w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 transition-colors',
+          isCompleted ? 'bg-green-500 text-white' : isOpen ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-500')}>
+          {isCompleted ? <Check className="w-4 h-4" /> : step + 1}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className={cn('font-semibold text-sm', isOpen ? 'text-gray-900' : 'text-gray-600')}>{title}</p>
+          {badge && !isOpen && <p className="text-xs text-gray-400 truncate mt-0.5">{badge}</p>}
+        </div>
+        {isOpen ? <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" /> : <ChevronDown className="w-5 h-5 text-gray-300 flex-shrink-0" />}
+      </button>
+      <div className={cn('transition-all duration-200', isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden')}>
+        <div className="px-4 pb-5 pt-1 space-y-4">
+          {children}
+          {step < 4 && (
+            <button type="button" onClick={() => setActiveStep(step + 1)}
+              className="w-full py-3 rounded-xl bg-green-600 text-white font-semibold text-sm active:scale-[0.98] transition-all shadow-sm">
+              Continue →
+            </button>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
 
 // --- PRICING CONSTANTS ---
 const STORY_MULTIPLIERS: Record<number, number> = { 1: 1.0, 2: 1.15, 3: 1.30 }
@@ -361,39 +400,6 @@ export function SalesQuoteForm() {
     })
   }
 
-  // Collapsible step wrapper
-  const StepSection = ({ step, title, children, badge }: { step: number; title: string; children: React.ReactNode; badge?: string }) => {
-    const isOpen = activeStep === step
-    const isCompleted = activeStep > step
-    return (
-      <section className="rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden transition-all">
-        <button type="button" onClick={() => setActiveStep(isOpen ? -1 : step)}
-          className="w-full flex items-center gap-3 p-4 text-left active:bg-gray-50 transition-colors">
-          <div className={cn('w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 transition-colors',
-            isCompleted ? 'bg-green-500 text-white' : isOpen ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-500')}>
-            {isCompleted ? <Check className="w-4 h-4" /> : step + 1}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className={cn('font-semibold text-sm', isOpen ? 'text-gray-900' : 'text-gray-600')}>{title}</p>
-            {badge && !isOpen && <p className="text-xs text-gray-400 truncate mt-0.5">{badge}</p>}
-          </div>
-          {isOpen ? <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" /> : <ChevronDown className="w-5 h-5 text-gray-300 flex-shrink-0" />}
-        </button>
-        <div className={cn('transition-all duration-200', isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden')}>
-          <div className="px-4 pb-5 pt-1 space-y-4">
-            {children}
-            {/* Next button */}
-            {step < 4 && (
-              <button type="button" onClick={() => setActiveStep(step + 1)}
-                className="w-full py-3 rounded-xl bg-green-600 text-white font-semibold text-sm active:scale-[0.98] transition-all shadow-sm">
-                Continue →
-              </button>
-            )}
-          </div>
-        </div>
-      </section>
-    )
-  }
 
   return (
     <form action={formAction} className="space-y-3">
@@ -418,7 +424,7 @@ export function SalesQuoteForm() {
       </div>
 
       {/* ═══════ STEP 1: CLIENT INFO ═══════ */}
-      <StepSection step={0} title="Client Information">
+      <StepSection step={0} title="Client Information" activeStep={activeStep} setActiveStep={setActiveStep}>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <input name="firstName" placeholder="First Name *" required inputMode="text" autoComplete="given-name"
@@ -457,7 +463,7 @@ export function SalesQuoteForm() {
       </StepSection>
 
       {/* ═══════ STEP 2: MEASUREMENTS ═══════ */}
-      <StepSection step={1} title="Property Measurements"
+      <StepSection step={1} title="Property Measurements" activeStep={activeStep} setActiveStep={setActiveStep}
         badge={houseAreaSqft > 0 ? `${houseAreaSqft.toLocaleString()} sqft house` : undefined}>
         <p className="text-sm text-gray-500">Measure the diagonal in Google Earth, then pick your unit.</p>
 
@@ -539,7 +545,7 @@ export function SalesQuoteForm() {
       </StepSection>
 
       {/* ═══════ STEP 3: WINDOWS ═══════ */}
-      <StepSection step={2} title="Window Count"
+      <StepSection step={2} title="Window Count" activeStep={activeStep} setActiveStep={setActiveStep}
         badge={totalWindowCount > 0 ? `${totalWindowCount} windows · ${windowFactorLabel}` : undefined}>
 
         {/* Visual Guide toggle */}
@@ -603,7 +609,7 @@ export function SalesQuoteForm() {
       </StepSection>
 
       {/* ═══════ STEP 4: SERVICES ═══════ */}
-      <StepSection step={3} title="Services"
+      <StepSection step={3} title="Services" activeStep={activeStep} setActiveStep={setActiveStep}
         badge={selectedCount > 0 ? `${selectedCount} selected · $${finalPrice.toLocaleString()}` : 'None selected yet'}>
         <p className="text-xs text-gray-500">Select any combination — nothing is required. Prices update live.</p>
         <div className="space-y-2">
@@ -745,7 +751,7 @@ export function SalesQuoteForm() {
       </StepSection>
 
       {/* ═══════ STEP 5: SUMMARY ═══════ */}
-      <StepSection step={4} title="Quote Summary"
+      <StepSection step={4} title="Quote Summary" activeStep={activeStep} setActiveStep={setActiveStep}
         badge={finalPrice > 0 ? `$${finalPrice.toLocaleString()}` : 'No services selected'}>
 
         {selectedCount === 0 && (
