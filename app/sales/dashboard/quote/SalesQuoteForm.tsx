@@ -250,6 +250,10 @@ export function SalesQuoteForm() {
   const [activeStep, setActiveStep] = useState(0) // which step is expanded on mobile
   const [houseDiag, setHouseDiag] = useState<string>('')
   const [drivewayDiag, setDrivewayDiag] = useState<string>('')
+  const [measureMode, setMeasureMode] = useState<'diagonal' | 'sqft'>('diagonal')
+  const [houseSqftManual, setHouseSqftManual] = useState<string>('')
+  const [drivewaySqftManual, setDrivewaySqftManual] = useState<string>('')
+  const [deckSqftManual, setDeckSqftManual] = useState<string>('')
   const [stories, setStories] = useState<number>(2)
   const [windows, setWindows] = useState({ tiny: 0, small: 0, medium: 0, large: 0 })
   const [services, setServices] = useState({
@@ -277,16 +281,22 @@ export function SalesQuoteForm() {
   // perimeterFactor: gutter rate is per linear metre, so convert ft → m when needed
   const perimeterFactor = measureUnit === 'm' ? 1 : 0.3048
 
-  const houseDiagVal  = parseFloat(houseDiag)    || 0
+  const houseDiagVal    = parseFloat(houseDiag)    || 0
   const drivewayDiagVal = parseFloat(drivewayDiag) || 0
-  const houseSide     = houseDiagVal / Math.SQRT2
-  const houseAreaSqft = Math.round(houseSide * houseSide * sqftFactor)
-  const housePerimeterM = houseSide * 4 * perimeterFactor   // always metres for gutter calc
+  const houseSide       = houseDiagVal / Math.SQRT2
+  const diagHouseAreaSqft = Math.round(houseSide * houseSide * sqftFactor)
+  const houseAreaSqft   = measureMode === 'sqft' ? (parseInt(houseSqftManual) || 0) : diagHouseAreaSqft
+  // Perimeter: when sqft is known directly, estimate as 4×√area (assumes roughly square house)
+  const housePerimeterM = measureMode === 'sqft'
+    ? 4 * Math.sqrt(houseAreaSqft * 0.0929)   // sqft → m² → side in m × 4
+    : houseSide * 4 * perimeterFactor
   const storyMultiplier = STORY_MULTIPLIERS[stories] || 1.0
-  const drivewaySide  = drivewayDiagVal / Math.SQRT2
-  const drivewayAreaSqft = Math.round(drivewaySide * drivewaySide * sqftFactor)
-  const deckDiagVal   = parseFloat(deckDiag) || 0
-  const deckAreaSqft  = Math.round((deckDiagVal / Math.SQRT2) ** 2 * sqftFactor)
+  const drivewaySide    = drivewayDiagVal / Math.SQRT2
+  const diagDrivewayAreaSqft = Math.round(drivewaySide * drivewaySide * sqftFactor)
+  const drivewayAreaSqft = measureMode === 'sqft' ? (parseInt(drivewaySqftManual) || 0) : diagDrivewayAreaSqft
+  const deckDiagVal     = parseFloat(deckDiag) || 0
+  const diagDeckAreaSqft = Math.round((deckDiagVal / Math.SQRT2) ** 2 * sqftFactor)
+  const deckAreaSqft    = measureMode === 'sqft' ? (parseInt(deckSqftManual) || 0) : diagDeckAreaSqft
   const totalWindowCount = windows.tiny + windows.small + windows.medium + windows.large
   const extWindowBase = windows.tiny * WINDOW_RATES.tiny + windows.small * WINDOW_RATES.small + windows.medium * WINDOW_RATES.medium + windows.large * WINDOW_RATES.large
 
@@ -465,36 +475,60 @@ export function SalesQuoteForm() {
       {/* ═══════ STEP 2: MEASUREMENTS ═══════ */}
       <StepSection step={1} title="Property Measurements" activeStep={activeStep} setActiveStep={setActiveStep}
         badge={houseAreaSqft > 0 ? `${houseAreaSqft.toLocaleString()} sqft house` : undefined}>
-        <p className="text-sm text-gray-500">Measure the diagonal in Google Earth, then pick your unit.</p>
-
-        {/* Unit toggle */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-gray-500">Unit:</span>
-          <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
-            {(['m', 'ft'] as const).map(u => (
-              <button key={u} type="button" onClick={() => { setMeasureUnit(u); setHouseDiag(''); setDrivewayDiag(''); setDeckDiag('') }}
-                className={cn('px-4 py-1.5 rounded-lg text-sm font-bold transition-all',
-                  measureUnit === u ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600')}>
-                {u === 'm' ? 'Metres (m)' : 'Feet (ft)'}
-              </button>
-            ))}
-          </div>
+        {/* Input mode toggle */}
+        <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
+          {([
+            { id: 'diagonal', label: '📐 Diagonal', hint: 'Measure on Google Earth' },
+            { id: 'sqft',     label: '📋 Sqft Known', hint: 'Client told you the size' },
+          ] as const).map(m => (
+            <button key={m.id} type="button"
+              onClick={() => setMeasureMode(m.id)}
+              className={cn('flex-1 py-2.5 rounded-lg text-sm font-bold transition-all text-center',
+                measureMode === m.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600')}>
+              {m.label}
+              <span className="block text-[10px] font-normal mt-0.5 opacity-70">{m.hint}</span>
+            </button>
+          ))}
         </div>
+
+        {/* Unit toggle — only relevant in diagonal mode */}
+        {measureMode === 'diagonal' && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-gray-500">Unit:</span>
+            <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
+              {(['m', 'ft'] as const).map(u => (
+                <button key={u} type="button" onClick={() => { setMeasureUnit(u); setHouseDiag(''); setDrivewayDiag(''); setDeckDiag('') }}
+                  className={cn('px-4 py-1.5 rounded-lg text-sm font-bold transition-all',
+                    measureUnit === u ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600')}>
+                  {u === 'm' ? 'Metres (m)' : 'Feet (ft)'}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* House */}
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
-              <Ruler className="w-4 h-4 text-green-600" /> House Diagonal ({measureUnit})
+              <Ruler className="w-4 h-4 text-green-600" />
+              {measureMode === 'sqft' ? 'House Area (sqft)' : `House Diagonal (${measureUnit})`}
             </label>
-            <input type="number" step={measureUnit === 'm' ? '0.1' : '1'} min="0" inputMode="decimal"
-              placeholder={measureUnit === 'm' ? 'e.g. 18.5' : 'e.g. 61'}
-              value={houseDiag} onChange={e => setHouseDiag(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50" />
+            {measureMode === 'sqft' ? (
+              <input type="number" step="1" min="0" inputMode="numeric"
+                placeholder="e.g. 2200"
+                value={houseSqftManual} onChange={e => setHouseSqftManual(e.target.value)}
+                className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50" />
+            ) : (
+              <input type="number" step={measureUnit === 'm' ? '0.1' : '1'} min="0" inputMode="decimal"
+                placeholder={measureUnit === 'm' ? 'e.g. 18.5' : 'e.g. 61'}
+                value={houseDiag} onChange={e => setHouseDiag(e.target.value)}
+                className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50" />
+            )}
             {houseAreaSqft > 0 && (
               <div className="rounded-xl bg-green-50 border border-green-200 px-3 py-2.5">
-                <p className="text-sm font-semibold text-green-800">≈ {houseAreaSqft.toLocaleString()} sqft</p>
+                <p className="text-sm font-semibold text-green-800">{houseAreaSqft.toLocaleString()} sqft</p>
                 <p className="text-xs text-green-600 mt-0.5">Siding: ${sidingPrice} · Gutters: ~${gutterPrice} · Roof: ${roofPrice}</p>
               </div>
             )}
@@ -503,15 +537,23 @@ export function SalesQuoteForm() {
           {/* Driveway */}
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
-              <Ruler className="w-4 h-4 text-blue-600" /> Driveway Diagonal ({measureUnit})
+              <Ruler className="w-4 h-4 text-blue-600" />
+              {measureMode === 'sqft' ? 'Driveway Area (sqft)' : `Driveway Diagonal (${measureUnit})`}
             </label>
-            <input type="number" step={measureUnit === 'm' ? '0.1' : '1'} min="0" inputMode="decimal"
-              placeholder={measureUnit === 'm' ? 'e.g. 12' : 'e.g. 40'}
-              value={drivewayDiag} onChange={e => setDrivewayDiag(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50" />
+            {measureMode === 'sqft' ? (
+              <input type="number" step="1" min="0" inputMode="numeric"
+                placeholder="e.g. 600"
+                value={drivewaySqftManual} onChange={e => setDrivewaySqftManual(e.target.value)}
+                className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50" />
+            ) : (
+              <input type="number" step={measureUnit === 'm' ? '0.1' : '1'} min="0" inputMode="decimal"
+                placeholder={measureUnit === 'm' ? 'e.g. 12' : 'e.g. 40'}
+                value={drivewayDiag} onChange={e => setDrivewayDiag(e.target.value)}
+                className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50" />
+            )}
             {drivewayAreaSqft > 0 && (
               <div className="rounded-xl bg-blue-50 border border-blue-200 px-3 py-2.5">
-                <p className="text-sm font-semibold text-blue-800">≈ {drivewayAreaSqft.toLocaleString()} sqft</p>
+                <p className="text-sm font-semibold text-blue-800">{drivewayAreaSqft.toLocaleString()} sqft</p>
                 <p className="text-xs text-blue-600 mt-0.5">Driveway wash: ${drivewayPrice}</p>
               </div>
             )}
@@ -734,11 +776,18 @@ export function SalesQuoteForm() {
                 {isOn && svc.key === 'deckPatio' && (
                   <div className="px-4 pb-4 space-y-2">
                     <label className="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
-                      <Ruler className="w-3.5 h-3.5 text-orange-600" /> Deck / Patio Diagonal ({measureUnit})
+                      <Ruler className="w-3.5 h-3.5 text-orange-600" />
+                      {measureMode === 'sqft' ? 'Deck / Patio Area (sqft)' : `Deck / Patio Diagonal (${measureUnit})`}
                     </label>
-                    <input type="number" step="0.1" min="0" inputMode="decimal" placeholder={measureUnit === 'm' ? 'e.g. 8.5' : 'e.g. 28'}
-                      value={deckDiag} onChange={e => setDeckDiag(e.target.value)}
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base font-semibold focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white" />
+                    {measureMode === 'sqft' ? (
+                      <input type="number" step="1" min="0" inputMode="numeric" placeholder="e.g. 300"
+                        value={deckSqftManual} onChange={e => setDeckSqftManual(e.target.value)}
+                        className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base font-semibold focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white" />
+                    ) : (
+                      <input type="number" step="0.1" min="0" inputMode="decimal" placeholder={measureUnit === 'm' ? 'e.g. 8.5' : 'e.g. 28'}
+                        value={deckDiag} onChange={e => setDeckDiag(e.target.value)}
+                        className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base font-semibold focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white" />
+                    )}
                     {deckAreaSqft > 0 && (
                       <p className="text-xs text-orange-700 font-medium">≈ {deckAreaSqft.toLocaleString()} sqft → ${deckPrice}</p>
                     )}
