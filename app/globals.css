@@ -7,15 +7,16 @@
     @apply bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300;
   }
 
-  /* Ensure typed text is always visible in dark mode */
-  .dark input,
-  .dark textarea,
-  .dark select {
-    @apply text-white;
+  /* Inputs always use light styling — all inputs in this app have explicit light backgrounds */
+  input,
+  textarea,
+  select {
+    @apply text-gray-900;
+    color-scheme: light;
   }
 
-  .dark input::placeholder,
-  .dark textarea::placeholder {
-    @apply text-gray-500;
+  input::placeholder,
+  textarea::placeholder {
+    @apply text-gray-400;
   }
 }
