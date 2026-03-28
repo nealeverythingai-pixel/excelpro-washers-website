@@ -131,7 +131,7 @@ export function ChatWidget() {
     }, 1000);
   };
 
-  if (pathname?.startsWith("/admin")) {
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/sales") || pathname?.startsWith("/contractor")) {
     return null;
   }
 

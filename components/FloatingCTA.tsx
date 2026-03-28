@@ -22,7 +22,7 @@ export function FloatingCTA() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  if (pathname?.startsWith("/admin")) return null;
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/sales") || pathname?.startsWith("/contractor")) return null;
 
   return (
     <AnimatePresence>

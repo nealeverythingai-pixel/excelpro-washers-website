@@ -2,10 +2,13 @@
 
 import { X, Megaphone } from "lucide-react";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export function AnnouncementBanner() {
   const [isVisible, setIsVisible] = useState(true);
+  const pathname = usePathname();
 
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/sales") || pathname?.startsWith("/contractor")) return null;
   if (!isVisible) return null;
 
   return (
