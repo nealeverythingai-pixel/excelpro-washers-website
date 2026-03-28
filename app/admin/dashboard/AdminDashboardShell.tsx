@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Menu } from 'lucide-react'
+import { Menu, ExternalLink } from 'lucide-react'
 import { AdminSidebar } from './AdminSidebar'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import Link from 'next/link'
 
 export function AdminDashboardShell({
   children,
@@ -66,6 +67,17 @@ export function AdminDashboardShell({
         <main className="flex-1 overflow-auto p-4 sm:p-6 bg-gray-50 dark:bg-gray-900">
           {children}
         </main>
+
+        <footer className="border-t dark:border-gray-700 bg-white dark:bg-gray-800 px-4 sm:px-6 py-3 flex items-center justify-end gap-4">
+          <Link
+            href="/sales/login"
+            target="_blank"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-green-700 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 transition-colors"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            Sales Portal
+          </Link>
+        </footer>
       </div>
     </div>
   )
