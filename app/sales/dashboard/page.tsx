@@ -1,11 +1,11 @@
 import { db } from '@/lib/db'
 import Link from 'next/link'
-import { Plus, DollarSign, TrendingUp, FileText, Clock, ChevronRight, Users, Calendar } from 'lucide-react'
+import { Plus, DollarSign, TrendingUp, FileText, ChevronRight, Users, Calendar } from 'lucide-react'
 
 const TIER_BADGES: Record<string, { label: string; bg: string; text: string }> = {
-  basic: { label: 'Basic', bg: 'bg-blue-100', text: 'text-blue-700' },
-  mid: { label: 'Mid', bg: 'bg-green-100', text: 'text-green-700' },
-  full: { label: 'Full', bg: 'bg-purple-100', text: 'text-purple-700' },
+  basic: { label: 'Basic', bg: 'bg-blue-500/15',   text: 'text-blue-400' },
+  mid:   { label: 'Mid',   bg: 'bg-green-500/15',  text: 'text-green-400' },
+  full:  { label: 'Full',  bg: 'bg-purple-500/15', text: 'text-purple-400' },
 }
 
 export default async function SalesDashboard() {
@@ -32,8 +32,8 @@ export default async function SalesDashboard() {
   return (
     <div className="space-y-6 max-w-2xl lg:max-w-none mx-auto">
 
-      {/* ─── Hero Card: Today's Summary (compact on mobile, wide banner on desktop) ─── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-600 to-emerald-700 text-white p-5 lg:p-8 shadow-lg">
+      {/* Hero Card */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-600 to-emerald-700 text-white p-5 lg:p-8 shadow-lg shadow-green-900/40">
         <div className="relative z-10 lg:flex lg:items-center lg:justify-between">
           <div>
             <p className="text-green-100 text-sm font-medium">Today&apos;s Revenue</p>
@@ -48,122 +48,97 @@ export default async function SalesDashboard() {
               <span>{quotes.length} total</span>
             </div>
           </div>
-          {/* Desktop: CTA button right-aligned inside the hero */}
           <Link href="/sales/dashboard/quote"
             className="hidden lg:inline-flex items-center gap-2 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-sm px-6 py-3 text-sm font-bold text-white transition-all">
             <Plus className="w-5 h-5" /> New Quote
           </Link>
         </div>
-        {/* Decorative circles */}
         <div className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-white/10" />
         <div className="absolute -bottom-4 -right-2 w-20 h-20 rounded-full bg-white/5" />
         <div className="hidden lg:block absolute -top-10 right-40 w-40 h-40 rounded-full bg-white/5" />
       </div>
 
-      {/* ─── Quick Action: New Quote (mobile only — desktop has it in hero) ─── */}
+      {/* Mobile: New Quote CTA */}
       <Link href="/sales/dashboard/quote"
-        className="lg:hidden flex items-center gap-4 rounded-2xl bg-white p-4 shadow-sm border border-gray-100 active:scale-[0.98] transition-all">
-        <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
-          <Plus className="w-6 h-6 text-green-600" />
+        className="lg:hidden flex items-center gap-4 rounded-2xl bg-zinc-900 border border-zinc-800 p-4 active:scale-[0.98] transition-all hover:border-zinc-700">
+        <div className="w-12 h-12 rounded-xl bg-green-500/15 flex items-center justify-center flex-shrink-0">
+          <Plus className="w-6 h-6 text-green-400" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900">Create New Quote</p>
-          <p className="text-sm text-gray-500">Start a property assessment</p>
+          <p className="font-semibold text-zinc-100">Create New Quote</p>
+          <p className="text-sm text-zinc-500">Start a property assessment</p>
         </div>
-        <ChevronRight className="w-5 h-5 text-gray-300 flex-shrink-0" />
+        <ChevronRight className="w-5 h-5 text-zinc-600 flex-shrink-0" />
       </Link>
 
-      {/* ─── Stats Grid — 2-col mobile, 4-col desktop ─── */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-        <div className="rounded-2xl bg-white p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-green-600" />
+        {[
+          { icon: TrendingUp, label: 'Total Revenue',    value: `$${totalRevenue.toLocaleString()}`,              iconBg: 'bg-green-500/15',  iconColor: 'text-green-400' },
+          { icon: DollarSign, label: 'Your Commission',  value: `$${Math.round(totalRepCommission).toLocaleString()}`, iconBg: 'bg-blue-500/15',   iconColor: 'text-blue-400' },
+          { icon: Users,      label: 'Total Quotes',     value: quotes.length.toString(),                         iconBg: 'bg-purple-500/15', iconColor: 'text-purple-400' },
+          { icon: Calendar,   label: 'Avg Quote Value',  value: `$${avgQuoteValue.toLocaleString()}`,             iconBg: 'bg-amber-500/15',  iconColor: 'text-amber-400' },
+        ].map(s => (
+          <div key={s.label} className="rounded-2xl bg-zinc-900 border border-zinc-800 p-4">
+            <div className="mb-3">
+              <div className={`w-8 h-8 rounded-lg ${s.iconBg} flex items-center justify-center`}>
+                <s.icon className={`w-4 h-4 ${s.iconColor}`} />
+              </div>
             </div>
+            <p className="text-2xl font-bold text-zinc-100">{s.value}</p>
+            <p className="text-xs text-zinc-500 font-medium mt-0.5">{s.label}</p>
           </div>
-          <p className="text-2xl font-bold text-gray-900">${totalRevenue.toLocaleString()}</p>
-          <p className="text-xs text-gray-500 font-medium mt-0.5">Total Revenue</p>
-        </div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-              <DollarSign className="w-4 h-4 text-blue-600" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-gray-900">${Math.round(totalRepCommission).toLocaleString()}</p>
-          <p className="text-xs text-gray-500 font-medium mt-0.5">Your Commission</p>
-        </div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
-              <Users className="w-4 h-4 text-purple-600" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-gray-900">{quotes.length}</p>
-          <p className="text-xs text-gray-500 font-medium mt-0.5">Total Quotes</p>
-        </div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-              <Calendar className="w-4 h-4 text-amber-600" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-gray-900">${avgQuoteValue.toLocaleString()}</p>
-          <p className="text-xs text-gray-500 font-medium mt-0.5">Avg Quote Value</p>
-        </div>
+        ))}
       </div>
 
-      {/* ─── Recent Quotes ─── */}
+      {/* Recent Quotes */}
       <div>
-        <h3 className="text-base font-semibold text-gray-900 mb-3 px-1">Recent Quotes</h3>
+        <h3 className="text-base font-semibold text-zinc-100 mb-3 px-1">Recent Quotes</h3>
 
         {recentQuotes.length === 0 ? (
-          <div className="rounded-2xl bg-white border border-gray-100 p-8 text-center">
-            <div className="w-14 h-14 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-3">
-              <FileText className="w-7 h-7 text-gray-300" />
+          <div className="rounded-2xl bg-zinc-900 border border-zinc-800 p-8 text-center">
+            <div className="w-14 h-14 rounded-full bg-zinc-800 flex items-center justify-center mx-auto mb-3">
+              <FileText className="w-7 h-7 text-zinc-600" />
             </div>
-            <p className="text-gray-500 font-medium">No quotes yet</p>
-            <p className="text-sm text-gray-400 mt-1">Tap New Quote to get started</p>
+            <p className="text-zinc-400 font-medium">No quotes yet</p>
+            <p className="text-sm text-zinc-600 mt-1">Tap New Quote to get started</p>
           </div>
         ) : (
           <>
-            {/* ── Mobile: Card List ── */}
+            {/* Mobile: Card List */}
             <div className="lg:hidden space-y-2">
               {recentQuotes.slice(0, 20).map((quote) => {
                 const client = getClient(quote.clientId)
                 const meta = parseMeta(quote.notes)
-                const tierKey = meta?.tier || ''
-                const tierBadge = TIER_BADGES[tierKey]
+                const tierBadge = TIER_BADGES[meta?.tier || '']
                 const clientName = client ? `${client.firstName} ${client.lastName}` : 'Unknown'
-
                 return (
-                  <div key={quote.id}
-                    className="rounded-2xl bg-white border border-gray-100 p-4 shadow-sm active:bg-gray-50 transition-colors">
+                  <div key={quote.id} className="rounded-2xl bg-zinc-900 border border-zinc-800 p-4 active:bg-zinc-800 transition-colors">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
-                          <span className="text-sm font-bold text-green-700">
+                        <div className="w-10 h-10 rounded-full bg-green-500/15 flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm font-bold text-green-400">
                             {clientName.split(' ').map(n => n[0]).join('').slice(0, 2)}
                           </span>
                         </div>
                         <div className="min-w-0">
-                          <p className="font-semibold text-gray-900 text-sm truncate">{clientName}</p>
+                          <p className="font-semibold text-zinc-100 text-sm truncate">{clientName}</p>
                           <div className="flex items-center gap-2 mt-0.5">
                             {tierBadge && (
                               <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold leading-none ${tierBadge.bg} ${tierBadge.text}`}>
                                 {tierBadge.label}
                               </span>
                             )}
-                            <span className="text-xs text-gray-400">
+                            <span className="text-xs text-zinc-600">
                               {new Date(quote.createdAt).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })}
                             </span>
                           </div>
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="text-base font-bold text-gray-900">${quote.total.toLocaleString()}</p>
+                        <p className="text-base font-bold text-zinc-100">${quote.total.toLocaleString()}</p>
                         {meta?.contractorPay && (
-                          <p className="text-[10px] text-gray-400 mt-0.5">
+                          <p className="text-[10px] text-zinc-600 mt-0.5">
                             Your {meta.leadSource === 'produced' ? '15' : '10'}%: ${(meta.repCommission || Math.round(quote.total * 0.10)).toLocaleString()}
                           </p>
                         )}
@@ -174,40 +149,38 @@ export default async function SalesDashboard() {
               })}
             </div>
 
-            {/* ── Desktop: Table View ── */}
-            <div className="hidden lg:block rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden">
+            {/* Desktop: Table */}
+            <div className="hidden lg:block rounded-2xl bg-zinc-900 border border-zinc-800 overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-100 bg-gray-50/50">
-                    <th className="text-left px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Client</th>
-                    <th className="text-left px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Package</th>
-                    <th className="text-left px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Date</th>
-                    <th className="text-right px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Total</th>
-                    <th className="text-right px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Contractor</th>
-                    <th className="text-right px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wider">Commission</th>
+                  <tr className="border-b border-zinc-800 bg-zinc-800/60">
+                    <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wider">Client</th>
+                    <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wider">Package</th>
+                    <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wider">Date</th>
+                    <th className="text-right px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wider">Total</th>
+                    <th className="text-right px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wider">Contractor</th>
+                    <th className="text-right px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wider">Commission</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-zinc-800/60">
                   {recentQuotes.slice(0, 30).map((quote) => {
                     const client = getClient(quote.clientId)
                     const meta = parseMeta(quote.notes)
-                    const tierKey = meta?.tier || ''
-                    const tierBadge = TIER_BADGES[tierKey]
+                    const tierBadge = TIER_BADGES[meta?.tier || '']
                     const clientName = client ? `${client.firstName} ${client.lastName}` : 'Unknown'
                     const contractorPay = meta?.contractorPay || Math.round(quote.total * 0.70)
                     const repCommission = meta?.repCommission || Math.round(quote.total * 0.10)
                     const leadSource = meta?.leadSource || 'given'
-
                     return (
-                      <tr key={quote.id} className="hover:bg-gray-50/50 transition-colors">
+                      <tr key={quote.id} className="hover:bg-zinc-800/40 transition-colors">
                         <td className="px-5 py-3.5">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
-                              <span className="text-xs font-bold text-green-700">
+                            <div className="w-8 h-8 rounded-full bg-green-500/15 flex items-center justify-center flex-shrink-0">
+                              <span className="text-xs font-bold text-green-400">
                                 {clientName.split(' ').map(n => n[0]).join('').slice(0, 2)}
                               </span>
                             </div>
-                            <span className="font-medium text-gray-900">{clientName}</span>
+                            <span className="font-medium text-zinc-200">{clientName}</span>
                           </div>
                         </td>
                         <td className="px-5 py-3.5">
@@ -216,15 +189,17 @@ export default async function SalesDashboard() {
                               {tierBadge.label}
                             </span>
                           ) : (
-                            <span className="text-gray-400">—</span>
+                            <span className="text-zinc-600">—</span>
                           )}
                         </td>
-                        <td className="px-5 py-3.5 text-gray-500">
+                        <td className="px-5 py-3.5 text-zinc-500">
                           {new Date(quote.createdAt).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </td>
-                        <td className="px-5 py-3.5 text-right font-bold text-gray-900">${quote.total.toLocaleString()}</td>
-                        <td className="px-5 py-3.5 text-right text-gray-500">${contractorPay.toLocaleString()}</td>
-                        <td className="px-5 py-3.5 text-right font-semibold text-green-700">${repCommission.toLocaleString()} <span className="text-xs font-normal text-gray-400">({leadSource === 'produced' ? '15' : '10'}%)</span></td>
+                        <td className="px-5 py-3.5 text-right font-bold text-zinc-100">${quote.total.toLocaleString()}</td>
+                        <td className="px-5 py-3.5 text-right text-zinc-500">${contractorPay.toLocaleString()}</td>
+                        <td className="px-5 py-3.5 text-right font-semibold text-green-400">
+                          ${repCommission.toLocaleString()} <span className="text-xs font-normal text-zinc-600">({leadSource === 'produced' ? '15' : '10'}%)</span>
+                        </td>
                       </tr>
                     )
                   })}

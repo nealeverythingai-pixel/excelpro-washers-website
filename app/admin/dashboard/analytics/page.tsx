@@ -148,7 +148,7 @@ export default function AnalyticsPage() {
       case 'growth': return 'bg-green-500';
       case 'scale-up': return 'bg-purple-500';
       case 'enterprise': return 'bg-orange-500';
-      default: return 'bg-gray-500';
+      default: return 'bg-zinc-500';
     }
   };
 

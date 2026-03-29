@@ -25,7 +25,7 @@ export default function EditJobForm({ job, clients, contractors }: EditJobFormPr
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!clientId || !title || !startDate || !total) {
       alert('Please fill in all required fields')
       return
@@ -64,12 +64,12 @@ export default function EditJobForm({ job, clients, contractors }: EditJobFormPr
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 dark:from-gray-900 dark:via-blue-950/20 dark:to-gray-900 p-8">
+    <div className="min-h-screen bg-zinc-900 p-8">
       <div className="max-w-3xl mx-auto">
         {/* Back Button */}
         <button
           onClick={() => router.push(`/admin/dashboard/jobs/${job.id}`)}
-          className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+          className="mb-6 flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Job
@@ -77,34 +77,34 @@ export default function EditJobForm({ job, clients, contractors }: EditJobFormPr
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl font-bold text-zinc-100 mb-2">
             Edit Job
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-zinc-400">
             Update job details and schedule
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Job Details Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-sky-100 dark:bg-sky-900/30 rounded-lg flex items-center justify-center">
-                <Briefcase className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+              <div className="w-10 h-10 bg-sky-500/15 rounded-lg flex items-center justify-center">
+                <Briefcase className="w-5 h-5 text-sky-400" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Job Information</h2>
+              <h2 className="text-xl font-semibold text-zinc-100">Job Information</h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-200 mb-2">
                   Client *
                 </label>
                 <select
                   value={clientId}
                   onChange={(e) => setClientId(e.target.value)}
                   required
-                  className="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-zinc-100"
                 >
                   {clients.map(client => (
                     <option key={client.id} value={client.id}>
@@ -116,7 +116,7 @@ export default function EditJobForm({ job, clients, contractors }: EditJobFormPr
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-200 mb-2">
                   Job Title *
                 </label>
                 <input
@@ -124,20 +124,20 @@ export default function EditJobForm({ job, clients, contractors }: EditJobFormPr
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
-                  className="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-zinc-100 placeholder:text-zinc-600"
                   placeholder="e.g., Residential Pressure Washing"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-200 mb-2">
                   Description
                 </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-gray-900 dark:text-white resize-none"
+                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-zinc-100 placeholder:text-zinc-600 resize-none"
                   placeholder="Additional job details..."
                 />
               </div>
@@ -145,17 +145,17 @@ export default function EditJobForm({ job, clients, contractors }: EditJobFormPr
           </div>
 
           {/* Schedule Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-sky-100 dark:bg-sky-900/30 rounded-lg flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+              <div className="w-10 h-10 bg-sky-500/15 rounded-lg flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-sky-400" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Schedule</h2>
+              <h2 className="text-xl font-semibold text-zinc-100">Schedule</h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-200 mb-2">
                   Start Date & Time *
                 </label>
                 <input
@@ -163,34 +163,34 @@ export default function EditJobForm({ job, clients, contractors }: EditJobFormPr
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                   required
-                  className="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-zinc-100"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-200 mb-2">
                   End Date & Time
                 </label>
                 <input
                   type="datetime-local"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-zinc-100"
                 />
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-sm text-zinc-500 mt-1">
                   Optional - Set if job duration is known
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-200 mb-2">
                   Status *
                 </label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as Job['status'])}
                   required
-                  className="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-zinc-100"
                 >
                   <option value="Scheduled">Scheduled</option>
                   <option value="Active">Active</option>
@@ -202,23 +202,23 @@ export default function EditJobForm({ job, clients, contractors }: EditJobFormPr
           </div>
 
           {/* Assignment & Cost Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-sky-100 dark:bg-sky-900/30 rounded-lg flex items-center justify-center">
-                <User className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+              <div className="w-10 h-10 bg-sky-500/15 rounded-lg flex items-center justify-center">
+                <User className="w-5 h-5 text-sky-400" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Assignment & Cost</h2>
+              <h2 className="text-xl font-semibold text-zinc-100">Assignment & Cost</h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-200 mb-2">
                   Assign Contractor
                 </label>
                 <select
                   value={contractorId}
                   onChange={(e) => setContractorId(e.target.value)}
-                  className="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-zinc-100"
                 >
                   <option value="">No contractor assigned</option>
                   {contractors.map(contractor => (
@@ -227,17 +227,17 @@ export default function EditJobForm({ job, clients, contractors }: EditJobFormPr
                     </option>
                   ))}
                 </select>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-sm text-zinc-500 mt-1">
                   Optional - Assign a team member to this job
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-200 mb-2">
                   Estimated Total *
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
                     $
                   </span>
                   <input
@@ -247,11 +247,11 @@ export default function EditJobForm({ job, clients, contractors }: EditJobFormPr
                     onChange={(e) => setTotal(e.target.value)}
                     required
                     min="0"
-                    className="w-full pl-8 pr-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-gray-900 dark:text-white"
+                    className="w-full pl-8 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent text-zinc-100 placeholder:text-zinc-600"
                     placeholder="0.00"
                   />
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-sm text-zinc-500 mt-1">
                   Estimated cost for this job
                 </p>
               </div>
@@ -271,7 +271,7 @@ export default function EditJobForm({ job, clients, contractors }: EditJobFormPr
             <button
               type="button"
               onClick={() => router.push(`/admin/dashboard/jobs/${job.id}`)}
-              className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors"
+              className="px-6 py-3 border border-zinc-700 text-zinc-200 hover:bg-zinc-800 rounded-lg font-medium transition-colors"
             >
               Cancel
             </button>

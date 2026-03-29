@@ -2,15 +2,15 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { 
-  FileText, 
-  Calendar, 
-  DollarSign, 
-  CheckCircle2, 
-  User, 
-  Phone, 
-  Mail, 
-  MapPin, 
+import {
+  FileText,
+  Calendar,
+  DollarSign,
+  CheckCircle2,
+  User,
+  Phone,
+  Mail,
+  MapPin,
   Clock,
   Briefcase,
   Edit,
@@ -34,15 +34,15 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Approved':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+        return 'bg-green-500/15 text-green-400'
       case 'Sent':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+        return 'bg-blue-500/15 text-blue-400'
       case 'Draft':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+        return 'bg-zinc-800 text-zinc-400'
       case 'Converted':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+        return 'bg-purple-500/15 text-purple-400'
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+        return 'bg-zinc-800 text-zinc-400'
     }
   }
 
@@ -51,7 +51,7 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
       alert('This quote has already been sent.')
       return
     }
-    
+
     const confirmSend = confirm('Send this quote to the client?')
     if (!confirmSend) return
 
@@ -81,7 +81,7 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
       alert('This quote has already been approved.')
       return
     }
-    
+
     const confirmApprove = confirm('Mark this quote as approved by client?')
     if (!confirmApprove) return
 
@@ -111,7 +111,7 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
       alert('This quote has already been converted to a job.')
       return
     }
-    
+
     const confirmConvert = confirm('Convert this quote to a job?')
     if (!confirmConvert) return
 
@@ -150,37 +150,36 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
   }
 
   const getTaxAmount = () => {
-    // Assuming 13% tax if not stored separately
     const subtotal = calculateSubtotal()
     return quote.total - subtotal
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 dark:from-gray-900 dark:via-blue-950/20 dark:to-gray-900 p-8">
+    <div className="min-h-screen bg-zinc-900 p-8">
       <div className="max-w-5xl mx-auto">
         {/* Back Button */}
         <button
           onClick={() => router.push('/admin/dashboard/quotes')}
-          className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+          className="mb-6 flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Quotes
         </button>
 
         {/* Header */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 mb-6">
+        <div className="bg-zinc-900 rounded-xl shadow-sm border border-zinc-800 p-8 mb-6">
           <div className="flex items-start justify-between mb-6">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <FileText className="w-8 h-8 text-sky-500" />
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-3xl font-bold text-zinc-100">
                   {quote.title}
                 </h1>
               </div>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-zinc-400">
                 Quote #{quote.id.split('_')[1]?.slice(0, 8) || quote.id.slice(0, 8)}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+              <p className="text-sm text-zinc-500 mt-1">
                 Created {formatDate(quote.createdAt)}
               </p>
             </div>
@@ -190,7 +189,7 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
                 {quote.status === 'Converted' && <Briefcase className="w-4 h-4" />}
                 {quote.status}
               </span>
-              <div className="mt-4 text-3xl font-bold text-gray-900 dark:text-white">
+              <div className="mt-4 text-3xl font-bold text-zinc-100">
                 ${quote.total.toLocaleString()}
               </div>
             </div>
@@ -198,13 +197,13 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
 
           {/* Status Alerts */}
           {quote.status === 'Draft' && (
-            <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex items-start gap-3 mb-6">
-              <Clock className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5" />
+            <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 flex items-start gap-3 mb-6">
+              <Clock className="w-5 h-5 text-zinc-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium text-gray-900 dark:text-gray-300">
+                <p className="font-medium text-zinc-300">
                   Draft Quote
                 </p>
-                <p className="text-sm text-gray-700 dark:text-gray-400 mt-1">
+                <p className="text-sm text-zinc-400 mt-1">
                   This quote has not been sent to the client yet. Review and send when ready.
                 </p>
               </div>
@@ -212,13 +211,13 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
           )}
 
           {quote.status === 'Sent' && (
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 flex items-start gap-3 mb-6">
-              <Send className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 flex items-start gap-3 mb-6">
+              <Send className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium text-blue-900 dark:text-blue-300">
+                <p className="font-medium text-blue-300">
                   Quote Sent
                 </p>
-                <p className="text-sm text-blue-700 dark:text-blue-400 mt-1">
+                <p className="text-sm text-blue-400 mt-1">
                   Waiting for client approval. Mark as approved once confirmed.
                 </p>
               </div>
@@ -226,13 +225,13 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
           )}
 
           {quote.status === 'Approved' && (
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-start gap-3 mb-6">
-              <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+            <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 flex items-start gap-3 mb-6">
+              <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium text-green-900 dark:text-green-300">
+                <p className="font-medium text-green-300">
                   Quote Approved
                 </p>
-                <p className="text-sm text-green-700 dark:text-green-400 mt-1">
+                <p className="text-sm text-green-400 mt-1">
                   Client has approved this quote. Ready to convert to a job.
                 </p>
               </div>
@@ -240,13 +239,13 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
           )}
 
           {quote.status === 'Converted' && (
-            <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 flex items-start gap-3 mb-6">
-              <Briefcase className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
+            <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4 flex items-start gap-3 mb-6">
+              <Briefcase className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium text-purple-900 dark:text-purple-300">
+                <p className="font-medium text-purple-300">
                   Converted to Job
                 </p>
-                <p className="text-sm text-purple-700 dark:text-purple-400 mt-1">
+                <p className="text-sm text-purple-400 mt-1">
                   This quote has been converted to a job and is now in progress.
                 </p>
               </div>
@@ -288,7 +287,7 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
             <button
               onClick={() => router.push(`/admin/dashboard/quotes/${quote.id}/edit`)}
               disabled={quote.status === 'Converted'}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 border border-zinc-700 text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors disabled:opacity-50"
             >
               <Edit className="w-4 h-4" />
               Edit Quote
@@ -298,35 +297,35 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Client Details */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-zinc-900 rounded-xl shadow-sm border border-zinc-800 p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-sky-100 dark:bg-sky-900/30 rounded-lg flex items-center justify-center">
-                <User className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+              <div className="w-10 h-10 bg-sky-500/15 rounded-lg flex items-center justify-center">
+                <User className="w-5 h-5 text-sky-400" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Client Details</h2>
+              <h2 className="text-xl font-semibold text-zinc-100">Client Details</h2>
             </div>
-            
+
             <div className="space-y-4">
               <div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-2xl font-bold text-zinc-100">
                   {client.firstName} {client.lastName}
                 </p>
                 {client.companyName && (
-                  <p className="text-gray-600 dark:text-gray-400 mt-1 flex items-center gap-2">
+                  <p className="text-zinc-400 mt-1 flex items-center gap-2">
                     <Building2 className="w-4 h-4" />
                     {client.companyName}
                   </p>
                 )}
               </div>
 
-              <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="space-y-3 pt-4 border-t border-zinc-800">
                 <div className="flex items-start gap-3">
-                  <Mail className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <Mail className="w-4 h-4 text-zinc-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Email</p>
-                    <a 
+                    <p className="text-sm text-zinc-400">Email</p>
+                    <a
                       href={`mailto:${client.email}`}
-                      className="text-gray-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+                      className="text-zinc-100 hover:text-sky-400 transition-colors"
                     >
                       {client.email}
                     </a>
@@ -335,12 +334,12 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
 
                 {client.phone && (
                   <div className="flex items-start gap-3">
-                    <Phone className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                    <Phone className="w-4 h-4 text-zinc-500 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Phone</p>
-                      <a 
+                      <p className="text-sm text-zinc-400">Phone</p>
+                      <a
                         href={`tel:${client.phone}`}
-                        className="text-gray-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+                        className="text-zinc-100 hover:text-sky-400 transition-colors"
                       >
                         {client.phone}
                       </a>
@@ -350,19 +349,19 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
 
                 {client.address && (
                   <div className="flex items-start gap-3">
-                    <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                    <MapPin className="w-4 h-4 text-zinc-500 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Address</p>
-                      <p className="text-gray-900 dark:text-white">{client.address}</p>
+                      <p className="text-sm text-zinc-400">Address</p>
+                      <p className="text-zinc-100">{client.address}</p>
                     </div>
                   </div>
                 )}
               </div>
 
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="pt-4 border-t border-zinc-800">
                 <button
                   onClick={() => router.push(`/admin/dashboard/clients?id=${client.id}`)}
-                  className="text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300 font-medium text-sm transition-colors"
+                  className="text-sky-400 hover:text-sky-300 font-medium text-sm transition-colors"
                 >
                   View Client Profile →
                 </button>
@@ -371,43 +370,43 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
           </div>
 
           {/* Quote Summary */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-zinc-900 rounded-xl shadow-sm border border-zinc-800 p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-sky-100 dark:bg-sky-900/30 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+              <div className="w-10 h-10 bg-sky-500/15 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-sky-400" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Quote Summary</h2>
+              <h2 className="text-xl font-semibold text-zinc-100">Quote Summary</h2>
             </div>
 
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="text-zinc-400">Subtotal</span>
+                <span className="font-medium text-zinc-100">
                   ${calculateSubtotal().toLocaleString()}
                 </span>
               </div>
 
               {getTaxAmount() > 0 && (
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600 dark:text-gray-400">Tax</span>
-                  <span className="font-medium text-gray-900 dark:text-white">
+                  <span className="text-zinc-400">Tax</span>
+                  <span className="font-medium text-zinc-100">
                     ${getTaxAmount().toLocaleString()}
                   </span>
                 </div>
               )}
 
-              <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
-                <span className="text-lg font-semibold text-gray-900 dark:text-white">Total</span>
-                <span className="text-2xl font-bold text-gray-900 dark:text-white">
+              <div className="flex justify-between items-center pt-4 border-t border-zinc-800">
+                <span className="text-lg font-semibold text-zinc-100">Total</span>
+                <span className="text-2xl font-bold text-zinc-100">
                   ${quote.total.toLocaleString()}
                 </span>
               </div>
 
-              <div className="flex items-start gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <Calendar className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+              <div className="flex items-start gap-3 pt-4 border-t border-zinc-800">
+                <Calendar className="w-4 h-4 text-zinc-500 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Created Date</p>
-                  <p className="text-gray-900 dark:text-white">
+                  <p className="text-sm text-zinc-400">Created Date</p>
+                  <p className="text-zinc-100">
                     {formatDate(quote.createdAt)}
                   </p>
                 </div>
@@ -415,10 +414,10 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
 
               {quote.salesRepId && (
                 <div className="flex items-start gap-3">
-                  <User className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <User className="w-4 h-4 text-zinc-500 mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Sales Rep</p>
-                    <p className="text-gray-900 dark:text-white">
+                    <p className="text-sm text-zinc-400">Sales Rep</p>
+                    <p className="text-zinc-100">
                       ID: {quote.salesRepId}
                     </p>
                   </div>
@@ -429,60 +428,60 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
         </div>
 
         {/* Line Items */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mt-6">
+        <div className="bg-zinc-900 rounded-xl shadow-sm border border-zinc-800 p-6 mt-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-sky-100 dark:bg-sky-900/30 rounded-lg flex items-center justify-center">
-              <Package className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+            <div className="w-10 h-10 bg-sky-500/15 rounded-lg flex items-center justify-center">
+              <Package className="w-5 h-5 text-sky-400" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Line Items</h2>
+            <h2 className="text-xl font-semibold text-zinc-100">Line Items</h2>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900 dark:text-white">Description</th>
-                  <th className="text-right py-3 px-4 text-sm font-semibold text-gray-900 dark:text-white">Quantity</th>
-                  <th className="text-right py-3 px-4 text-sm font-semibold text-gray-900 dark:text-white">Unit Price</th>
-                  <th className="text-right py-3 px-4 text-sm font-semibold text-gray-900 dark:text-white">Total</th>
+                <tr className="border-b border-zinc-800">
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-zinc-100">Description</th>
+                  <th className="text-right py-3 px-4 text-sm font-semibold text-zinc-100">Quantity</th>
+                  <th className="text-right py-3 px-4 text-sm font-semibold text-zinc-100">Unit Price</th>
+                  <th className="text-right py-3 px-4 text-sm font-semibold text-zinc-100">Total</th>
                 </tr>
               </thead>
               <tbody>
                 {quote.items.map((item, index) => (
-                  <tr key={index} className="border-b border-gray-100 dark:border-gray-700/50 last:border-0">
-                    <td className="py-4 px-4 text-gray-900 dark:text-white">{item.description}</td>
-                    <td className="py-4 px-4 text-right text-gray-900 dark:text-white">{item.quantity}</td>
-                    <td className="py-4 px-4 text-right text-gray-900 dark:text-white">${item.unitPrice.toLocaleString()}</td>
-                    <td className="py-4 px-4 text-right font-medium text-gray-900 dark:text-white">
+                  <tr key={index} className="border-b border-zinc-800/50 last:border-0">
+                    <td className="py-4 px-4 text-zinc-100">{item.description}</td>
+                    <td className="py-4 px-4 text-right text-zinc-100">{item.quantity}</td>
+                    <td className="py-4 px-4 text-right text-zinc-100">${item.unitPrice.toLocaleString()}</td>
+                    <td className="py-4 px-4 text-right font-medium text-zinc-100">
                       ${(item.quantity * item.unitPrice).toLocaleString()}
                     </td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
-                <tr className="border-t-2 border-gray-300 dark:border-gray-600">
-                  <td colSpan={3} className="py-4 px-4 text-right font-semibold text-gray-900 dark:text-white">
+                <tr className="border-t-2 border-zinc-700">
+                  <td colSpan={3} className="py-4 px-4 text-right font-semibold text-zinc-100">
                     Subtotal
                   </td>
-                  <td className="py-4 px-4 text-right font-semibold text-gray-900 dark:text-white">
+                  <td className="py-4 px-4 text-right font-semibold text-zinc-100">
                     ${calculateSubtotal().toLocaleString()}
                   </td>
                 </tr>
                 {getTaxAmount() > 0 && (
                   <tr>
-                    <td colSpan={3} className="py-2 px-4 text-right text-gray-600 dark:text-gray-400">
+                    <td colSpan={3} className="py-2 px-4 text-right text-zinc-400">
                       Tax
                     </td>
-                    <td className="py-2 px-4 text-right text-gray-900 dark:text-white">
+                    <td className="py-2 px-4 text-right text-zinc-100">
                       ${getTaxAmount().toLocaleString()}
                     </td>
                   </tr>
                 )}
-                <tr className="border-t border-gray-300 dark:border-gray-600">
-                  <td colSpan={3} className="py-4 px-4 text-right text-lg font-bold text-gray-900 dark:text-white">
+                <tr className="border-t border-zinc-700">
+                  <td colSpan={3} className="py-4 px-4 text-right text-lg font-bold text-zinc-100">
                     Total
                   </td>
-                  <td className="py-4 px-4 text-right text-lg font-bold text-gray-900 dark:text-white">
+                  <td className="py-4 px-4 text-right text-lg font-bold text-zinc-100">
                     ${quote.total.toLocaleString()}
                   </td>
                 </tr>
@@ -493,18 +492,18 @@ export default function QuoteDetailClient({ quote, client, job }: QuoteDetailCli
 
         {/* Linked Job */}
         {job && quote.status === 'Converted' && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mt-6">
+          <div className="bg-zinc-900 rounded-xl shadow-sm border border-zinc-800 p-6 mt-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-sky-100 dark:bg-sky-900/30 rounded-lg flex items-center justify-center">
-                <Briefcase className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+              <div className="w-10 h-10 bg-sky-500/15 rounded-lg flex items-center justify-center">
+                <Briefcase className="w-5 h-5 text-sky-400" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Converted Job</h2>
+              <h2 className="text-xl font-semibold text-zinc-100">Converted Job</h2>
             </div>
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-lg font-semibold text-gray-900 dark:text-white">{job.title}</p>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-lg font-semibold text-zinc-100">{job.title}</p>
+                <p className="text-zinc-400">
                   Status: {job.status} • ${job.total.toLocaleString()}
                 </p>
               </div>

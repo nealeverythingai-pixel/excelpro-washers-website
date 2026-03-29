@@ -2,12 +2,12 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { 
-  Plus, 
-  Search, 
-  Calendar, 
-  User, 
-  DollarSign, 
+import {
+  Plus,
+  Search,
+  Calendar,
+  User,
+  DollarSign,
   MapPin,
   Clock,
   CheckCircle2,
@@ -102,7 +102,7 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
       })
 
       if (response.ok) {
-        setJobs(jobs.map(j => 
+        setJobs(jobs.map(j =>
           j.id === jobId ? { ...j, status: 'Completed' as const } : j
         ))
       }
@@ -123,8 +123,8 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
     } else if (date.toDateString() === tomorrow.toDateString()) {
       return `Tomorrow at ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`
     } else {
-      return date.toLocaleDateString('en-US', { 
-        month: 'short', 
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
         day: 'numeric',
         year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
       })
@@ -133,28 +133,28 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
 
   // Status colors
   const statusConfig = {
-    'Scheduled': { 
-      bg: 'bg-blue-100 dark:bg-blue-950', 
-      text: 'text-blue-800 dark:text-blue-200',
-      border: 'border-blue-200 dark:border-blue-800',
+    'Scheduled': {
+      bg: 'bg-blue-500/15',
+      text: 'text-blue-400',
+      border: 'border-blue-500/30',
       icon: CalendarDays
     },
-    'Active': { 
-      bg: 'bg-green-100 dark:bg-green-950', 
-      text: 'text-green-800 dark:text-green-200',
-      border: 'border-green-200 dark:border-green-800',
+    'Active': {
+      bg: 'bg-green-500/15',
+      text: 'text-green-400',
+      border: 'border-green-500/30',
       icon: Clock
     },
-    'Completed': { 
-      bg: 'bg-gray-100 dark:bg-gray-800', 
-      text: 'text-gray-800 dark:text-gray-200',
-      border: 'border-gray-200 dark:border-gray-700',
+    'Completed': {
+      bg: 'bg-zinc-800',
+      text: 'text-zinc-400',
+      border: 'border-zinc-700',
       icon: CheckCircle2
     },
-    'Cancelled': { 
-      bg: 'bg-red-100 dark:bg-red-950', 
-      text: 'text-red-800 dark:text-red-200',
-      border: 'border-red-200 dark:border-red-800',
+    'Cancelled': {
+      bg: 'bg-red-500/15',
+      text: 'text-red-400',
+      border: 'border-red-500/30',
       icon: XCircle
     }
   }
@@ -164,8 +164,8 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Jobs</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your scheduled and completed jobs</p>
+          <h1 className="text-3xl font-bold text-zinc-100">Jobs</h1>
+          <p className="text-zinc-400 mt-1">Manage your scheduled and completed jobs</p>
         </div>
         <Link
           href="/admin/dashboard/jobs/new"
@@ -178,38 +178,38 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Scheduled</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stats.scheduled}</p>
+              <p className="text-sm text-zinc-400">Scheduled</p>
+              <p className="text-2xl font-bold text-zinc-100 mt-1">{stats.scheduled}</p>
             </div>
-            <div className="p-3 bg-blue-100 dark:bg-blue-950 rounded-lg">
-              <CalendarDays className="text-blue-600 dark:text-blue-400" size={24} />
+            <div className="p-3 bg-blue-500/15 rounded-lg">
+              <CalendarDays className="text-blue-400" size={24} />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Active</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stats.active}</p>
+              <p className="text-sm text-zinc-400">Active</p>
+              <p className="text-2xl font-bold text-zinc-100 mt-1">{stats.active}</p>
             </div>
-            <div className="p-3 bg-green-100 dark:bg-green-950 rounded-lg">
-              <Clock className="text-green-600 dark:text-green-400" size={24} />
+            <div className="p-3 bg-green-500/15 rounded-lg">
+              <Clock className="text-green-400" size={24} />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Completed</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stats.completed}</p>
+              <p className="text-sm text-zinc-400">Completed</p>
+              <p className="text-2xl font-bold text-zinc-100 mt-1">{stats.completed}</p>
             </div>
-            <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
-              <CheckCircle2 className="text-gray-600 dark:text-gray-400" size={24} />
+            <div className="p-3 bg-zinc-800 rounded-lg">
+              <CheckCircle2 className="text-zinc-400" size={24} />
             </div>
           </div>
         </div>
@@ -230,16 +230,16 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 space-y-4">
+      <div className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800 space-y-4">
         {/* Search Bar */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={20} />
           <input
             type="text"
             placeholder="Search by job title, client name, or description..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full pl-10 pr-4 py-2 border border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-zinc-800 text-zinc-100 placeholder:text-zinc-600"
           />
         </div>
 
@@ -251,7 +251,7 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filterStatus === 'all'
                   ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
               }`}
             >
               All ({jobs.length})
@@ -261,7 +261,7 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filterStatus === 'Scheduled'
                   ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
               }`}
             >
               Scheduled ({stats.scheduled})
@@ -271,7 +271,7 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filterStatus === 'Active'
                   ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
               }`}
             >
               Active ({stats.active})
@@ -281,7 +281,7 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filterStatus === 'Completed'
                   ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
               }`}
             >
               Completed ({stats.completed})
@@ -293,7 +293,7 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'date' | 'client' | 'value')}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-zinc-700 rounded-lg bg-zinc-800 text-zinc-100 focus:ring-2 focus:ring-blue-500"
             >
               <option value="date">Sort by Date</option>
               <option value="client">Sort by Client</option>
@@ -301,13 +301,13 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
             </select>
 
             {/* View Toggle */}
-            <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+            <div className="flex items-center gap-1 bg-zinc-800 rounded-lg p-1">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded ${
                   viewMode === 'grid'
-                    ? 'bg-white dark:bg-gray-600 text-blue-500'
-                    : 'text-gray-600 dark:text-gray-400'
+                    ? 'bg-zinc-700 text-blue-500'
+                    : 'text-zinc-400'
                 }`}
               >
                 <LayoutGrid size={20} />
@@ -316,8 +316,8 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded ${
                   viewMode === 'list'
-                    ? 'bg-white dark:bg-gray-600 text-blue-500'
-                    : 'text-gray-600 dark:text-gray-400'
+                    ? 'bg-zinc-700 text-blue-500'
+                    : 'text-zinc-400'
                 }`}
               >
                 <List size={20} />
@@ -329,11 +329,11 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
 
       {/* Jobs List */}
       {filteredJobs.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center border border-gray-200 dark:border-gray-700">
-          <Calendar className="mx-auto text-gray-400 mb-4" size={48} />
-          <p className="text-gray-600 dark:text-gray-400">
-            {searchTerm || filterStatus !== 'all' 
-              ? 'No jobs match your filters.' 
+        <div className="bg-zinc-900 rounded-lg shadow-sm p-12 text-center border border-zinc-800">
+          <Calendar className="mx-auto text-zinc-500 mb-4" size={48} />
+          <p className="text-zinc-400">
+            {searchTerm || filterStatus !== 'all'
+              ? 'No jobs match your filters.'
               : 'No jobs found. Create one to get started.'}
           </p>
         </div>
@@ -342,23 +342,23 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
           {filteredJobs.map((job) => {
             const client = getClient(job.clientId)
             const StatusIcon = statusConfig[job.status].icon
-            
+
             return (
               <div
                 key={job.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all"
+                className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800 hover:border-blue-500 hover:shadow-md transition-all"
               >
                 {/* Job Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <Link 
+                    <Link
                       href={`/admin/dashboard/jobs/${job.id}`}
-                      className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-500 transition-colors"
+                      className="text-lg font-semibold text-zinc-100 hover:text-blue-500 transition-colors"
                     >
                       {job.title}
                     </Link>
                     {job.description && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                      <p className="text-sm text-zinc-400 mt-1 line-clamp-2">
                         {job.description}
                       </p>
                     )}
@@ -371,39 +371,39 @@ export default function JobsPageClient({ initialJobs, initialClients }: JobsPage
 
                 {/* Job Details */}
                 <div className="space-y-2 mb-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-sm text-zinc-400">
                     <User size={16} />
                     <span className="font-medium">{getClientName(job.clientId)}</span>
                     {client?.companyName && (
-                      <span className="text-gray-400">• {client.companyName}</span>
+                      <span className="text-zinc-500">• {client.companyName}</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-sm text-zinc-400">
                     <Calendar size={16} />
                     <span>{formatDate(job.startDate)}</span>
                     {job.endDate && (
-                      <span className="text-gray-400">
+                      <span className="text-zinc-500">
                         → {formatDate(job.endDate)}
                       </span>
                     )}
                   </div>
                   {client?.address && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-2 text-sm text-zinc-400">
                       <MapPin size={16} />
                       <span className="truncate">{client.address}</span>
                     </div>
                   )}
-                  <div className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-zinc-100">
                     <DollarSign size={16} />
                     <span>${job.total.toLocaleString()}</span>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex gap-2 pt-4 border-t border-zinc-800">
                   <Link
                     href={`/admin/dashboard/jobs/${job.id}`}
-                    className="flex-1 px-4 py-2 text-center border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    className="flex-1 px-4 py-2 text-center border border-zinc-700 text-zinc-200 rounded-lg hover:bg-zinc-800 transition-colors"
                   >
                     View Details
                   </Link>

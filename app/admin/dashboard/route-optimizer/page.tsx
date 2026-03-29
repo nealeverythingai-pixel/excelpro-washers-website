@@ -51,20 +51,20 @@ export default async function RouteOptimizerPage({
     <div className="space-y-6 h-[calc(100vh-8rem)] flex flex-col">
       <div className="flex flex-col justify-between sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Route Optimizer</h1>
-          <p className="mt-1 text-sm text-gray-500">Coordinate your team's route for efficiency</p>
+          <h1 className="text-2xl font-bold text-zinc-100">Route Optimizer</h1>
+          <p className="mt-1 text-sm text-zinc-500">Coordinate your team's route for efficiency</p>
         </div>
         
         <div className="mt-4 sm:mt-0 flex items-center space-x-3">
              <form className="flex items-center space-x-2">
-                <label htmlFor="date" className="text-sm font-medium text-gray-700">Date:</label>
-                <input 
-                    type="date" 
-                    name="date" 
+                <label htmlFor="date" className="text-sm font-medium text-zinc-200">Date:</label>
+                <input
+                    type="date"
+                    name="date"
                     defaultValue={selectedDate}
-                    className="rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm p-2 border"
+                    className="rounded-md border-zinc-700 bg-zinc-800 text-zinc-100 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm p-2 border"
                 />
-                <button type="submit" className="rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200">
+                <button type="submit" className="rounded-md bg-zinc-800 px-3 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-700">
                     Go
                 </button>
             </form>
@@ -73,9 +73,9 @@ export default async function RouteOptimizerPage({
 
       <div className="flex flex-1 gap-6 overflow-hidden">
           {/* List View */}
-          <div className="w-1/3 flex flex-col bg-white rounded-lg shadow h-full overflow-hidden">
-              <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                  <h3 className="font-semibold text-gray-900">Stops ({stops.length})</h3>
+          <div className="w-1/3 flex flex-col bg-zinc-900 rounded-lg shadow h-full overflow-hidden border border-zinc-800">
+              <div className="p-4 border-b border-zinc-800 bg-zinc-800 flex justify-between items-center">
+                  <h3 className="font-semibold text-zinc-100">Stops ({stops.length})</h3>
                   {stops.length > 0 && (
                       <a 
                         href={googleMapsUrl} 
@@ -90,7 +90,7 @@ export default async function RouteOptimizerPage({
               </div>
               <div className="overflow-y-auto flex-1 p-4 space-y-4">
                   {stops.length === 0 ? (
-                      <div className="text-center text-gray-500 py-10">
+                      <div className="text-center text-zinc-500 py-10">
                           <p>No jobs scheduled for this date.</p>
                           <p className="text-xs mt-2">Select a different date above.</p>
                       </div>
@@ -98,21 +98,21 @@ export default async function RouteOptimizerPage({
                       stops.map((stop, index) => (
                           <div key={stop.id} className="relative flex items-start space-x-3">
                                <div className="flex flex-col items-center">
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-white font-bold text-sm ring-4 ring-white shadow-sm z-10">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-white font-bold text-sm ring-4 ring-zinc-900 shadow-sm z-10">
                                         {index + 1}
                                     </div>
                                     {index !== stops.length - 1 && (
-                                        <div className="w-0.5 bg-gray-200 h-full absolute top-8 bottom-[-16px] left-4 -ml-px"></div>
+                                        <div className="w-0.5 bg-zinc-700 h-full absolute top-8 bottom-[-16px] left-4 -ml-px"></div>
                                     )}
                                </div>
-                               <div className="bg-gray-50 rounded-lg p-3 w-full border border-gray-200">
+                               <div className="bg-zinc-800 rounded-lg p-3 w-full border border-zinc-700">
                                    <div className="flex justify-between items-start">
-                                       <h4 className="font-medium text-gray-900 text-sm">{stop.clientName}</h4>
-                                       <span className="text-xs font-mono text-gray-500">{stop.time}</span>
+                                       <h4 className="font-medium text-zinc-100 text-sm">{stop.clientName}</h4>
+                                       <span className="text-xs font-mono text-zinc-500">{stop.time}</span>
                                    </div>
-                                   <p className="text-xs text-gray-500 mt-1">{stop.title}</p>
-                                   <div className="flex items-center mt-2 text-xs text-gray-600">
-                                       <MapPin className="h-3 w-3 mr-1 text-gray-400" />
+                                   <p className="text-xs text-zinc-500 mt-1">{stop.title}</p>
+                                   <div className="flex items-center mt-2 text-xs text-zinc-400">
+                                       <MapPin className="h-3 w-3 mr-1 text-zinc-500" />
                                        {stop.address}
                                    </div>
                                </div>
@@ -123,13 +123,13 @@ export default async function RouteOptimizerPage({
           </div>
 
           {/* Map View Placeholder */}
-           <div className="flex-1 bg-white rounded-lg shadow overflow-hidden relative">
+           <div className="flex-1 bg-zinc-900 rounded-lg shadow overflow-hidden relative border border-zinc-800">
                {/* Since we don't have a real map API, we'll create a stylized placeholder or static visualization */}
-               <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+               <div className="absolute inset-0 bg-zinc-800 flex items-center justify-center">
                     <div className="text-center">
-                        <Map className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900">Map Visualization</h3>
-                        <p className="text-gray-500 max-w-sm mx-auto mt-2">
+                        <Map className="h-16 w-16 text-zinc-600 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-zinc-100">Map Visualization</h3>
+                        <p className="text-zinc-500 max-w-sm mx-auto mt-2">
                             Interactive map preview requires a Google Maps API Key. 
                             Use the <b>"Optimize in Maps"</b> button to view the real route.
                         </p>

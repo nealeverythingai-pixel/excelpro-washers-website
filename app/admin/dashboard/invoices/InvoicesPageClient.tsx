@@ -158,9 +158,9 @@ export default function InvoicesPageClient({ initialInvoices, initialClients, in
 
   // Get status badge color
   const getStatusBadgeColor = (invoice: Invoice) => {
-    if (isOverdue(invoice)) return 'bg-red-100 text-red-800'
-    if (invoice.status === 'Paid') return 'bg-green-100 text-green-800'
-    return 'bg-blue-100 text-blue-800'
+    if (isOverdue(invoice)) return 'bg-red-500/15 text-red-400'
+    if (invoice.status === 'Paid') return 'bg-green-500/15 text-green-400'
+    return 'bg-blue-500/15 text-blue-400'
   }
 
   // Get status display text
@@ -182,12 +182,12 @@ export default function InvoicesPageClient({ initialInvoices, initialClients, in
       {/* Header */}
       <div className="flex flex-col justify-between sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Invoices</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Track payments and accounts receivable</p>
+          <h1 className="text-2xl font-bold text-zinc-100">Invoices</h1>
+          <p className="mt-1 text-sm text-zinc-500">Track payments and accounts receivable</p>
         </div>
         <div className="mt-4 sm:mt-0">
-          <Link 
-            href="/admin/dashboard/invoices/new" 
+          <Link
+            href="/admin/dashboard/invoices/new"
             className="inline-flex items-center justify-center rounded-md bg-sky-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-600 transition-colors"
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -198,50 +198,50 @@ export default function InvoicesPageClient({ initialInvoices, initialClients, in
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Outstanding</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">${stats.outstanding.toLocaleString()}</p>
+              <p className="text-sm font-medium text-zinc-400">Outstanding</p>
+              <p className="text-2xl font-bold text-zinc-100 mt-2">${stats.outstanding.toLocaleString()}</p>
             </div>
-            <div className="rounded-full bg-red-100 dark:bg-red-900/30 p-3">
-              <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
+            <div className="rounded-full bg-red-500/15 p-3">
+              <AlertCircle className="h-6 w-6 text-red-400" />
             </div>
           </div>
         </div>
 
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Paid This Month</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">${stats.paidThisMonth.toLocaleString()}</p>
+              <p className="text-sm font-medium text-zinc-400">Paid This Month</p>
+              <p className="text-2xl font-bold text-zinc-100 mt-2">${stats.paidThisMonth.toLocaleString()}</p>
             </div>
-            <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-3">
-              <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+            <div className="rounded-full bg-green-500/15 p-3">
+              <CheckCircle className="h-6 w-6 text-green-400" />
             </div>
           </div>
         </div>
 
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Overdue</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">{stats.overdueCount}</p>
+              <p className="text-sm font-medium text-zinc-400">Overdue</p>
+              <p className="text-2xl font-bold text-zinc-100 mt-2">{stats.overdueCount}</p>
             </div>
-            <div className="rounded-full bg-red-100 dark:bg-red-900/30 p-3">
-              <Clock className="h-6 w-6 text-red-600 dark:text-red-400" />
+            <div className="rounded-full bg-red-500/15 p-3">
+              <Clock className="h-6 w-6 text-red-400" />
             </div>
           </div>
         </div>
 
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Payment Time</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">{stats.avgPaymentTime} days</p>
+              <p className="text-sm font-medium text-zinc-400">Avg Payment Time</p>
+              <p className="text-2xl font-bold text-zinc-100 mt-2">{stats.avgPaymentTime} days</p>
             </div>
-            <div className="rounded-full bg-sky-100 dark:bg-sky-900/30 p-3">
-              <Calendar className="h-6 w-6 text-sky-600 dark:text-sky-400" />
+            <div className="rounded-full bg-sky-500/15 p-3">
+              <Calendar className="h-6 w-6 text-sky-400" />
             </div>
           </div>
         </div>
@@ -250,13 +250,13 @@ export default function InvoicesPageClient({ initialInvoices, initialClients, in
       {/* Search and Filters */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"
             placeholder="Search by invoice # or client name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 pl-10 pr-4 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="w-full rounded-md border border-zinc-700 bg-zinc-800 pl-10 pr-4 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
           />
         </div>
 
@@ -266,7 +266,7 @@ export default function InvoicesPageClient({ initialInvoices, initialClients, in
             className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
               filterStatus === 'all'
                 ? 'bg-sky-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
             }`}
           >
             All
@@ -276,7 +276,7 @@ export default function InvoicesPageClient({ initialInvoices, initialClients, in
             className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
               filterStatus === 'Unpaid'
                 ? 'bg-sky-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
             }`}
           >
             Unpaid
@@ -286,7 +286,7 @@ export default function InvoicesPageClient({ initialInvoices, initialClients, in
             className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
               filterStatus === 'Paid'
                 ? 'bg-sky-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
             }`}
           >
             Paid
@@ -296,7 +296,7 @@ export default function InvoicesPageClient({ initialInvoices, initialClients, in
             className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
               filterStatus === 'Overdue'
                 ? 'bg-sky-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
             }`}
           >
             Overdue
@@ -306,7 +306,7 @@ export default function InvoicesPageClient({ initialInvoices, initialClients, in
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-          className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+          className="rounded-md border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm text-zinc-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
         >
           <option value="date">Sort by Date</option>
           <option value="client">Sort by Client</option>
@@ -317,10 +317,10 @@ export default function InvoicesPageClient({ initialInvoices, initialClients, in
 
       {/* Invoice Cards */}
       {filteredInvoices.length === 0 ? (
-        <div className="rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 p-12 text-center">
-          <DollarSign className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">No invoices found</h3>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <div className="rounded-lg border-2 border-dashed border-zinc-700 p-12 text-center">
+          <DollarSign className="mx-auto h-12 w-12 text-zinc-500" />
+          <h3 className="mt-2 text-sm font-semibold text-zinc-100">No invoices found</h3>
+          <p className="mt-1 text-sm text-zinc-500">
             {searchTerm || filterStatus !== 'all' ? 'Try adjusting your filters' : 'Get started by creating a new invoice'}
           </p>
           {!searchTerm && filterStatus === 'all' && (
@@ -345,15 +345,15 @@ export default function InvoicesPageClient({ initialInvoices, initialClients, in
             return (
               <div
                 key={invoice.id}
-                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm hover:shadow-md transition-shadow"
+                className="rounded-lg border border-zinc-800 bg-zinc-900 p-6 shadow-sm hover:shadow-md transition-shadow"
               >
                 {/* Invoice Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    <p className="text-lg font-semibold text-zinc-100">
                       INV-{invoice.id.toUpperCase().slice(0, 6)}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{clientName}</p>
+                    <p className="text-sm text-zinc-400 mt-1">{clientName}</p>
                   </div>
                   <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${getStatusBadgeColor(invoice)}`}>
                     {getStatusText(invoice)}
@@ -363,27 +363,27 @@ export default function InvoicesPageClient({ initialInvoices, initialClients, in
                 {/* Invoice Details */}
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">Amount</span>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">${invoice.total.toLocaleString()}</span>
+                    <span className="text-zinc-400">Amount</span>
+                    <span className="font-semibold text-zinc-100">${invoice.total.toLocaleString()}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">Issued</span>
-                    <span className="text-gray-900 dark:text-gray-100">{new Date(invoice.createdAt).toLocaleDateString()}</span>
+                    <span className="text-zinc-400">Issued</span>
+                    <span className="text-zinc-100">{new Date(invoice.createdAt).toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">Due Date</span>
-                    <span className={`${isOverdue(invoice) ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-gray-900 dark:text-gray-100'}`}>
+                    <span className="text-zinc-400">Due Date</span>
+                    <span className={`${isOverdue(invoice) ? 'text-red-400 font-semibold' : 'text-zinc-100'}`}>
                       {new Date(invoice.dueDate).toLocaleDateString()}
                     </span>
                   </div>
                   {jobTitle && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500 dark:text-gray-400">Job</span>
-                      <span className="text-gray-900 dark:text-gray-100 truncate ml-2">{jobTitle}</span>
+                      <span className="text-zinc-400">Job</span>
+                      <span className="text-zinc-100 truncate ml-2">{jobTitle}</span>
                     </div>
                   )}
                   {daysOverdue > 0 && (
-                    <div className="mt-2 flex items-center gap-1 text-xs text-red-600 dark:text-red-400 font-semibold">
+                    <div className="mt-2 flex items-center gap-1 text-xs text-red-400 font-semibold">
                       <Clock className="h-3 w-3" />
                       {daysOverdue} days overdue
                     </div>
@@ -391,7 +391,7 @@ export default function InvoicesPageClient({ initialInvoices, initialClients, in
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex gap-2 pt-4 border-t border-zinc-800">
                   {invoice.status !== 'Paid' && (
                     <button
                       onClick={() => handleMarkPaid(invoice.id)}

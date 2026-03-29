@@ -269,11 +269,11 @@ export default function AIPerformancePage() {
         <CardContent>
           <div className="space-y-4">
             {metrics.recentDecisions.map((decision) => (
-              <div key={decision.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+              <div key={decision.id} className="border border-zinc-800 rounded-lg p-4 hover:bg-zinc-800 transition-colors">
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h4 className="font-semibold text-gray-900">{decision.leadName}</h4>
+                      <h4 className="font-semibold text-zinc-100">{decision.leadName}</h4>
                       <Badge variant={
                         decision.aiCategory === 'hot' ? 'destructive' :
                         decision.aiCategory === 'warm' ? 'default' :
@@ -293,19 +293,19 @@ export default function AIPerformancePage() {
                   </div>
                   
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-gray-900">{decision.aiScore}</div>
-                    <div className="text-xs text-gray-500">AI Score</div>
+                    <div className="text-2xl font-bold text-zinc-100">{decision.aiScore}</div>
+                    <div className="text-xs text-zinc-500">AI Score</div>
                   </div>
                 </div>
 
-                <div className="bg-gray-50 p-3 rounded text-sm mb-3">
+                <div className="bg-zinc-800 p-3 rounded text-sm mb-3 text-zinc-300">
                   <strong>AI Reasoning:</strong> {decision.aiReasoning}
                 </div>
 
                 <div className="flex justify-between items-center">
                   <div className="text-sm">
-                    <span className="text-gray-600">Estimated Value:</span>
-                    <span className="font-semibold text-gray-900 ml-2">${decision.estimatedValue}</span>
+                    <span className="text-zinc-400">Estimated Value:</span>
+                    <span className="font-semibold text-zinc-100 ml-2">${decision.estimatedValue}</span>
                   </div>
 
                   <div className="flex gap-2">

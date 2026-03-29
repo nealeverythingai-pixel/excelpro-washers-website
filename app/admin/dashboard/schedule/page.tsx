@@ -52,7 +52,7 @@ export default async function SchedulePage() {
       {/* Legend */}
       <div className="flex flex-wrap gap-3 text-xs">
         <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-green-500 inline-block" /> Available</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gray-300 inline-block" /> No schedule set</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-zinc-600 inline-block" /> No schedule set</span>
         <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-red-400 inline-block" /> Blocked (own job)</span>
       </div>
 

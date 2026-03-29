@@ -61,22 +61,22 @@ export default function NewJobForm({ clients, contractors }: NewJobFormProps) {
     <div className="mx-auto max-w-3xl">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Schedule New Job</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Create a new service appointment</p>
+          <h1 className="text-2xl font-bold text-zinc-100">Schedule New Job</h1>
+          <p className="mt-1 text-sm text-zinc-500">Create a new service appointment</p>
         </div>
-        <Link 
-          href="/admin/dashboard/jobs" 
-          className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+        <Link
+          href="/admin/dashboard/jobs"
+          className="text-sm font-medium text-zinc-500 hover:text-zinc-100"
         >
           Cancel
         </Link>
       </div>
 
       {clients.length === 0 ? (
-        <div className="rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-12 text-center">
-          <FileText className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">No clients found</h3>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <div className="rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 p-12 text-center">
+          <FileText className="mx-auto h-12 w-12 text-zinc-500" />
+          <h3 className="mt-2 text-sm font-semibold text-zinc-100">No clients found</h3>
+          <p className="mt-1 text-sm text-zinc-500">
             You need to create a client before scheduling a job
           </p>
           <div className="mt-6">
@@ -91,22 +91,22 @@ export default function NewJobForm({ clients, contractors }: NewJobFormProps) {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Client and Title */}
-          <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow border border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+          <div className="rounded-lg bg-zinc-900 p-6 border border-zinc-800">
+            <h2 className="text-lg font-semibold text-zinc-100 mb-4 flex items-center">
               <UserIcon className="h-5 w-5 mr-2" />
               Client & Job Details
             </h2>
-            
+
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-200 mb-2">
                   Client *
                 </label>
                 <select
                   value={clientId}
                   onChange={(e) => setClientId(e.target.value)}
                   required
-                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="w-full rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-2 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 >
                   <option value="">Select a client...</option>
                   {clients.map(client => (
@@ -119,7 +119,7 @@ export default function NewJobForm({ clients, contractors }: NewJobFormProps) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-200 mb-2">
                   Job Title *
                 </label>
                 <input
@@ -128,12 +128,12 @@ export default function NewJobForm({ clients, contractors }: NewJobFormProps) {
                   onChange={(e) => setTitle(e.target.value)}
                   required
                   placeholder="e.g. Window Cleaning - Residential"
-                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="w-full rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 placeholder:text-zinc-600 px-3 py-2 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-200 mb-2">
                   Description
                 </label>
                 <textarea
@@ -141,22 +141,22 @@ export default function NewJobForm({ clients, contractors }: NewJobFormProps) {
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
                   placeholder="Job details, special instructions, equipment needed..."
-                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="w-full rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 placeholder:text-zinc-600 px-3 py-2 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 />
               </div>
             </div>
           </div>
 
           {/* Scheduling */}
-          <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow border border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+          <div className="rounded-lg bg-zinc-900 p-6 border border-zinc-800">
+            <h2 className="text-lg font-semibold text-zinc-100 mb-4 flex items-center">
               <Calendar className="h-5 w-5 mr-2" />
               Schedule
             </h2>
-            
+
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-200 mb-2">
                   Start Date & Time *
                 </label>
                 <input
@@ -164,31 +164,31 @@ export default function NewJobForm({ clients, contractors }: NewJobFormProps) {
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                   required
-                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="w-full rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-2 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-200 mb-2">
                   End Date & Time
-                  <span className="text-xs text-gray-500 ml-1">(Optional)</span>
+                  <span className="text-xs text-zinc-500 ml-1">(Optional)</span>
                 </label>
                 <input
                   type="datetime-local"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="w-full rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-2 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-200 mb-2">
                   Initial Status *
                 </label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as 'Scheduled' | 'Active')}
-                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="w-full rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-2 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 >
                   <option value="Scheduled">Scheduled (Future job)</option>
                   <option value="Active">Active (In progress)</option>
@@ -196,14 +196,14 @@ export default function NewJobForm({ clients, contractors }: NewJobFormProps) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-200 mb-2">
                   Assign Contractor
-                  <span className="text-xs text-gray-500 ml-1">(Optional)</span>
+                  <span className="text-xs text-zinc-500 ml-1">(Optional)</span>
                 </label>
                 <select
                   value={contractorId}
                   onChange={(e) => setContractorId(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="w-full rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-2 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 >
                   <option value="">Unassigned</option>
                   {contractors.map(contractor => (
@@ -213,7 +213,7 @@ export default function NewJobForm({ clients, contractors }: NewJobFormProps) {
                   ))}
                 </select>
                 {contractors.length === 0 && (
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 text-xs text-zinc-500">
                     No contractors available
                   </p>
                 )}
@@ -222,19 +222,19 @@ export default function NewJobForm({ clients, contractors }: NewJobFormProps) {
           </div>
 
           {/* Pricing */}
-          <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow border border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+          <div className="rounded-lg bg-zinc-900 p-6 border border-zinc-800">
+            <h2 className="text-lg font-semibold text-zinc-100 mb-4 flex items-center">
               <DollarSign className="h-5 w-5 mr-2" />
               Pricing
             </h2>
-            
+
             <div className="max-w-md">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-zinc-200 mb-2">
                 Estimated Total
-                <span className="text-xs text-gray-500 ml-1">(Can be updated later)</span>
+                <span className="text-xs text-zinc-500 ml-1">(Can be updated later)</span>
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">$</span>
                 <input
                   type="number"
                   min="0"
@@ -242,10 +242,10 @@ export default function NewJobForm({ clients, contractors }: NewJobFormProps) {
                   value={total}
                   onChange={(e) => setTotal(e.target.value)}
                   placeholder="0.00"
-                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 pl-8 pr-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="w-full rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 placeholder:text-zinc-600 pl-8 pr-3 py-2 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 />
               </div>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-zinc-500">
                 This is an estimate. Final amount can be adjusted when marking the job complete.
               </p>
             </div>
@@ -255,7 +255,7 @@ export default function NewJobForm({ clients, contractors }: NewJobFormProps) {
           <div className="flex items-center justify-end gap-3 pt-6">
             <Link
               href="/admin/dashboard/jobs"
-              className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="rounded-md border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-800 transition-colors"
             >
               Cancel
             </Link>

@@ -59,7 +59,7 @@ export default function NewQuoteForm({ clients }: NewQuoteFormProps) {
 
   // Update line item
   const updateLineItem = (id: string, field: keyof LineItem, value: string | number) => {
-    setLineItems(lineItems.map(item => 
+    setLineItems(lineItems.map(item =>
       item.id === id ? { ...item, [field]: value } : item
     ))
   }
@@ -71,7 +71,7 @@ export default function NewQuoteForm({ clients }: NewQuoteFormProps) {
 
     try {
       // Filter out empty line items
-      const validLineItems = lineItems.filter(item => 
+      const validLineItems = lineItems.filter(item =>
         item.description.trim() && item.quantity > 0 && item.unitPrice > 0
       )
 
@@ -98,7 +98,7 @@ export default function NewQuoteForm({ clients }: NewQuoteFormProps) {
 
       if (response.ok) {
         const data = await response.json()
-        
+
         // If sending immediately, trigger email
         if (sendImmediately) {
           await fetch(`/api/admin/quotes/${data.quote.id}/send`, {
@@ -123,12 +123,12 @@ export default function NewQuoteForm({ clients }: NewQuoteFormProps) {
     <div className="mx-auto max-w-4xl">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">New Quote</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Create a detailed quote with line items</p>
+          <h1 className="text-2xl font-bold text-zinc-100">New Quote</h1>
+          <p className="mt-1 text-sm text-zinc-500">Create a detailed quote with line items</p>
         </div>
-        <Link 
-          href="/admin/dashboard/quotes" 
-          className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+        <Link
+          href="/admin/dashboard/quotes"
+          className="text-sm font-medium text-zinc-500 hover:text-zinc-100"
         >
           Cancel
         </Link>
@@ -136,19 +136,19 @@ export default function NewQuoteForm({ clients }: NewQuoteFormProps) {
 
       <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-6">
         {/* Client and Title */}
-        <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow border border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Quote Details</h2>
-          
+        <div className="rounded-lg bg-zinc-900 p-6 border border-zinc-800">
+          <h2 className="text-lg font-semibold text-zinc-100 mb-4">Quote Details</h2>
+
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-zinc-200 mb-2">
                 Client *
               </label>
               <select
                 value={clientId}
                 onChange={(e) => setClientId(e.target.value)}
                 required
-                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                className="w-full rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-2 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
               >
                 <option value="">Select a client...</option>
                 {clients.map(client => (
@@ -161,7 +161,7 @@ export default function NewQuoteForm({ clients }: NewQuoteFormProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-zinc-200 mb-2">
                 Quote Title *
               </label>
               <input
@@ -170,16 +170,16 @@ export default function NewQuoteForm({ clients }: NewQuoteFormProps) {
                 onChange={(e) => setTitle(e.target.value)}
                 required
                 placeholder="e.g. Window Cleaning - Spring 2026"
-                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                className="w-full rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 placeholder:text-zinc-600 px-3 py-2 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
               />
             </div>
           </div>
         </div>
 
         {/* Line Items */}
-        <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow border border-gray-200 dark:border-gray-700">
+        <div className="rounded-lg bg-zinc-900 p-6 border border-zinc-800">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Line Items</h2>
+            <h2 className="text-lg font-semibold text-zinc-100">Line Items</h2>
             <button
               type="button"
               onClick={addLineItem}
@@ -192,10 +192,10 @@ export default function NewQuoteForm({ clients }: NewQuoteFormProps) {
 
           <div className="space-y-3">
             {lineItems.map((item, index) => (
-              <div key={item.id} className="grid gap-3 md:grid-cols-12 items-start p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+              <div key={item.id} className="grid gap-3 md:grid-cols-12 items-start p-4 border border-zinc-800 rounded-lg">
                 {/* Description */}
                 <div className="md:col-span-5">
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                  <label className="block text-xs font-medium text-zinc-400 mb-1">
                     Description *
                   </label>
                   <input
@@ -203,13 +203,13 @@ export default function NewQuoteForm({ clients }: NewQuoteFormProps) {
                     value={item.description}
                     onChange={(e) => updateLineItem(item.id, 'description', e.target.value)}
                     placeholder="Service description"
-                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                    className="w-full rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 placeholder:text-zinc-600 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                   />
                 </div>
 
                 {/* Quantity */}
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                  <label className="block text-xs font-medium text-zinc-400 mb-1">
                     Quantity *
                   </label>
                   <input
@@ -218,13 +218,13 @@ export default function NewQuoteForm({ clients }: NewQuoteFormProps) {
                     step="1"
                     value={item.quantity}
                     onChange={(e) => updateLineItem(item.id, 'quantity', parseInt(e.target.value) || 0)}
-                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                    className="w-full rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                   />
                 </div>
 
                 {/* Unit Price */}
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                  <label className="block text-xs font-medium text-zinc-400 mb-1">
                     Unit Price *
                   </label>
                   <input
@@ -233,16 +233,16 @@ export default function NewQuoteForm({ clients }: NewQuoteFormProps) {
                     step="0.01"
                     value={item.unitPrice}
                     onChange={(e) => updateLineItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
-                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                    className="w-full rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                   />
                 </div>
 
                 {/* Line Total */}
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                  <label className="block text-xs font-medium text-zinc-400 mb-1">
                     Total
                   </label>
-                  <div className="flex items-center h-[38px] px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-md">
+                  <div className="flex items-center h-[38px] px-3 py-2 text-sm font-semibold text-zinc-100 bg-zinc-800 border border-zinc-800 rounded-md">
                     ${getLineTotal(item).toFixed(2)}
                   </div>
                 </div>
@@ -253,7 +253,7 @@ export default function NewQuoteForm({ clients }: NewQuoteFormProps) {
                     type="button"
                     onClick={() => removeLineItem(item.id)}
                     disabled={lineItems.length === 1}
-                    className="p-2 text-red-600 hover:text-red-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
+                    className="p-2 text-red-600 hover:text-red-700 disabled:text-zinc-500 disabled:cursor-not-allowed transition-colors"
                     title="Remove item"
                   >
                     <X className="h-5 w-5" />
@@ -265,35 +265,35 @@ export default function NewQuoteForm({ clients }: NewQuoteFormProps) {
         </div>
 
         {/* Calculations */}
-        <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow border border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Pricing</h2>
-          
+        <div className="rounded-lg bg-zinc-900 p-6 border border-zinc-800">
+          <h2 className="text-lg font-semibold text-zinc-100 mb-4">Pricing</h2>
+
           <div className="space-y-4 max-w-md ml-auto">
             {/* Subtotal */}
-            <div className="flex items-center justify-between text-gray-900 dark:text-gray-100">
+            <div className="flex items-center justify-between text-zinc-100">
               <span>Subtotal</span>
               <span className="font-semibold">${subtotal.toFixed(2)}</span>
             </div>
 
             {/* Discount */}
             <div className="flex items-center justify-between">
-              <label className="text-gray-700 dark:text-gray-300">Discount</label>
+              <label className="text-zinc-200">Discount</label>
               <div className="flex items-center gap-2">
-                <span className="text-gray-500">$</span>
+                <span className="text-zinc-500">$</span>
                 <input
                   type="number"
                   min="0"
                   step="0.01"
                   value={discount}
                   onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
-                  className="w-24 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-1 text-sm text-gray-900 dark:text-gray-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="w-24 rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-1 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 />
               </div>
             </div>
 
             {/* Tax Rate */}
             <div className="flex items-center justify-between">
-              <label className="text-gray-700 dark:text-gray-300">Tax Rate</label>
+              <label className="text-zinc-200">Tax Rate</label>
               <div className="flex items-center gap-2">
                 <input
                   type="number"
@@ -302,24 +302,24 @@ export default function NewQuoteForm({ clients }: NewQuoteFormProps) {
                   step="0.1"
                   value={taxRate}
                   onChange={(e) => setTaxRate(parseFloat(e.target.value) || 0)}
-                  className="w-20 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-1 text-sm text-gray-900 dark:text-gray-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="w-20 rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-1 text-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 />
-                <span className="text-gray-500">%</span>
+                <span className="text-zinc-500">%</span>
               </div>
             </div>
 
             {/* Tax Amount */}
             {taxRate > 0 && (
-              <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex items-center justify-between text-sm text-zinc-400">
                 <span>Tax ({taxRate}%)</span>
                 <span>${taxAmount.toFixed(2)}</span>
               </div>
             )}
 
             {/* Total */}
-            <div className="flex items-center justify-between text-lg font-bold text-gray-900 dark:text-gray-100 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between text-lg font-bold text-zinc-100 pt-4 border-t border-zinc-800">
               <span>Total</span>
-              <span className="text-sky-600 dark:text-sky-400">${total.toFixed(2)}</span>
+              <span className="text-sky-400">${total.toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -328,7 +328,7 @@ export default function NewQuoteForm({ clients }: NewQuoteFormProps) {
         <div className="flex items-center justify-end gap-3 pt-6">
           <Link
             href="/admin/dashboard/quotes"
-            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="rounded-md border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-800 transition-colors"
           >
             Cancel
           </Link>

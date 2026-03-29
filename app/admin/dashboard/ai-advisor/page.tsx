@@ -32,11 +32,11 @@ function renderMarkdown(text: string): string {
 
   // Code blocks (``` ... ```)
   html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_m, _lang, code) => {
-    return `<pre class="bg-gray-900 text-green-300 text-xs p-3 rounded-md my-2 overflow-x-auto"><code>${code.trim()}</code></pre>`;
+    return `<pre class="bg-zinc-900 text-green-300 text-xs p-3 rounded-md my-2 overflow-x-auto"><code>${code.trim()}</code></pre>`;
   });
 
   // Inline code
-  html = html.replace(/`([^`]+)`/g, '<code class="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded text-xs font-mono">$1</code>');
+  html = html.replace(/`([^`]+)`/g, '<code class="bg-zinc-700 px-1 py-0.5 rounded text-xs font-mono">$1</code>');
 
   // Headers (process before bold so ** in headers works)
   html = html.replace(/^#### (.+)$/gm, '<h5 class="font-semibold text-sm mt-3 mb-1">$1</h5>');
@@ -52,7 +52,7 @@ function renderMarkdown(text: string): string {
   html = html.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
 
   // Horizontal rule
-  html = html.replace(/^---$/gm, '<hr class="my-3 border-gray-300 dark:border-gray-600" />');
+  html = html.replace(/^---$/gm, '<hr class="my-3 border-zinc-700" />');
 
   // Numbered lists
   html = html.replace(/^(\d+)\. (.+)$/gm, '<li class="ml-5 list-decimal text-sm leading-relaxed">$2</li>');
@@ -245,7 +245,7 @@ export default function AIAdvisorPage() {
                 >
                   {message.role === 'assistant' ? (
                     <div
-                      className="text-sm prose prose-sm dark:prose-invert max-w-none [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0 [&_p]:mb-2 [&_p:last-child]:mb-0"
+                      className="text-sm prose prose-sm prose-invert max-w-none [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0 [&_p]:mb-2 [&_p:last-child]:mb-0"
                       dangerouslySetInnerHTML={{ __html: renderMarkdown(message.content) }}
                     />
                   ) : (
@@ -271,7 +271,7 @@ export default function AIAdvisorPage() {
               <div className="flex-1 max-w-[80%]">
                 <div className="inline-block p-3 rounded-lg bg-muted">
                   <div
-                    className="text-sm prose prose-sm dark:prose-invert max-w-none [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0 [&_p]:mb-2 [&_p:last-child]:mb-0"
+                    className="text-sm prose prose-sm prose-invert max-w-none [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0 [&_p]:mb-2 [&_p:last-child]:mb-0"
                     dangerouslySetInnerHTML={{ __html: renderMarkdown(streamingContent) }}
                   />
                 </div>

@@ -2,10 +2,10 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { 
-  Search, 
-  Flame, 
-  Thermometer, 
+import {
+  Search,
+  Flame,
+  Thermometer,
   Snowflake,
   TrendingUp,
   Mail,
@@ -78,13 +78,13 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
     const conversionRate = requests.length > 0 ? (converted / requests.length) * 100 : 0
     const pipelineValue = allLeads.reduce((acc, r) => acc + (r.estimatedValue || 0), 0)
 
-    return { 
-      total: allLeads.length, 
-      hot, 
-      warm, 
-      cold, 
+    return {
+      total: allLeads.length,
+      hot,
+      warm,
+      cold,
       conversionRate: Math.round(conversionRate),
-      pipelineValue 
+      pipelineValue
     }
   }, [requests])
 
@@ -100,7 +100,7 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
       })
 
       if (response.ok) {
-        setRequests(requests.map(r => 
+        setRequests(requests.map(r =>
           r.id === requestId ? { ...r, status: 'Converted' } : r
         ))
         alert('Lead converted to client successfully!')
@@ -121,7 +121,7 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
       })
 
       if (response.ok) {
-        setRequests(requests.map(r => 
+        setRequests(requests.map(r =>
           r.id === requestId ? { ...r, status: status as Request['status'] } : r
         ))
       }
@@ -150,20 +150,20 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
     hot: {
       icon: Flame,
       color: 'text-red-500',
-      bg: 'bg-red-50 dark:bg-red-950',
-      border: 'border-red-200 dark:border-red-800'
+      bg: 'bg-red-500/10',
+      border: 'border-red-500/30'
     },
     warm: {
       icon: Thermometer,
       color: 'text-yellow-500',
-      bg: 'bg-yellow-50 dark:bg-yellow-950',
-      border: 'border-yellow-200 dark:border-yellow-800'
+      bg: 'bg-amber-500/10',
+      border: 'border-amber-500/30'
     },
     cold: {
       icon: Snowflake,
       color: 'text-blue-500',
-      bg: 'bg-blue-50 dark:bg-blue-950',
-      border: 'border-blue-200 dark:border-blue-800'
+      bg: 'bg-blue-500/10',
+      border: 'border-blue-500/30'
     }
   }
 
@@ -171,65 +171,65 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
     <div className="p-8 space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Leads</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">AI-qualified leads from your contact form</p>
+        <h1 className="text-3xl font-bold text-zinc-100">Leads</h1>
+        <p className="text-zinc-400 mt-1">AI-qualified leads from your contact form</p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Leads</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stats.total}</p>
+              <p className="text-sm text-zinc-400">Total Leads</p>
+              <p className="text-2xl font-bold text-zinc-100 mt-1">{stats.total}</p>
             </div>
-            <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
-              <TrendingUp className="text-gray-600 dark:text-gray-400" size={24} />
+            <div className="p-3 bg-zinc-800 rounded-lg">
+              <TrendingUp className="text-zinc-400" size={24} />
             </div>
           </div>
         </div>
 
-        <div 
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-md transition-shadow"
+        <div
+          className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800 cursor-pointer hover:shadow-md transition-shadow"
           onClick={() => setFilterCategory(filterCategory === 'hot' ? 'all' : 'hot')}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Hot Leads</p>
-              <p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">{stats.hot}</p>
+              <p className="text-sm text-zinc-400">Hot Leads</p>
+              <p className="text-2xl font-bold text-red-600 mt-1">{stats.hot}</p>
             </div>
-            <div className="p-3 bg-red-100 dark:bg-red-950 rounded-lg">
-              <Flame className="text-red-600 dark:text-red-400" size={24} />
+            <div className="p-3 bg-red-500/15 rounded-lg">
+              <Flame className="text-red-400" size={24} />
             </div>
           </div>
         </div>
 
-        <div 
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-md transition-shadow"
+        <div
+          className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800 cursor-pointer hover:shadow-md transition-shadow"
           onClick={() => setFilterCategory(filterCategory === 'warm' ? 'all' : 'warm')}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Warm Leads</p>
-              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mt-1">{stats.warm}</p>
+              <p className="text-sm text-zinc-400">Warm Leads</p>
+              <p className="text-2xl font-bold text-yellow-600 mt-1">{stats.warm}</p>
             </div>
-            <div className="p-3 bg-yellow-100 dark:bg-yellow-950 rounded-lg">
-              <Thermometer className="text-yellow-600 dark:text-yellow-400" size={24} />
+            <div className="p-3 bg-amber-500/15 rounded-lg">
+              <Thermometer className="text-amber-400" size={24} />
             </div>
           </div>
         </div>
 
-        <div 
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-md transition-shadow"
+        <div
+          className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800 cursor-pointer hover:shadow-md transition-shadow"
           onClick={() => setFilterCategory(filterCategory === 'cold' ? 'all' : 'cold')}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Cold Leads</p>
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">{stats.cold}</p>
+              <p className="text-sm text-zinc-400">Cold Leads</p>
+              <p className="text-2xl font-bold text-blue-600 mt-1">{stats.cold}</p>
             </div>
-            <div className="p-3 bg-blue-100 dark:bg-blue-950 rounded-lg">
-              <Snowflake className="text-blue-600 dark:text-blue-400" size={24} />
+            <div className="p-3 bg-blue-500/15 rounded-lg">
+              <Snowflake className="text-blue-400" size={24} />
             </div>
           </div>
         </div>
@@ -250,16 +250,16 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 space-y-4">
+      <div className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800 space-y-4">
         {/* Search Bar */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={20} />
           <input
             type="text"
             placeholder="Search by name, email, or phone..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full pl-10 pr-4 py-2 border border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-zinc-800 text-zinc-100 placeholder:text-zinc-600"
           />
         </div>
 
@@ -270,7 +270,7 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               filterCategory === 'all'
                 ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
             }`}
           >
             All Categories
@@ -280,7 +280,7 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               filterCategory === 'hot'
                 ? 'bg-red-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
             }`}
           >
             Hot ({stats.hot})
@@ -290,7 +290,7 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               filterCategory === 'warm'
                 ? 'bg-yellow-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
             }`}
           >
             Warm ({stats.warm})
@@ -300,20 +300,20 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               filterCategory === 'cold'
                 ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
             }`}
           >
             Cold ({stats.cold})
           </button>
 
-          <div className="w-px bg-gray-300 dark:bg-gray-600 mx-2" />
+          <div className="w-px bg-zinc-700 mx-2" />
 
           <button
             onClick={() => setFilterStatus('all')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               filterStatus === 'all'
                 ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
             }`}
           >
             All Status
@@ -323,7 +323,7 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               filterStatus === 'New'
                 ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
             }`}
           >
             New
@@ -333,7 +333,7 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               filterStatus === 'Contacted'
                 ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
             }`}
           >
             Contacted
@@ -343,8 +343,8 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
 
       {/* Conversion Rate Info */}
       {stats.conversionRate > 0 && (
-        <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-4">
-          <p className="text-green-800 dark:text-green-200">
+        <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+          <p className="text-green-400">
             <strong>Conversion Rate:</strong> {stats.conversionRate}% of leads have been converted to clients
           </p>
         </div>
@@ -352,9 +352,9 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
 
       {/* Leads List */}
       {filteredRequests.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center border border-gray-200 dark:border-gray-700">
-          <TrendingUp className="mx-auto text-gray-400 mb-4" size={48} />
-          <p className="text-gray-600 dark:text-gray-400">
+        <div className="bg-zinc-900 rounded-lg shadow-sm p-12 text-center border border-zinc-800">
+          <TrendingUp className="mx-auto text-zinc-500 mb-4" size={48} />
+          <p className="text-zinc-400">
             {searchTerm || filterCategory !== 'all' || filterStatus !== 'all'
               ? 'No leads match your filters.'
               : 'No leads yet. They will appear here when someone fills out your contact form.'}
@@ -366,15 +366,15 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
             const name = request.name || `${request.firstName} ${request.lastName}`
             const CategoryIcon = categoryConfig[request.aiCategory as keyof typeof categoryConfig]?.icon || TrendingUp
             const config = categoryConfig[request.aiCategory as keyof typeof categoryConfig] || {
-              color: 'text-gray-500',
-              bg: 'bg-gray-50 dark:bg-gray-800',
-              border: 'border-gray-200 dark:border-gray-700'
+              color: 'text-zinc-500',
+              bg: 'bg-zinc-800',
+              border: 'border-zinc-700'
             }
 
             return (
               <div
                 key={request.id}
-                className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border-2 ${config.border} hover:shadow-md transition-all`}
+                className={`bg-zinc-900 rounded-lg shadow-sm p-6 border-2 ${config.border} hover:shadow-md transition-all`}
               >
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4">
@@ -383,22 +383,22 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
                       <CategoryIcon className={config.color} size={24} />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{name}</h3>
+                      <h3 className="text-xl font-semibold text-zinc-100">{name}</h3>
                       <div className="flex items-center gap-2 mt-1">
                         {request.aiScore && (
-                          <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs font-bold text-gray-700 dark:text-gray-300">
+                          <span className="px-2 py-0.5 bg-zinc-800 rounded text-xs font-bold text-zinc-200">
                             Score: {request.aiScore}/100
                           </span>
                         )}
                         <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                          request.status === 'Converted' ? 'bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-200' :
-                          request.status === 'Contacted' ? 'bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-200' :
-                          request.status === 'Lost' ? 'bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-200' :
-                          'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                          request.status === 'Converted' ? 'bg-green-500/15 text-green-400' :
+                          request.status === 'Contacted' ? 'bg-blue-500/15 text-blue-400' :
+                          request.status === 'Lost' ? 'bg-red-500/15 text-red-400' :
+                          'bg-zinc-800 text-zinc-400'
                         }`}>
                           {request.status}
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-zinc-500">
                           {formatDate(request.createdAt)}
                         </span>
                       </div>
@@ -406,8 +406,8 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
                   </div>
                   {request.estimatedValue && (
                     <div className="text-right">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Est. Value</p>
-                      <p className="text-xl font-bold text-gray-900 dark:text-white">
+                      <p className="text-xs text-zinc-500">Est. Value</p>
+                      <p className="text-xl font-bold text-zinc-100">
                         ${request.estimatedValue.toLocaleString()}
                       </p>
                     </div>
@@ -416,13 +416,13 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
 
                 {/* Contact Info */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-sm text-zinc-400">
                     <Mail size={16} />
                     <a href={`mailto:${request.email}`} className="hover:text-blue-500 transition-colors">
                       {request.email}
                     </a>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-sm text-zinc-400">
                     <Phone size={16} />
                     <a href={`tel:${request.phone}`} className="hover:text-blue-500 transition-colors">
                       {request.phone}
@@ -432,8 +432,8 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
 
                 {/* Service */}
                 <div className="mb-4">
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Service Requested</p>
-                  <p className="text-sm text-gray-900 dark:text-white capitalize">
+                  <p className="text-xs font-medium text-zinc-500 uppercase mb-1">Service Requested</p>
+                  <p className="text-sm text-zinc-100 capitalize">
                     {request.service?.replace(/-/g, ' ') || 'N/A'}
                   </p>
                 </div>
@@ -441,8 +441,8 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
                 {/* Message */}
                 {request.message && (
                   <div className="mb-4">
-                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Message</p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
+                    <p className="text-xs font-medium text-zinc-500 uppercase mb-1">Message</p>
+                    <p className="text-sm text-zinc-200 line-clamp-2">
                       {request.message}
                     </p>
                   </div>
@@ -451,15 +451,15 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
                 {/* AI Analysis */}
                 {request.aiReasoning && (
                   <div className={`mb-4 p-3 ${config.bg} rounded-lg border ${config.border}`}>
-                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase mb-1">AI Analysis</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-xs font-medium text-zinc-200 uppercase mb-1">AI Analysis</p>
+                    <p className="text-sm text-zinc-400">
                       {request.aiReasoning}
                     </p>
                   </div>
                 )}
 
                 {/* Actions */}
-                <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex flex-wrap gap-2 pt-4 border-t border-zinc-800">
                   <a
                     href={`tel:${request.phone}`}
                     className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors text-sm font-medium"
@@ -479,7 +479,7 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
                       {request.status !== 'Contacted' && (
                         <button
                           onClick={() => handleUpdateStatus(request.id, 'Contacted')}
-                          className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
+                          className="flex items-center gap-2 px-4 py-2 border border-zinc-700 text-zinc-200 rounded-lg hover:bg-zinc-800 transition-colors text-sm font-medium"
                         >
                           <CheckCircle size={16} />
                           Mark Contacted
@@ -494,7 +494,7 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
                       </button>
                       <button
                         onClick={() => handleUpdateStatus(request.id, 'Lost')}
-                        className="flex items-center gap-2 px-4 py-2 border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-950 transition-colors text-sm font-medium"
+                        className="flex items-center gap-2 px-4 py-2 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/10 transition-colors text-sm font-medium"
                       >
                         <XCircle size={16} />
                         Mark Lost
@@ -504,7 +504,7 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
                   {request.status === 'Converted' && (
                     <Link
                       href="/admin/dashboard/clients"
-                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium"
+                      className="flex items-center gap-2 px-4 py-2 bg-zinc-800 text-zinc-200 rounded-lg hover:bg-zinc-700 transition-colors text-sm font-medium"
                     >
                       View in Clients
                     </Link>

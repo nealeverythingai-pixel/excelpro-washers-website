@@ -36,13 +36,13 @@ export default function CronTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-zinc-900 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Cron Job Testing</h1>
+        <h1 className="text-3xl font-bold text-zinc-100 mb-8">Cron Job Testing</h1>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Test Follow-ups Cron</h2>
-          <p className="text-gray-600 mb-4">
+        <div className="bg-zinc-800 rounded-lg shadow p-6 mb-6 border border-zinc-700">
+          <h2 className="text-xl font-semibold text-zinc-100 mb-4">Test Follow-ups Cron</h2>
+          <p className="text-zinc-400 mb-4">
             Runs daily at 9 AM. Checks for pending follow-ups and sends scheduled emails.
           </p>
           <button
@@ -54,9 +54,9 @@ export default function CronTestPage() {
           </button>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Test Stale Leads Check</h2>
-          <p className="text-gray-600 mb-4">
+        <div className="bg-zinc-800 rounded-lg shadow p-6 mb-6 border border-zinc-700">
+          <h2 className="text-xl font-semibold text-zinc-100 mb-4">Test Stale Leads Check</h2>
+          <p className="text-zinc-400 mb-4">
             Runs daily at 6 PM. Finds leads that haven't been contacted in 30+ days.
           </p>
           <button
@@ -69,12 +69,12 @@ export default function CronTestPage() {
         </div>
 
         {result && (
-          <div className={`rounded-lg shadow p-6 ${result.success ? 'bg-green-50' : 'bg-red-50'}`}>
-            <h3 className="text-lg font-semibold mb-2">
+          <div className={`rounded-lg shadow p-6 border ${result.success ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
+            <h3 className="text-lg font-semibold text-zinc-100 mb-2">
               {result.success ? '✅ Success' : '❌ Error'}
             </h3>
-            <p className="text-sm text-gray-600 mb-2">Status: {result.status}</p>
-            <pre className="bg-white p-4 rounded overflow-auto text-sm">
+            <p className="text-sm text-zinc-400 mb-2">Status: {result.status}</p>
+            <pre className="bg-zinc-800 text-zinc-100 p-4 rounded overflow-auto text-sm">
               {JSON.stringify(result.data || result.error, null, 2)}
             </pre>
           </div>

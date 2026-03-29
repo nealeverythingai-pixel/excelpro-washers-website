@@ -2,9 +2,9 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { 
-  Plus, 
-  Search, 
+import {
+  Plus,
+  Search,
   FileText,
   Calendar,
   DollarSign,
@@ -89,15 +89,15 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
     const sent = quotes.filter(q => q.status === 'Sent').length
     const approved = quotes.filter(q => q.status === 'Approved').length
     const converted = quotes.filter(q => q.status === 'Converted').length
-    
+
     const acceptanceRate = sent > 0 ? Math.round(((approved + converted) / sent) * 100) : 0
     const pendingValue = quotes
       .filter(q => q.status === 'Sent' || q.status === 'Approved')
       .reduce((acc, q) => acc + q.total, 0)
 
-    return { 
+    return {
       thisMonth: thisMonthQuotes.length,
-      draft, 
+      draft,
       sent,
       approved,
       converted,
@@ -118,7 +118,7 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
       })
 
       if (response.ok) {
-        setQuotes(quotes.map(q => 
+        setQuotes(quotes.map(q =>
           q.id === quoteId ? { ...q, status: 'Sent' as const } : q
         ))
         alert('Quote sent successfully!')
@@ -139,7 +139,7 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
       })
 
       if (response.ok) {
-        setQuotes(quotes.map(q => 
+        setQuotes(quotes.map(q =>
           q.id === quoteId ? { ...q, status: 'Approved' as const } : q
         ))
       }
@@ -160,7 +160,7 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
       })
 
       if (response.ok) {
-        setQuotes(quotes.map(q => 
+        setQuotes(quotes.map(q =>
           q.id === quoteId ? { ...q, status: 'Converted' as const } : q
         ))
         alert('Quote converted to job successfully!')
@@ -174,8 +174,8 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
   // Format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
       day: 'numeric',
       year: 'numeric'
     })
@@ -183,24 +183,24 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
 
   // Status config
   const statusConfig = {
-    'Draft': { 
-      bg: 'bg-gray-100 dark:bg-gray-700', 
-      text: 'text-gray-800 dark:text-gray-200',
+    'Draft': {
+      bg: 'bg-zinc-800',
+      text: 'text-zinc-400',
       icon: FileText
     },
-    'Sent': { 
-      bg: 'bg-blue-100 dark:bg-blue-950', 
-      text: 'text-blue-800 dark:text-blue-200',
+    'Sent': {
+      bg: 'bg-blue-500/15',
+      text: 'text-blue-400',
       icon: Send
     },
-    'Approved': { 
-      bg: 'bg-green-100 dark:bg-green-950', 
-      text: 'text-green-800 dark:text-green-200',
+    'Approved': {
+      bg: 'bg-green-500/15',
+      text: 'text-green-400',
       icon: CheckCircle
     },
-    'Converted': { 
-      bg: 'bg-purple-100 dark:bg-purple-950', 
-      text: 'text-purple-800 dark:text-purple-200',
+    'Converted': {
+      bg: 'bg-purple-500/15',
+      text: 'text-purple-400',
       icon: CheckCircle
     }
   }
@@ -210,8 +210,8 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Quotes</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Create and manage your service quotes</p>
+          <h1 className="text-3xl font-bold text-zinc-100">Quotes</h1>
+          <p className="text-zinc-400 mt-1">Create and manage your service quotes</p>
         </div>
         <Link
           href="/admin/dashboard/quotes/new"
@@ -224,50 +224,50 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">This Month</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stats.thisMonth}</p>
+              <p className="text-sm text-zinc-400">This Month</p>
+              <p className="text-2xl font-bold text-zinc-100 mt-1">{stats.thisMonth}</p>
             </div>
-            <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
-              <Calendar className="text-gray-600 dark:text-gray-400" size={24} />
+            <div className="p-3 bg-zinc-800 rounded-lg">
+              <Calendar className="text-zinc-400" size={24} />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Draft</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stats.draft}</p>
+              <p className="text-sm text-zinc-400">Draft</p>
+              <p className="text-2xl font-bold text-zinc-100 mt-1">{stats.draft}</p>
             </div>
-            <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
-              <FileText className="text-gray-600 dark:text-gray-400" size={24} />
+            <div className="p-3 bg-zinc-800 rounded-lg">
+              <FileText className="text-zinc-400" size={24} />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Pending</p>
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">{stats.sent}</p>
+              <p className="text-sm text-zinc-400">Pending</p>
+              <p className="text-2xl font-bold text-blue-400 mt-1">{stats.sent}</p>
             </div>
-            <div className="p-3 bg-blue-100 dark:bg-blue-950 rounded-lg">
-              <Clock className="text-blue-600 dark:text-blue-400" size={24} />
+            <div className="p-3 bg-blue-500/15 rounded-lg">
+              <Clock className="text-blue-400" size={24} />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Acceptance Rate</p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">{stats.acceptanceRate}%</p>
+              <p className="text-sm text-zinc-400">Acceptance Rate</p>
+              <p className="text-2xl font-bold text-green-400 mt-1">{stats.acceptanceRate}%</p>
             </div>
-            <div className="p-3 bg-green-100 dark:bg-green-950 rounded-lg">
-              <CheckCircle className="text-green-600 dark:text-green-400" size={24} />
+            <div className="p-3 bg-green-500/15 rounded-lg">
+              <CheckCircle className="text-green-400" size={24} />
             </div>
           </div>
         </div>
@@ -288,16 +288,16 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 space-y-4">
+      <div className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800 space-y-4">
         {/* Search Bar */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={20} />
           <input
             type="text"
             placeholder="Search by quote title, client name, or quote ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full pl-10 pr-4 py-2 border border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-zinc-800 text-zinc-100 placeholder:text-zinc-600"
           />
         </div>
 
@@ -309,7 +309,7 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filterStatus === 'all'
                   ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
               }`}
             >
               All ({quotes.length})
@@ -319,7 +319,7 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filterStatus === 'Draft'
                   ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
               }`}
             >
               Draft ({stats.draft})
@@ -329,7 +329,7 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filterStatus === 'Sent'
                   ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
               }`}
             >
               Sent ({stats.sent})
@@ -339,7 +339,7 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filterStatus === 'Approved'
                   ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
               }`}
             >
               Approved ({stats.approved})
@@ -350,7 +350,7 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as 'date' | 'client' | 'value')}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-zinc-700 rounded-lg bg-zinc-800 text-zinc-100 focus:ring-2 focus:ring-blue-500"
           >
             <option value="date">Sort by Date</option>
             <option value="client">Sort by Client</option>
@@ -361,11 +361,11 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
 
       {/* Quotes List */}
       {filteredQuotes.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center border border-gray-200 dark:border-gray-700">
-          <FileText className="mx-auto text-gray-400 mb-4" size={48} />
-          <p className="text-gray-600 dark:text-gray-400">
-            {searchTerm || filterStatus !== 'all' 
-              ? 'No quotes match your filters.' 
+        <div className="bg-zinc-900 rounded-lg shadow-sm p-12 text-center border border-zinc-800">
+          <FileText className="mx-auto text-zinc-500 mb-4" size={48} />
+          <p className="text-zinc-400">
+            {searchTerm || filterStatus !== 'all'
+              ? 'No quotes match your filters.'
               : 'No quotes yet. Create your first quote to get started.'}
           </p>
         </div>
@@ -375,22 +375,22 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
             const client = getClient(quote.clientId)
             const config = statusConfig[quote.status as keyof typeof statusConfig] || statusConfig['Draft']
             const StatusIcon = config.icon
-            
+
             return (
               <div
                 key={quote.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all"
+                className="bg-zinc-900 rounded-lg shadow-sm p-6 border border-zinc-800 hover:border-blue-500 hover:shadow-md transition-all"
               >
                 {/* Quote Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <Link 
+                    <Link
                       href={`/admin/dashboard/quotes/${quote.id}`}
-                      className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-500 transition-colors"
+                      className="text-lg font-semibold text-zinc-100 hover:text-blue-500 transition-colors"
                     >
                       {quote.title}
                     </Link>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-xs text-zinc-500 mt-1">
                       Quote #{quote.id.slice(0, 8)}
                     </p>
                   </div>
@@ -402,18 +402,18 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
 
                 {/* Quote Details */}
                 <div className="space-y-2 mb-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-sm text-zinc-400">
                     <User size={16} />
                     <span className="font-medium">{getClientName(quote.clientId)}</span>
                     {client?.companyName && (
-                      <span className="text-gray-400">• {client.companyName}</span>
+                      <span className="text-zinc-500">• {client.companyName}</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-sm text-zinc-400">
                     <Calendar size={16} />
                     <span>{formatDate(quote.createdAt)}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-zinc-100">
                     <DollarSign size={16} />
                     <span>${(quote.total || 0).toLocaleString()}</span>
                   </div>
@@ -421,16 +421,16 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
 
                 {/* Line Items Preview */}
                 {quote.items && quote.items.length > 0 && (
-                  <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">Items</p>
+                  <div className="mb-4 p-3 bg-zinc-800 rounded-lg">
+                    <p className="text-xs font-medium text-zinc-500 uppercase mb-2">Items</p>
                     <div className="space-y-1">
                       {quote.items.slice(0, 2).map((item, idx) => (
-                        <div key={idx} className="text-sm text-gray-700 dark:text-gray-300">
+                        <div key={idx} className="text-sm text-zinc-200">
                           {item.description} - ${item.unitPrice.toFixed(2)}
                         </div>
                       ))}
                       {quote.items.length > 2 && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-zinc-500">
                           +{quote.items.length - 2} more items
                         </p>
                       )}
@@ -439,10 +439,10 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
                 )}
 
                 {/* Actions */}
-                <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex gap-2 pt-4 border-t border-zinc-800">
                   <Link
                     href={`/admin/dashboard/quotes/${quote.id}`}
-                    className="flex-1 px-4 py-2 text-center border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
+                    className="flex-1 px-4 py-2 text-center border border-zinc-700 text-zinc-200 rounded-lg hover:bg-zinc-800 transition-colors text-sm font-medium"
                   >
                     View Details
                   </Link>
