@@ -12,9 +12,9 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen">
       {/* Left brand panel — desktop only */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-slate-950 p-12 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-zinc-950 p-12 relative overflow-hidden">
         {/* Background decoration */}
-        <div className="absolute inset-0 bg-gradient-to-br from-green-600/20 via-transparent to-slate-950" />
+        <div className="absolute inset-0 bg-gradient-to-br from-green-600/20 via-transparent to-zinc-950" />
         <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-green-500/5 blur-3xl" />
         <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-green-400/5 blur-3xl" />
 
@@ -24,7 +24,7 @@ export default function LoginPage() {
           </div>
           <div>
             <p className="text-base font-bold text-white">ExcelPro Washers</p>
-            <p className="text-xs text-slate-400">Ottawa, ON</p>
+            <p className="text-xs text-zinc-400">Ottawa, ON</p>
           </div>
         </div>
 
@@ -37,7 +37,7 @@ export default function LoginPage() {
             Manage your<br />
             <span className="text-green-400">business operations</span>
           </h1>
-          <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
+          <p className="text-zinc-400 text-sm leading-relaxed max-w-xs">
             Access leads, clients, jobs, quotes, and analytics all from one powerful dashboard.
           </p>
         </div>
@@ -50,7 +50,7 @@ export default function LoginPage() {
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-1.5">
               <div className={`h-2 w-2 rounded-full ${item.color}`} />
-              <span className="text-xs text-slate-500">{item.label}</span>
+              <span className="text-xs text-zinc-500">{item.label}</span>
             </div>
           ))}
         </div>
