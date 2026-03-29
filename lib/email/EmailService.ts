@@ -528,13 +528,7 @@ export class EmailService {
           <!-- Logo / Brand bar -->
           <tr>
             <td align="center" style="padding-bottom:20px;">
-              <table cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="background:#0284c7;border-radius:10px;padding:10px 20px;">
-                    <span style="color:#ffffff;font-size:16px;font-weight:700;letter-spacing:0.5px;">ExcelPro Washers</span>
-                  </td>
-                </tr>
-              </table>
+              <img src="${SITE_URL}/navbar-logo.jpg" alt="ExcelPro Washers" width="180" style="display:block;height:auto;border-radius:8px;" />
             </td>
           </tr>
 
