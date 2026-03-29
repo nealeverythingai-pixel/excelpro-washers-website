@@ -92,8 +92,6 @@ export class EmailService {
     requestId?: string;
   }): Promise<boolean> {
     const services = params.service.split(',').map(s => s.trim());
-    const minPrice = Math.round(params.estimatedValue * 0.9);
-    const maxPrice = Math.round(params.estimatedValue * 1.1);
     const requestNumber = params.requestId || `REQ-${Date.now()}`;
     const requestTime = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
     
@@ -138,9 +136,9 @@ export class EmailService {
       <p>Thanks for reaching out about our services! We've reviewed your request and here's your personalized estimate:</p>
       
       <div class="price-box">
-        <div style="color: #6b7280; font-size: 14px; margin-bottom: 10px;">ESTIMATED PRICE</div>
-        <div class="price">$${minPrice} - $${maxPrice}</div>
-        <div style="color: #6b7280; font-size: 14px; margin-top: 10px;">Final price confirmed after property inspection</div>
+        <div style="color: #6b7280; font-size: 14px; margin-bottom: 10px;">PRICING</div>
+        <div style="font-size: 18px; font-weight: 600; color: #111827; margin: 8px 0;">Confirmed after property review</div>
+        <div style="color: #6b7280; font-size: 14px; margin-top: 4px;">We'll give you an exact price when we connect — no surprises.</div>
       </div>
       
       <h3>📋 Services Included:</h3>
@@ -239,7 +237,7 @@ export class EmailService {
 
     const result = await this.send({
       to: params.email,
-      subject: `Your ExcelPro Washers Quote - $${minPrice}-$${maxPrice}`,
+      subject: `Your ExcelPro Washers Quote`,
       html,
     });
 
@@ -508,63 +506,169 @@ export class EmailService {
     name: string;
     email: string;
     service: string;
+    message?: string;
   }): Promise<boolean> {
     const firstName = params.name.split(' ')[0];
+    const services = params.service.split(',').map(s => s.trim()).filter(Boolean);
+
     const html = `
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-    .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
-    .checkmark { font-size: 48px; margin-bottom: 10px; }
-    .what-next { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; }
-    .step { display: flex; align-items: flex-start; margin: 12px 0; }
-    .step-icon { font-size: 20px; margin-right: 12px; flex-shrink: 0; }
-    .cta-button { display: inline-block; background: #0ea5e9; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 10px; }
-  </style>
+  <title>Request Received — ExcelPro Washers</title>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <div class="checkmark">✅</div>
-      <h1 style="margin: 0; font-size: 24px;">We got your request!</h1>
-      <p style="margin: 8px 0 0 0; opacity: 0.9;">ExcelPro Washers</p>
-    </div>
-    <div class="content">
-      <p>Hi <strong>${firstName}</strong>,</p>
-      <p>Thanks for reaching out! We've received your request for <strong>${params.service}</strong> and we'll be in touch with you very shortly.</p>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;">
 
-      <div class="what-next">
-        <p style="font-weight: bold; margin-top: 0;">What happens next:</p>
-        <div class="step">
-          <span class="step-icon">📋</span>
-          <span>We're reviewing your request and preparing a personalized quote</span>
-        </div>
-        <div class="step">
-          <span class="step-icon">📧</span>
-          <span>You'll receive your quote by email shortly</span>
-        </div>
-        <div class="step">
-          <span class="step-icon">📞</span>
-          <span>A team member may call to confirm the details before your appointment</span>
-        </div>
-      </div>
+          <!-- Logo / Brand bar -->
+          <tr>
+            <td align="center" style="padding-bottom:20px;">
+              <table cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background:#16a34a;border-radius:10px;padding:10px 20px;">
+                    <span style="color:#ffffff;font-size:16px;font-weight:700;letter-spacing:0.5px;">ExcelPro Washers</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-      <p>In the meantime, if you have any questions don't hesitate to reply to this email.</p>
-      <p>Talk soon,<br><strong>The ExcelPro Washers Team</strong></p>
+          <!-- Main card -->
+          <tr>
+            <td style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
 
-      <div style="text-align: center;">
-        <a href="${SITE_URL}" class="cta-button">Visit Our Website</a>
-      </div>
+              <!-- Green header -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background:linear-gradient(135deg,#16a34a 0%,#15803d 100%);padding:36px 32px;text-align:center;">
+                    <div style="background:rgba(255,255,255,0.15);display:inline-block;border-radius:50%;width:60px;height:60px;line-height:60px;font-size:28px;margin-bottom:12px;">&#10003;</div>
+                    <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;letter-spacing:-0.3px;">Request Received!</h1>
+                    <p style="margin:8px 0 0;color:rgba(255,255,255,0.85);font-size:15px;">We'll be in touch shortly.</p>
+                  </td>
+                </tr>
+              </table>
 
-      ${this.complianceFooter(params.email, true)}
-    </div>
-  </div>
+              <!-- Body -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding:32px;">
+
+                    <p style="margin:0 0 16px;font-size:16px;color:#18181b;">Hi <strong>${firstName}</strong>,</p>
+                    <p style="margin:0 0 24px;font-size:15px;color:#52525b;line-height:1.6;">Thanks for contacting us! We've received your request and a member of our team will review it and reach out to you very soon.</p>
+
+                    <!-- Services requested -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;margin-bottom:${params.message ? '20px' : '24px'};">
+                      <tr>
+                        <td style="padding:16px 20px;">
+                          <p style="margin:0 0 10px;font-size:13px;font-weight:600;color:#15803d;text-transform:uppercase;letter-spacing:0.5px;">Service${services.length > 1 ? 's' : ''} Requested</p>
+                          ${services.map(s => `<div style="display:flex;align-items:center;margin:4px 0;"><span style="color:#16a34a;font-weight:700;margin-right:8px;">&#10003;</span><span style="font-size:15px;color:#18181b;">${s}</span></div>`).join('')}
+                        </td>
+                      </tr>
+                    </table>
+
+                    ${params.message ? `
+                    <!-- Customer message -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background:#fafafa;border:1px solid #e4e4e7;border-left:3px solid #16a34a;border-radius:0 8px 8px 0;margin-bottom:24px;">
+                      <tr>
+                        <td style="padding:16px 20px;">
+                          <p style="margin:0 0 6px;font-size:13px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:0.5px;">Your Message</p>
+                          <p style="margin:0;font-size:15px;color:#3f3f46;line-height:1.6;">${params.message}</p>
+                        </td>
+                      </tr>
+                    </table>
+                    ` : ''}
+
+                    <!-- What happens next -->
+                    <p style="margin:0 0 14px;font-size:15px;font-weight:600;color:#18181b;">What happens next:</p>
+
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="padding:10px 0;border-bottom:1px solid #f4f4f5;">
+                          <table cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="width:32px;vertical-align:top;padding-top:2px;">
+                                <div style="background:#dcfce7;border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;font-size:12px;font-weight:700;color:#16a34a;">1</div>
+                              </td>
+                              <td style="padding-left:12px;">
+                                <p style="margin:0;font-size:14px;font-weight:600;color:#18181b;">Request Review</p>
+                                <p style="margin:2px 0 0;font-size:13px;color:#71717a;">We review your details and prepare a personalized quote</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:10px 0;border-bottom:1px solid #f4f4f5;">
+                          <table cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="width:32px;vertical-align:top;padding-top:2px;">
+                                <div style="background:#dcfce7;border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;font-size:12px;font-weight:700;color:#16a34a;">2</div>
+                              </td>
+                              <td style="padding-left:12px;">
+                                <p style="margin:0;font-size:14px;font-weight:600;color:#18181b;">We'll Reach Out</p>
+                                <p style="margin:2px 0 0;font-size:13px;color:#71717a;">Expect a call or email to confirm details and answer questions</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:10px 0;">
+                          <table cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="width:32px;vertical-align:top;padding-top:2px;">
+                                <div style="background:#dcfce7;border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;font-size:12px;font-weight:700;color:#16a34a;">3</div>
+                              </td>
+                              <td style="padding-left:12px;">
+                                <p style="margin:0;font-size:14px;font-weight:600;color:#18181b;">Confirmed Pricing & Booking</p>
+                                <p style="margin:2px 0 0;font-size:13px;color:#71717a;">We'll confirm exact pricing after a quick property review, then schedule your service</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Divider -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+                      <tr><td style="border-top:1px solid #f4f4f5;"></td></tr>
+                    </table>
+
+                    <p style="margin:0 0 4px;font-size:15px;color:#52525b;line-height:1.6;">Have a question in the meantime? Just reply to this email — we're happy to help.</p>
+                    <p style="margin:16px 0 0;font-size:15px;color:#18181b;">Talk soon,<br><strong>The ExcelPro Washers Team</strong></p>
+
+                  </td>
+                </tr>
+              </table>
+
+              <!-- CTA footer -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background:#f9fafb;border-top:1px solid #f4f4f5;padding:20px 32px;text-align:center;">
+                    <a href="${SITE_URL}" style="display:inline-block;background:#16a34a;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:8px;">Visit Our Website</a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 0;text-align:center;">
+              ${this.complianceFooter(params.email, true)}
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>`;
 

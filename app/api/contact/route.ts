@@ -3,7 +3,8 @@ import { AILeadQualifier } from '@/lib/ai/LeadQualifier';
 import { LeadRouter } from '@/lib/ai/LeadRouter';
 import { NotificationService } from '@/lib/notifications/NotificationService';
 import { EmailService } from '@/lib/email/EmailService';
-import { leadRequests, leadQuotes } from '@/lib/db/leads';
+import { db } from '@/lib/db';
+import { leadQuotes } from '@/lib/db/leads';
 import { subscribers } from '@/lib/db/subscribers';
 
 /**
@@ -38,24 +39,24 @@ export async function POST(request: NextRequest) {
 
     console.log(`📊 Lead Score: ${result.score.overall}/100 (${result.score.category.toUpperCase()})`);
 
-    // 2. Store in Supabase
+    // 2. Store in Supabase (requests table — used by admin CRM leads page)
     const requestId = `req_${Date.now()}`;
     try {
-      await leadRequests.create({
+      await db.requests.create({
         id: requestId,
         name,
-        first_name: body.firstName || '',
-        last_name: body.lastName || '',
+        firstName: body.firstName || '',
+        lastName: body.lastName || '',
         email,
         phone,
         address,
         service,
         message,
         status: 'new',
-        ai_score: result.score.overall,
-        ai_category: result.score.category,
-        ai_reasoning: result.score.reasoning,
-        estimated_value: result.score.estimatedValue,
+        aiScore: result.score.overall,
+        aiCategory: result.score.category,
+        aiReasoning: result.score.reasoning,
+        estimatedValue: result.score.estimatedValue,
       });
     } catch (dbErr) {
       console.error('DB insert failed (non-critical):', dbErr);
@@ -78,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     // 4. Send instant confirmation to customer
     try {
-      await EmailService.sendConfirmation({ name, email, service });
+      await EmailService.sendConfirmation({ name, email, service, message });
     } catch (confirmErr) {
       console.error('Confirmation email failed (non-critical):', confirmErr);
     }
