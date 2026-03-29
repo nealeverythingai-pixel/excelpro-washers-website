@@ -530,7 +530,7 @@ export class EmailService {
             <td align="center" style="padding-bottom:20px;">
               <table cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="background:#16a34a;border-radius:10px;padding:10px 20px;">
+                  <td style="background:#0284c7;border-radius:10px;padding:10px 20px;">
                     <span style="color:#ffffff;font-size:16px;font-weight:700;letter-spacing:0.5px;">ExcelPro Washers</span>
                   </td>
                 </tr>
@@ -545,7 +545,7 @@ export class EmailService {
               <!-- Green header -->
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="background:linear-gradient(135deg,#16a34a 0%,#15803d 100%);padding:36px 32px;text-align:center;">
+                  <td style="background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 100%);padding:36px 32px;text-align:center;">
                     <div style="background:rgba(255,255,255,0.15);display:inline-block;border-radius:50%;width:60px;height:60px;line-height:60px;font-size:28px;margin-bottom:12px;">&#10003;</div>
                     <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;letter-spacing:-0.3px;">Request Received!</h1>
                     <p style="margin:8px 0 0;color:rgba(255,255,255,0.85);font-size:15px;">We'll be in touch shortly.</p>
@@ -562,18 +562,18 @@ export class EmailService {
                     <p style="margin:0 0 24px;font-size:15px;color:#52525b;line-height:1.6;">Thanks for contacting us! We've received your request and a member of our team will review it and reach out to you very soon.</p>
 
                     <!-- Services requested -->
-                    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;margin-bottom:${params.message ? '20px' : '24px'};">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;margin-bottom:${params.message ? '20px' : '24px'};">
                       <tr>
                         <td style="padding:16px 20px;">
-                          <p style="margin:0 0 10px;font-size:13px;font-weight:600;color:#15803d;text-transform:uppercase;letter-spacing:0.5px;">Service${services.length > 1 ? 's' : ''} Requested</p>
-                          ${services.map(s => `<div style="display:flex;align-items:center;margin:4px 0;"><span style="color:#16a34a;font-weight:700;margin-right:8px;">&#10003;</span><span style="font-size:15px;color:#18181b;">${s}</span></div>`).join('')}
+                          <p style="margin:0 0 10px;font-size:13px;font-weight:600;color:#0369a1;text-transform:uppercase;letter-spacing:0.5px;">Service${services.length > 1 ? 's' : ''} Requested</p>
+                          ${services.map(s => `<div style="display:flex;align-items:center;margin:4px 0;"><span style="color:#0ea5e9;font-weight:700;margin-right:8px;">&#10003;</span><span style="font-size:15px;color:#18181b;">${s}</span></div>`).join('')}
                         </td>
                       </tr>
                     </table>
 
                     ${params.message ? `
                     <!-- Customer message -->
-                    <table width="100%" cellpadding="0" cellspacing="0" style="background:#fafafa;border:1px solid #e4e4e7;border-left:3px solid #16a34a;border-radius:0 8px 8px 0;margin-bottom:24px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background:#fafafa;border:1px solid #e4e4e7;border-left:3px solid #0ea5e9;border-radius:0 8px 8px 0;margin-bottom:24px;">
                       <tr>
                         <td style="padding:16px 20px;">
                           <p style="margin:0 0 6px;font-size:13px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:0.5px;">Your Message</p>
@@ -592,7 +592,7 @@ export class EmailService {
                           <table cellpadding="0" cellspacing="0">
                             <tr>
                               <td style="width:32px;vertical-align:top;padding-top:2px;">
-                                <div style="background:#dcfce7;border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;font-size:12px;font-weight:700;color:#16a34a;">1</div>
+                                <div style="background:#e0f2fe;border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;font-size:12px;font-weight:700;color:#0284c7;">1</div>
                               </td>
                               <td style="padding-left:12px;">
                                 <p style="margin:0;font-size:14px;font-weight:600;color:#18181b;">Request Review</p>
@@ -607,7 +607,7 @@ export class EmailService {
                           <table cellpadding="0" cellspacing="0">
                             <tr>
                               <td style="width:32px;vertical-align:top;padding-top:2px;">
-                                <div style="background:#dcfce7;border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;font-size:12px;font-weight:700;color:#16a34a;">2</div>
+                                <div style="background:#e0f2fe;border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;font-size:12px;font-weight:700;color:#0284c7;">2</div>
                               </td>
                               <td style="padding-left:12px;">
                                 <p style="margin:0;font-size:14px;font-weight:600;color:#18181b;">We'll Reach Out</p>
@@ -622,7 +622,7 @@ export class EmailService {
                           <table cellpadding="0" cellspacing="0">
                             <tr>
                               <td style="width:32px;vertical-align:top;padding-top:2px;">
-                                <div style="background:#dcfce7;border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;font-size:12px;font-weight:700;color:#16a34a;">3</div>
+                                <div style="background:#e0f2fe;border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;font-size:12px;font-weight:700;color:#0284c7;">3</div>
                               </td>
                               <td style="padding-left:12px;">
                                 <p style="margin:0;font-size:14px;font-weight:600;color:#18181b;">Confirmed Pricing & Booking</p>
@@ -650,7 +650,7 @@ export class EmailService {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="background:#f9fafb;border-top:1px solid #f4f4f5;padding:20px 32px;text-align:center;">
-                    <a href="${SITE_URL}" style="display:inline-block;background:#16a34a;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:8px;">Visit Our Website</a>
+                    <a href="${SITE_URL}" style="display:inline-block;background:#0284c7;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:8px;">Visit Our Website</a>
                   </td>
                 </tr>
               </table>
