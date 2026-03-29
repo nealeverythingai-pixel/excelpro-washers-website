@@ -34,7 +34,7 @@ export function BlogList({ posts }: { posts: BlogPost[] }) {
               "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200",
               activeCategory === category
                 ? "bg-primary-600 text-white shadow-md transform scale-105"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
             )}
           >
             {category}
@@ -47,7 +47,7 @@ export function BlogList({ posts }: { posts: BlogPost[] }) {
         {filteredPosts.map((post) => (
           <article
             key={post.slug}
-            className="flex flex-col items-start justify-between rounded-2xl bg-gray-50 p-6 shadow-sm hover:shadow-md transition-shadow"
+            className="flex flex-col items-start justify-between rounded-2xl bg-gray-50 dark:bg-gray-800 p-6 shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="flex items-center gap-x-4 text-xs">
               <time dateTime={post.date} className="text-gray-500">
@@ -58,13 +58,13 @@ export function BlogList({ posts }: { posts: BlogPost[] }) {
               </span>
             </div>
             <div className="group relative">
-              <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
+              <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 dark:text-white group-hover:text-gray-600 dark:group-hover:text-gray-300">
                 <Link href={`/blog/${post.slug}`}>
                   <span className="absolute inset-0" />
                   {post.title}
                 </Link>
               </h3>
-              <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">
+              <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600 dark:text-gray-400">
                 {post.excerpt}
               </p>
             </div>

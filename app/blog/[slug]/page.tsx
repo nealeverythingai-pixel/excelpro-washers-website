@@ -24,7 +24,7 @@ const posts: Record<string, {
     description: 'Searching for "window cleaners near me" in Ottawa? ExcelPro Washers offers streak-free, reliable, and affordable window cleaning services for your home.',
     content: (
       <>
-        <p className="lead text-xl text-gray-700 dark:text-gray-300 mb-8">
+        <p className="lead text-xl text-gray-700 dark:text-gray-300 mb-8 [&_strong]:text-gray-900 [&_strong]:dark:text-white">
             If you've been searching for <strong>"window cleaners near me"</strong> or <strong>"best window cleaners in Ottawa"</strong>, you're probably tired of looking through dirty, streaky windows. Living in Ottawa means dealing with harsh winters, muddy springs, and humid summers—all of which wreak havoc on your glass surfaces.
         </p>
         
@@ -114,7 +114,7 @@ const posts: Record<string, {
     description: 'Learn why Soft Wash is the safest method for cleaning your Ottawa home\'s siding and roof. Protect your investment with ExcelPro Washers.',
     content: (
       <>
-        <p className="lead text-xl text-gray-700 mb-8">
+        <p className="lead text-xl text-gray-700 dark:text-gray-300 mb-8">
             Homeowners often ask us: "Should I pressure wash my house?" The answer is often <strong>NO</strong>—you should <strong>Soft Wash</strong> it. At ExcelPro Washers, we specialize in <strong>Soft Wash services in Ottawa</strong> to safely clean delicate surfaces.
         </p>
         
@@ -138,9 +138,9 @@ const posts: Record<string, {
             Our Soft Wash system applies a biodegradable cleaning solution that kills the algae and mold at the root, keeping your home cleaner for longer. It's safe for your plants and pets when handled by professionals.
         </p>
 
-        <div className="bg-green-50 p-6 rounded-xl border border-green-100 my-8">
-            <h3 className="text-xl font-bold text-green-800 mb-2">Protect Your Siding Today</h3>
-            <p className="text-green-700 mb-4">Get a gentle, effective clean that restores your home's beauty without the risk of damage.</p>
+        <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-xl border border-green-100 dark:border-green-700 my-8">
+            <h3 className="text-xl font-bold text-green-800 dark:text-green-300 mb-2">Protect Your Siding Today</h3>
+            <p className="text-green-700 dark:text-green-400 mb-4">Get a gentle, effective clean that restores your home's beauty without the risk of damage.</p>
             <Link href="/contact" className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
                 Get a Soft Wash Quote
             </Link>
@@ -156,7 +156,7 @@ const posts: Record<string, {
     description: 'Revive your Ottawa property with professional pressure washing. We clean driveways, decks, and patios to remove years of grime and salt.',
     content: (
       <>
-        <p className="lead text-xl text-gray-700 mb-8">
+        <p className="lead text-xl text-gray-700 dark:text-gray-300 mb-8">
             Winter in Ottawa leaves behind a mess of salt, sand, and grime on your driveways and walkways. <strong>Pressure washing</strong> is the most effective way to blast away deep-seated dirt and restore the look of your hardscapes.
         </p>
         

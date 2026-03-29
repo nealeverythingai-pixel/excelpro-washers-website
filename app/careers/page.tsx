@@ -8,9 +8,9 @@ export const metadata = {
 
 export default function CareersPage() {
   return (
-    <div className="bg-white">
+    <div className="bg-white dark:bg-gray-900 transition-colors duration-300">
       {/* Hero Section */}
-      <div className="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
+      <div className="relative isolate overflow-hidden bg-gray-900 dark:bg-black py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl lg:mx-0">
             <div className="inline-flex items-center rounded-full bg-orange-500/10 px-3 py-1 text-sm font-semibold text-orange-400 ring-1 ring-inset ring-orange-500/20 mb-6">
@@ -43,43 +43,43 @@ export default function CareersPage() {
       <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
         <div className="mx-auto max-w-2xl lg:max-w-none">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
               Why Join ExcelPro?
             </h2>
-            <p className="mt-4 text-lg text-gray-600">
+            <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
               This isn't just a job; it's a launchpad for your career and financial freedom.
             </p>
           </div>
 
           <dl className="grid grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
             <div className="flex flex-col">
-              <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900">
+              <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900 dark:text-white">
                 <DollarSign className="h-5 w-5 flex-none text-green-600" aria-hidden="true" />
                 Uncapped Commission
               </dt>
-              <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
+              <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600 dark:text-gray-400">
                 <p className="flex-auto">
                   Top performers earn <strong>$1,500 - $2,500+ weekly</strong>. You get paid what you are worth. Our aggressive commission structure means every door is an opportunity.
                 </p>
               </dd>
             </div>
             <div className="flex flex-col">
-              <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900">
+              <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900 dark:text-white">
                 <Clock className="h-5 w-5 flex-none text-blue-600" aria-hidden="true" />
                 Flexible Schedule
               </dt>
-              <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
+              <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600 dark:text-gray-400">
                 <p className="flex-auto">
                   You control your hours. Whether you want to hustle 6 days a week or balance it with school/work, we support your drive.
                 </p>
               </dd>
             </div>
             <div className="flex flex-col">
-              <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900">
+              <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900 dark:text-white">
                 <TrendingUp className="h-5 w-5 flex-none text-purple-600" aria-hidden="true" />
                 Growth & Training
               </dt>
-              <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
+              <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600 dark:text-gray-400">
                 <p className="flex-auto">
                   Master the art of sales with daily training from top industry experts. We promote from within—team leader positions available soon.
                 </p>
@@ -92,31 +92,31 @@ export default function CareersPage() {
         <div className="mt-32 sm:mt-40">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl mb-6">
+                    <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl mb-6">
                         The Role: Door-to-Door Sales Rep
                     </h2>
                     <ul className="space-y-4">
                         <li className="flex gap-3">
                             <Target className="h-6 w-6 text-orange-600 shrink-0" />
-                            <span className="text-gray-700">Generate leads and close sales for our premium exterior cleaning services.</span>
+                            <span className="text-gray-700 dark:text-gray-300">Generate leads and close sales for our premium exterior cleaning services.</span>
                         </li>
                         <li className="flex gap-3">
                             <Users className="h-6 w-6 text-orange-600 shrink-0" />
-                            <span className="text-gray-700">Build relationships with homeowners in local neighborhoods.</span>
+                            <span className="text-gray-700 dark:text-gray-300">Build relationships with homeowners in local neighborhoods.</span>
                         </li>
                         <li className="flex gap-3">
                             <Zap className="h-6 w-6 text-orange-600 shrink-0" />
-                            <span className="text-gray-700">Represent the ExcelPro brand with professionalism and energy.</span>
+                            <span className="text-gray-700 dark:text-gray-300">Represent the ExcelPro brand with professionalism and energy.</span>
                         </li>
                         <li className="flex gap-3">
                             <Star className="h-6 w-6 text-orange-600 shrink-0" />
-                            <span className="text-gray-700">Use our dedicated Sales App to track progress and generate instant quotes.</span>
+                            <span className="text-gray-700 dark:text-gray-300">Use our dedicated Sales App to track progress and generate instant quotes.</span>
                         </li>
                     </ul>
                 </div>
-                <div className="bg-gray-100 rounded-2xl p-8 border border-gray-200">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Who We Are Looking For</h3>
-                    <div className="space-y-4 text-gray-600">
+                <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Who We Are Looking For</h3>
+                    <div className="space-y-4 text-gray-600 dark:text-gray-400">
                         <p>✅ <strong>Go-Getters:</strong> You don't wait for things to happen; you make them happen.</p>
                         <p>✅ <strong>Resilient:</strong> You embrace "no" as one step closer to a "yes".</p>
                         <p>✅ <strong>Communicators:</strong> You love talking to people and making new connections.</p>

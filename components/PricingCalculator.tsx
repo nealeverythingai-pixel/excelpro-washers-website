@@ -147,16 +147,16 @@ export function PricingCalculator() {
   };
 
   return (
-    <section className="py-16 bg-white sm:py-24">
+    <section className="py-16 bg-white dark:bg-gray-900 sm:py-24 transition-colors duration-300">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl sm:text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Instant Price Estimator</h2>
-          <p className="mt-6 text-lg leading-8 text-gray-600">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">Instant Price Estimator</h2>
+          <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
             Select the services you need and get a custom estimate in seconds.
           </p>
         </div>
 
-        <div className="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-gray-200 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
+        <div className="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-gray-200 dark:ring-gray-700 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none dark:bg-gray-800">
           <div className="p-8 sm:p-10 lg:flex-auto">
             
             {/* Service Selection Tabs */}
@@ -165,10 +165,10 @@ export function PricingCalculator() {
                     onClick={() => setActiveServices(p => ({ ...p, windowCleaning: !p.windowCleaning }))}
                     className={cn(
                         "flex items-center gap-3 px-5 py-3 rounded-lg text-sm font-medium border-2 transition-all shadow-sm hover:shadow-md",
-                        activeServices.windowCleaning ? "bg-primary-50 border-primary-500 text-primary-700" : "bg-white border-dashed border-gray-300 text-gray-400 hover:border-primary-300 hover:text-gray-600"
+                        activeServices.windowCleaning ? "bg-primary-50 dark:bg-primary-900/20 border-primary-500 text-primary-700 dark:text-primary-300" : "bg-white dark:bg-gray-700 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-primary-300 hover:text-gray-600"
                     )}
                 >
-                   <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", activeServices.windowCleaning ? "bg-primary-600 border-primary-600" : "border-gray-300 bg-white")}>
+                   <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", activeServices.windowCleaning ? "bg-primary-600 border-primary-600" : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700")}>
                         {activeServices.windowCleaning && <Check className="w-3 h-3 text-white" />}
                    </div>
                    <div className="flex items-center gap-2">
@@ -179,10 +179,10 @@ export function PricingCalculator() {
                     onClick={() => setActiveServices(p => ({ ...p, softWash: !p.softWash }))}
                     className={cn(
                         "flex items-center gap-3 px-5 py-3 rounded-lg text-sm font-medium border-2 transition-all shadow-sm hover:shadow-md",
-                        activeServices.softWash ? "bg-green-50 border-green-500 text-green-700" : "bg-white border-dashed border-gray-300 text-gray-400 hover:border-green-300 hover:text-gray-600"
+                        activeServices.softWash ? "bg-green-50 dark:bg-green-900/20 border-green-500 text-green-700 dark:text-green-300" : "bg-white dark:bg-gray-700 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-green-300 hover:text-gray-600"
                     )}
                 >
-                   <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", activeServices.softWash ? "bg-green-600 border-green-600" : "border-gray-300 bg-white")}>
+                   <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", activeServices.softWash ? "bg-green-600 border-green-600" : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700")}>
                         {activeServices.softWash && <Check className="w-3 h-3 text-white" />}
                    </div>
                    <div className="flex items-center gap-2">
@@ -193,10 +193,10 @@ export function PricingCalculator() {
                     onClick={() => setActiveServices(p => ({ ...p, pressureWashing: !p.pressureWashing }))}
                     className={cn(
                         "flex items-center gap-3 px-5 py-3 rounded-lg text-sm font-medium border-2 transition-all shadow-sm hover:shadow-md",
-                        activeServices.pressureWashing ? "bg-blue-50 border-blue-500 text-blue-700" : "bg-white border-dashed border-gray-300 text-gray-400 hover:border-blue-300 hover:text-gray-600"
+                        activeServices.pressureWashing ? "bg-blue-50 dark:bg-blue-900/20 border-blue-500 text-blue-700 dark:text-blue-300" : "bg-white dark:bg-gray-700 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-blue-300 hover:text-gray-600"
                     )}
                 >
-                   <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", activeServices.pressureWashing ? "bg-blue-600 border-blue-600" : "border-gray-300 bg-white")}>
+                   <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", activeServices.pressureWashing ? "bg-blue-600 border-blue-600" : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700")}>
                         {activeServices.pressureWashing && <Check className="w-3 h-3 text-white" />}
                    </div>
                    <div className="flex items-center gap-2">
@@ -207,10 +207,10 @@ export function PricingCalculator() {
                     onClick={() => setActiveServices(p => ({ ...p, gutterCleaning: !p.gutterCleaning }))}
                     className={cn(
                         "flex items-center gap-3 px-5 py-3 rounded-lg text-sm font-medium border-2 transition-all shadow-sm hover:shadow-md",
-                        activeServices.gutterCleaning ? "bg-orange-50 border-orange-500 text-orange-700" : "bg-white border-dashed border-gray-300 text-gray-400 hover:border-orange-300 hover:text-gray-600"
+                        activeServices.gutterCleaning ? "bg-orange-50 dark:bg-orange-900/20 border-orange-500 text-orange-700 dark:text-orange-300" : "bg-white dark:bg-gray-700 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-orange-300 hover:text-gray-600"
                     )}
                 >
-                   <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", activeServices.gutterCleaning ? "bg-orange-600 border-orange-600" : "border-gray-300 bg-white")}>
+                   <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", activeServices.gutterCleaning ? "bg-orange-600 border-orange-600" : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700")}>
                         {activeServices.gutterCleaning && <Check className="w-3 h-3 text-white" />}
                    </div>
                    <div className="flex items-center gap-2">
@@ -221,10 +221,10 @@ export function PricingCalculator() {
                     onClick={() => setActiveServices(p => ({ ...p, roofCleaning: !p.roofCleaning }))}
                     className={cn(
                         "flex items-center gap-3 px-5 py-3 rounded-lg text-sm font-medium border-2 transition-all shadow-sm hover:shadow-md",
-                        activeServices.roofCleaning ? "bg-purple-50 border-purple-500 text-purple-700" : "bg-white border-dashed border-gray-300 text-gray-400 hover:border-purple-300 hover:text-gray-600"
+                        activeServices.roofCleaning ? "bg-purple-50 dark:bg-purple-900/20 border-purple-500 text-purple-700 dark:text-purple-300" : "bg-white dark:bg-gray-700 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-purple-300 hover:text-gray-600"
                     )}
                 >
-                   <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", activeServices.roofCleaning ? "bg-purple-600 border-purple-600" : "border-gray-300 bg-white")}>
+                   <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", activeServices.roofCleaning ? "bg-purple-600 border-purple-600" : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700")}>
                         {activeServices.roofCleaning && <Check className="w-3 h-3 text-white" />}
                    </div>
                    <div className="flex items-center gap-2">
@@ -237,13 +237,13 @@ export function PricingCalculator() {
               {/* Window Cleaning Section */}
               {activeServices.windowCleaning && (
                 <div className="animate-in fade-in slide-in-from-top-4">
-                  <h3 className="text-lg font-bold tracking-tight text-gray-900 border-b pb-2 mb-6 flex items-center gap-2">
+                  <h3 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white border-b dark:border-gray-700 pb-2 mb-6 flex items-center gap-2">
                     <Droplets className="w-5 h-5 text-primary-600" /> Window Cleaning
                   </h3>
-                  
+
                   {/* Stories Input */}
                   <div className="mb-8">
-                    <label className="text-sm font-semibold leading-6 text-gray-900">How many stories is your home?</label>
+                    <label className="text-sm font-semibold leading-6 text-gray-900 dark:text-white">How many stories is your home?</label>
                     <div className="mt-4 flex gap-4">
                       {[1, 2, 3].map((num) => (
                         <button
@@ -253,7 +253,7 @@ export function PricingCalculator() {
                             "flex-1 rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset transition-all",
                             stories === num
                               ? "bg-primary-600 text-white ring-primary-600"
-                              : "bg-white text-gray-900 ring-gray-300 hover:bg-gray-50"
+                              : "bg-white dark:bg-gray-700 text-gray-900 dark:text-white ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
                           )}
                         >
                           {num} Story
@@ -266,7 +266,7 @@ export function PricingCalculator() {
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                       <div className="flex items-center gap-2 mb-2">
-                        <label htmlFor="small-windows" className="text-sm font-semibold text-gray-900">
+                        <label htmlFor="small-windows" className="text-sm font-semibold text-gray-900 dark:text-white">
                           Small Windows
                         </label>
                         <div className="group relative flex items-center">
@@ -282,14 +282,14 @@ export function PricingCalculator() {
                         min="0"
                         value={smallWindows || ''}
                         onChange={(e) => setSmallWindows(Math.max(0, parseInt(e.target.value) || 0))}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
                         placeholder="0"
                       />
                     </div>
 
                     <div>
                       <div className="flex items-center gap-2 mb-2">
-                        <label htmlFor="large-windows" className="text-sm font-semibold text-gray-900">
+                        <label htmlFor="large-windows" className="text-sm font-semibold text-gray-900 dark:text-white">
                           Large Windows
                         </label>
                         <div className="group relative flex items-center">
@@ -305,7 +305,7 @@ export function PricingCalculator() {
                         min="0"
                         value={largeWindows || ''}
                         onChange={(e) => setLargeWindows(Math.max(0, parseInt(e.target.value) || 0))}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
                         placeholder="0"
                       />
                     </div>
@@ -316,8 +316,8 @@ export function PricingCalculator() {
               {/* Soft Wash / Gutter / Roof Shared Property Selection */}
               {(activeServices.softWash || activeServices.gutterCleaning || activeServices.roofCleaning) && (
                 <div className="animate-in fade-in slide-in-from-top-4">
-                    <h3 className="text-lg font-bold tracking-tight text-gray-900 border-b pb-2 mb-6 flex items-center gap-2">
-                        <Home className="w-5 h-5 text-gray-600" /> Property Details (for Soft Wash / Gutters / Roof)
+                    <h3 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white border-b dark:border-gray-700 pb-2 mb-6 flex items-center gap-2">
+                        <Home className="w-5 h-5 text-gray-600 dark:text-gray-400" /> Property Details (for Soft Wash / Gutters / Roof)
                     </h3>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -333,14 +333,14 @@ export function PricingCalculator() {
                                 className={cn(
                                     "relative flex flex-col items-start p-4 rounded-xl border-2 text-left transition-all",
                                     homeType === type.id
-                                        ? "border-green-600 bg-green-50"
-                                        : "border-gray-200 hover:border-green-200 bg-white"
+                                        ? "border-green-600 bg-green-50 dark:bg-green-900/20"
+                                        : "border-gray-200 dark:border-gray-600 hover:border-green-200 bg-white dark:bg-gray-700"
                                 )}
                             >
-                                <span className={cn("font-semibold", homeType === type.id ? "text-green-900" : "text-gray-900")}>
+                                <span className={cn("font-semibold", homeType === type.id ? "text-green-900 dark:text-green-300" : "text-gray-900 dark:text-white")}>
                                     {type.label}
                                 </span>
-                                <span className="text-sm text-gray-500 mt-1">{type.price} Size</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400 mt-1">{type.price} Size</span>
                                 {homeType === type.id && <Check className="absolute top-4 right-4 w-5 h-5 text-green-600" />}
                             </button>
                         ))}
@@ -351,13 +351,13 @@ export function PricingCalculator() {
               {/* Pressure Washing Section */}
               {activeServices.pressureWashing && (
                  <div className="animate-in fade-in slide-in-from-top-4">
-                    <h3 className="text-lg font-bold tracking-tight text-gray-900 border-b pb-2 mb-6 flex items-center gap-2">
+                    <h3 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white border-b dark:border-gray-700 pb-2 mb-6 flex items-center gap-2">
                         <Waves className="w-5 h-5 text-blue-600" /> Pressure Washing
                     </h3>
 
                     <div className="space-y-6">
                         <div>
-                            <label className="text-sm font-semibold leading-6 text-gray-900 block mb-4">Driveway Cleaning</label>
+                            <label className="text-sm font-semibold leading-6 text-gray-900 dark:text-white block mb-4">Driveway Cleaning</label>
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                 {[
                                     { id: 'none', label: 'None', price: 0 },
@@ -372,7 +372,7 @@ export function PricingCalculator() {
                                             "rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset transition-all",
                                             drivewaySize === type.id
                                             ? "bg-blue-600 text-white ring-blue-600"
-                                            : "bg-white text-gray-900 ring-gray-300 hover:bg-gray-50"
+                                            : "bg-white dark:bg-gray-700 text-gray-900 dark:text-white ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
                                         )}
                                     >
                                         {type.label}
@@ -382,7 +382,7 @@ export function PricingCalculator() {
                         </div>
 
                         <div>
-                            <label htmlFor="deck-area" className="text-sm font-semibold leading-6 text-gray-900 block mb-2">
+                            <label htmlFor="deck-area" className="text-sm font-semibold leading-6 text-gray-900 dark:text-white block mb-2">
                                 Deck / Patio / Walkway Area (sq ft)
                             </label>
                              <div className="relative mt-2 rounded-md shadow-sm max-w-xs">
@@ -392,14 +392,14 @@ export function PricingCalculator() {
                                     min="0"
                                     value={deckPatioArea || ''}
                                     onChange={(e) => setDeckPatioArea(Math.max(0, parseInt(e.target.value) || 0))}
-                                    className="block w-full rounded-md border-0 py-1.5 pl-4 pr-12 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                                    className="block w-full rounded-md border-0 py-1.5 pl-4 pr-12 text-gray-900 dark:text-white dark:bg-gray-700 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                                     placeholder="0"
                                 />
                                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                    <span className="text-gray-500 sm:text-sm">sq ft</span>
+                                    <span className="text-gray-500 dark:text-gray-400 sm:text-sm">sq ft</span>
                                 </div>
                             </div>
-                            <p className="mt-2 text-xs text-gray-500">Estimated at $0.35 per sq ft</p>
+                            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">Estimated at $0.35 per sq ft</p>
                         </div>
                     </div>
                 </div>
@@ -408,7 +408,7 @@ export function PricingCalculator() {
 
             {/* Empty State Help */}
             {!activeServices.windowCleaning && !activeServices.softWash && !activeServices.pressureWashing && !activeServices.gutterCleaning && !activeServices.roofCleaning && (
-                <div className="text-center py-10 text-gray-500 italic">
+                <div className="text-center py-10 text-gray-500 dark:text-gray-400 italic">
                     Select a service above to get started.
                 </div>
             )}
@@ -416,40 +416,40 @@ export function PricingCalculator() {
           </div>
 
           <div className="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
-            <div className="rounded-2xl bg-gray-50 py-10 text-center ring-1 ring-inset ring-gray-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16 sticky top-24">
+            <div className="rounded-2xl bg-gray-50 dark:bg-gray-900 py-10 text-center ring-1 ring-inset ring-gray-900/5 dark:ring-gray-700 lg:flex lg:flex-col lg:justify-center lg:py-16 sticky top-24">
               <div className="mx-auto max-w-xs px-8">
-                <p className="text-base font-semibold text-gray-600">Estimated Total</p>
-                
+                <p className="text-base font-semibold text-gray-600 dark:text-gray-400">Estimated Total</p>
+
                 {/* Breakdown */}
-                <div className="mt-4 space-y-2 text-sm text-gray-500 border-b border-gray-200 pb-4 mb-4">
+                <div className="mt-4 space-y-2 text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
                     {activeServices.windowCleaning && (
                         <div className="flex justify-between">
                             <span>Window Cleaning:</span>
-                            <span className="font-medium text-gray-900">${costs.window}</span>
+                            <span className="font-medium text-gray-900 dark:text-white">${costs.window}</span>
                         </div>
                     )}
                     {activeServices.softWash && (
                         <div className="flex justify-between">
                             <span>Soft Wash:</span>
-                            <span className="font-medium text-gray-900">${costs.softWash}</span>
+                            <span className="font-medium text-gray-900 dark:text-white">${costs.softWash}</span>
                         </div>
                     )}
                     {activeServices.gutterCleaning && (
                         <div className="flex justify-between">
                             <span>Gutter Cleaning:</span>
-                            <span className="font-medium text-gray-900">${costs.gutter}</span>
+                            <span className="font-medium text-gray-900 dark:text-white">${costs.gutter}</span>
                         </div>
                     )}
                     {activeServices.roofCleaning && (
                         <div className="flex justify-between">
                             <span>Roof Cleaning:</span>
-                            <span className="font-medium text-gray-900">${costs.roof}</span>
+                            <span className="font-medium text-gray-900 dark:text-white">${costs.roof}</span>
                         </div>
                     )}
                     {activeServices.pressureWashing && (
                         <div className="flex justify-between">
                             <span>Pressure Washing:</span>
-                            <span className="font-medium text-gray-900">${costs.pressure}</span>
+                            <span className="font-medium text-gray-900 dark:text-white">${costs.pressure}</span>
                         </div>
                     )}
                      {(!activeServices.windowCleaning && !activeServices.softWash && !activeServices.pressureWashing && !activeServices.gutterCleaning && !activeServices.roofCleaning) && (
@@ -459,9 +459,9 @@ export function PricingCalculator() {
                     {/* Minimum Charge Display */}
                     {costs.minimumApplied && (
                         <>
-                            <div className="flex justify-between pt-2 border-t border-dashed border-gray-200">
+                            <div className="flex justify-between pt-2 border-t border-dashed border-gray-200 dark:border-gray-700">
                                 <span>Subtotal:</span>
-                                <span className="font-medium text-gray-500">${costs.total}</span>
+                                <span className="font-medium text-gray-500 dark:text-gray-400">${costs.total}</span>
                             </div>
                             <div className="mt-2 text-xs text-amber-600 font-medium bg-amber-50 p-2 rounded border border-amber-200">
                                 Minimum Service Charge Applied: $200 CAD
@@ -471,8 +471,8 @@ export function PricingCalculator() {
                 </div>
 
                 <p className="flex items-baseline justify-center gap-x-2">
-                  <span className="text-5xl font-bold tracking-tight text-gray-900">${costs.finalTotal}</span>
-                  <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600">CAD</span>
+                  <span className="text-5xl font-bold tracking-tight text-gray-900 dark:text-white">${costs.finalTotal}</span>
+                  <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600 dark:text-gray-400">CAD</span>
                 </p>
                 
                 <div className="mt-10">
@@ -482,7 +482,7 @@ export function PricingCalculator() {
                     >
                     Book This Price
                     </Link>
-                    <p className="mt-4 text-xs text-center text-gray-500">
+                    <p className="mt-4 text-xs text-center text-gray-500 dark:text-gray-400">
                         *Final price subject to on-site verification.
                     </p>
                 </div>
