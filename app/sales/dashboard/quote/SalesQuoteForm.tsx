@@ -19,18 +19,18 @@ function StepSection({
   const isOpen = activeStep === step
   const isCompleted = activeStep > step
   return (
-    <section className="rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden transition-all">
+    <section className="rounded-2xl bg-zinc-900 border border-zinc-800 overflow-hidden transition-all">
       <button type="button" onClick={() => setActiveStep(isOpen ? -1 : step)}
-        className="w-full flex items-center gap-3 p-4 text-left active:bg-gray-50 transition-colors">
+        className="w-full flex items-center gap-3 p-4 text-left active:bg-zinc-800 transition-colors">
         <div className={cn('w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 transition-colors',
-          isCompleted ? 'bg-green-500 text-white' : isOpen ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-500')}>
+          isCompleted ? 'bg-green-500 text-white' : isOpen ? 'bg-green-600 text-white' : 'bg-zinc-800 text-zinc-500')}>
           {isCompleted ? <Check className="w-4 h-4" /> : step + 1}
         </div>
         <div className="flex-1 min-w-0">
-          <p className={cn('font-semibold text-sm', isOpen ? 'text-gray-900' : 'text-gray-600')}>{title}</p>
-          {badge && !isOpen && <p className="text-xs text-gray-400 truncate mt-0.5">{badge}</p>}
+          <p className={cn('font-semibold text-sm', isOpen ? 'text-zinc-100' : 'text-zinc-400')}>{title}</p>
+          {badge && !isOpen && <p className="text-xs text-zinc-500 truncate mt-0.5">{badge}</p>}
         </div>
-        {isOpen ? <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" /> : <ChevronDown className="w-5 h-5 text-gray-300 flex-shrink-0" />}
+        {isOpen ? <ChevronUp className="w-5 h-5 text-zinc-400 flex-shrink-0" /> : <ChevronDown className="w-5 h-5 text-zinc-600 flex-shrink-0" />}
       </button>
       <div className={cn('transition-all duration-200', isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden')}>
         <div className="px-4 pb-5 pt-1 space-y-4">
@@ -424,7 +424,7 @@ export function SalesQuoteForm() {
         {STEPS.map((label, i) => (
           <div key={label} className="flex-1 flex flex-col items-center gap-1">
             <div className={cn('h-1.5 w-full rounded-full transition-colors',
-              i <= activeStep ? 'bg-green-500' : 'bg-gray-200'
+              i <= activeStep ? 'bg-green-500' : 'bg-zinc-700'
             )} />
             <span className={cn('text-[9px] lg:text-[11px] font-semibold hidden sm:block',
               i <= activeStep ? 'text-green-600' : 'text-gray-400'
@@ -438,18 +438,18 @@ export function SalesQuoteForm() {
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <input name="firstName" placeholder="First Name *" required inputMode="text" autoComplete="given-name"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
+              className="w-full rounded-xl border border-zinc-700 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-zinc-800 text-zinc-100 placeholder:text-zinc-600" />
             <input name="lastName" placeholder="Last Name *" required inputMode="text" autoComplete="family-name"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
+              className="w-full rounded-xl border border-zinc-700 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-zinc-800 text-zinc-100 placeholder:text-zinc-600" />
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <input name="email" type="email" placeholder="Email *" required autoComplete="email"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
+              className="w-full rounded-xl border border-zinc-700 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-zinc-800 text-zinc-100 placeholder:text-zinc-600" />
             <input name="phone" type="tel" placeholder="Phone *" required inputMode="tel" autoComplete="tel"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
+              className="w-full rounded-xl border border-zinc-700 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-zinc-800 text-zinc-100 placeholder:text-zinc-600" />
           </div>
           <input name="address" placeholder="Street Address *" required autoComplete="street-address"
-            className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 placeholder:text-gray-400" />
+            className="w-full rounded-xl border border-zinc-700 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-zinc-800 text-zinc-100 placeholder:text-zinc-600" />
 
           {/* Lead Source */}
           <div className="space-y-2">
@@ -457,13 +457,13 @@ export function SalesQuoteForm() {
             <div className="grid grid-cols-2 gap-2">
               <button type="button" onClick={() => setLeadSource('given')}
                 className={cn('py-3 rounded-xl text-sm font-bold border-2 transition-all active:scale-95',
-                  leadSource === 'given' ? 'bg-blue-50 border-blue-500 text-blue-800 shadow-sm' : 'bg-white border-gray-200 text-gray-500')}>
+                  leadSource === 'given' ? 'bg-blue-500/10 border-blue-500 text-blue-300 shadow-sm' : 'bg-zinc-800 border-zinc-700 text-zinc-500')}>
                 📋 Lead Given
                 <span className="block text-xs font-normal mt-0.5 opacity-70">10% commission</span>
               </button>
               <button type="button" onClick={() => setLeadSource('produced')}
                 className={cn('py-3 rounded-xl text-sm font-bold border-2 transition-all active:scale-95',
-                  leadSource === 'produced' ? 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-sm' : 'bg-white border-gray-200 text-gray-500')}>
+                  leadSource === 'produced' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-300 shadow-sm' : 'bg-zinc-800 border-zinc-700 text-zinc-500')}>
                 🎯 Self-Generated
                 <span className="block text-xs font-normal mt-0.5 opacity-70">15% commission</span>
               </button>
@@ -476,7 +476,7 @@ export function SalesQuoteForm() {
       <StepSection step={1} title="Property Measurements" activeStep={activeStep} setActiveStep={setActiveStep}
         badge={houseAreaSqft > 0 ? `${houseAreaSqft.toLocaleString()} sqft house` : undefined}>
         {/* Input mode toggle */}
-        <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
+        <div className="flex bg-zinc-800 rounded-xl p-1 gap-1">
           {([
             { id: 'diagonal', label: '📐 Diagonal', hint: 'Measure on Google Earth' },
             { id: 'sqft',     label: '📋 Sqft Known', hint: 'Client told you the size' },
@@ -484,7 +484,7 @@ export function SalesQuoteForm() {
             <button key={m.id} type="button"
               onClick={() => setMeasureMode(m.id)}
               className={cn('flex-1 py-2.5 rounded-lg text-sm font-bold transition-all text-center',
-                measureMode === m.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600')}>
+                measureMode === m.id ? 'bg-zinc-700 text-zinc-100 shadow-sm' : 'text-zinc-500 hover:text-zinc-300')}>
               {m.label}
               <span className="block text-[10px] font-normal mt-0.5 opacity-70">{m.hint}</span>
             </button>
@@ -495,11 +495,11 @@ export function SalesQuoteForm() {
         {measureMode === 'diagonal' && (
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-gray-500">Unit:</span>
-            <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
+            <div className="flex bg-zinc-800 rounded-xl p-1 gap-1">
               {(['m', 'ft'] as const).map(u => (
                 <button key={u} type="button" onClick={() => { setMeasureUnit(u); setHouseDiag(''); setDrivewayDiag(''); setDeckDiag('') }}
                   className={cn('px-4 py-1.5 rounded-lg text-sm font-bold transition-all',
-                    measureUnit === u ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600')}>
+                    measureUnit === u ? 'bg-zinc-700 text-zinc-100 shadow-sm' : 'text-zinc-500 hover:text-zinc-300')}>
                   {u === 'm' ? 'Metres (m)' : 'Feet (ft)'}
                 </button>
               ))}
@@ -519,12 +519,12 @@ export function SalesQuoteForm() {
               <input type="number" step="1" min="0" inputMode="numeric"
                 placeholder="e.g. 2200"
                 value={houseSqftManual} onChange={e => setHouseSqftManual(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50" />
+                className="w-full rounded-xl border border-zinc-700 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-zinc-800 text-zinc-100" />
             ) : (
               <input type="number" step={measureUnit === 'm' ? '0.1' : '1'} min="0" inputMode="decimal"
                 placeholder={measureUnit === 'm' ? 'e.g. 18.5' : 'e.g. 61'}
                 value={houseDiag} onChange={e => setHouseDiag(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50" />
+                className="w-full rounded-xl border border-zinc-700 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-zinc-800 text-zinc-100" />
             )}
             {houseAreaSqft > 0 && (
               <div className="rounded-xl bg-green-50 border border-green-200 px-3 py-2.5">
@@ -544,12 +544,12 @@ export function SalesQuoteForm() {
               <input type="number" step="1" min="0" inputMode="numeric"
                 placeholder="e.g. 600"
                 value={drivewaySqftManual} onChange={e => setDrivewaySqftManual(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50" />
+                className="w-full rounded-xl border border-zinc-700 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-zinc-800 text-zinc-100" />
             ) : (
               <input type="number" step={measureUnit === 'm' ? '0.1' : '1'} min="0" inputMode="decimal"
                 placeholder={measureUnit === 'm' ? 'e.g. 12' : 'e.g. 40'}
                 value={drivewayDiag} onChange={e => setDrivewayDiag(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50" />
+                className="w-full rounded-xl border border-zinc-700 px-4 py-3.5 lg:py-2.5 text-lg lg:text-base font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-zinc-800 text-zinc-100" />
             )}
             {drivewayAreaSqft > 0 && (
               <div className="rounded-xl bg-blue-50 border border-blue-200 px-3 py-2.5">
@@ -576,7 +576,7 @@ export function SalesQuoteForm() {
               {[1, 2, 3].map(s => (
                 <button key={s} type="button" onClick={() => setStories(s)}
                   className={cn('py-4 rounded-xl text-sm font-bold border-2 transition-all active:scale-95',
-                    stories === s ? 'bg-green-50 border-green-500 text-green-800 shadow-sm' : 'bg-white border-gray-200 text-gray-500')}>
+                    stories === s ? 'bg-green-500/10 border-green-500 text-green-300 shadow-sm' : 'bg-zinc-800 border-zinc-700 text-zinc-500')}>
                   {s}F
                   <span className="block text-xs font-normal mt-0.5 opacity-70">×{STORY_MULTIPLIERS[s].toFixed(2)}</span>
                 </button>
@@ -599,7 +599,7 @@ export function SalesQuoteForm() {
         {showGuide && (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {WINDOW_TYPES.map(wt => (
-              <div key={wt.key} className="border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm">
+              <div key={wt.key} className="border border-zinc-800 rounded-2xl overflow-hidden bg-zinc-900">
                 {/* SVG Illustration */}
                 <div className="bg-gradient-to-b from-sky-50 to-blue-50 p-3 flex items-center justify-center border-b border-gray-100">
                   <div className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32">
@@ -627,12 +627,12 @@ export function SalesQuoteForm() {
         {/* Window Counters — 2-col mobile, 4-col desktop */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {WINDOW_TYPES.map(wt => (
-            <div key={wt.key} className="bg-gray-50 border border-gray-200 rounded-2xl p-4 text-center">
+            <div key={wt.key} className="bg-zinc-800 border border-zinc-700 rounded-2xl p-4 text-center">
               <p className="text-xs font-semibold text-gray-700 mb-2">{wt.label} <span className="text-green-600">${wt.price} ea.</span></p>
               <div className="flex items-center justify-center gap-3">
                 <button type="button" onClick={() => setWindows(p => ({ ...p, [wt.key]: Math.max(0, p[wt.key as keyof typeof p] - 1) }))}
-                  className="w-11 h-11 rounded-full bg-white border-2 border-gray-200 text-gray-600 font-bold text-xl flex items-center justify-center active:scale-90 active:bg-gray-100 transition-all shadow-sm">−</button>
-                <span className="text-2xl font-bold text-gray-900 w-10 text-center tabular-nums">{windows[wt.key as keyof typeof windows]}</span>
+                  className="w-11 h-11 rounded-full bg-zinc-800 border-2 border-zinc-700 text-zinc-300 font-bold text-xl flex items-center justify-center active:scale-90 active:bg-zinc-700 transition-all shadow-sm">−</button>
+                <span className="text-2xl font-bold text-zinc-100 w-10 text-center tabular-nums">{windows[wt.key as keyof typeof windows]}</span>
                 <button type="button" onClick={() => setWindows(p => ({ ...p, [wt.key]: p[wt.key as keyof typeof p] + 1 }))}
                   className="w-11 h-11 rounded-full bg-green-500 text-white font-bold text-xl flex items-center justify-center active:scale-90 active:bg-green-600 transition-all shadow-sm">+</button>
               </div>
@@ -641,9 +641,9 @@ export function SalesQuoteForm() {
         </div>
 
         {totalWindowCount > 0 && (
-          <div className="rounded-xl bg-green-50 border border-green-200 px-3 py-2.5 flex items-center justify-between">
-            <span className="text-sm text-gray-700">{totalWindowCount} windows · {windowBreakdown}</span>
-            <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+          <div className="rounded-xl bg-green-500/10 border border-green-500/30 px-3 py-2.5 flex items-center justify-between">
+            <span className="text-sm text-zinc-300">{totalWindowCount} windows · {windowBreakdown}</span>
+            <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-green-500/15 text-green-400">
               Ext: ${extWindowPrice} · Int: ${intWindowPrice}
             </span>
           </div>
@@ -731,7 +731,7 @@ export function SalesQuoteForm() {
           ] as const).map(svc => {
             const isOn = services[svc.key]
             const borderColor =
-              !isOn ? 'border-gray-200 bg-white' :
+              !isOn ? 'border-zinc-700 bg-zinc-900' :
               svc.color === 'purple' ? 'border-purple-400 bg-purple-50' :
               svc.color === 'amber'  ? 'border-amber-400 bg-amber-50' :
               svc.color === 'sky'    ? 'border-sky-400 bg-sky-50' :
@@ -782,11 +782,11 @@ export function SalesQuoteForm() {
                     {measureMode === 'sqft' ? (
                       <input type="number" step="1" min="0" inputMode="numeric" placeholder="e.g. 300"
                         value={deckSqftManual} onChange={e => setDeckSqftManual(e.target.value)}
-                        className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base font-semibold focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white" />
+                        className="w-full rounded-xl border border-zinc-700 px-4 py-3 text-base font-semibold focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-zinc-800 text-zinc-100" />
                     ) : (
                       <input type="number" step="0.1" min="0" inputMode="decimal" placeholder={measureUnit === 'm' ? 'e.g. 8.5' : 'e.g. 28'}
                         value={deckDiag} onChange={e => setDeckDiag(e.target.value)}
-                        className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base font-semibold focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white" />
+                        className="w-full rounded-xl border border-zinc-700 px-4 py-3 text-base font-semibold focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-zinc-800 text-zinc-100" />
                     )}
                     {deckAreaSqft > 0 && (
                       <p className="text-xs text-orange-700 font-medium">≈ {deckAreaSqft.toLocaleString()} sqft → ${deckPrice}</p>
@@ -811,7 +811,7 @@ export function SalesQuoteForm() {
         {selectedCount > 0 && (
           <div className="space-y-3">
             {/* Three-tab selector */}
-            <div className="grid grid-cols-3 gap-1.5 bg-gray-100 rounded-2xl p-1">
+            <div className="grid grid-cols-3 gap-1.5 bg-zinc-800 rounded-2xl p-1">
               {([
                 { id: 'standard',  label: 'Standard',  emoji: '📋' },
                 { id: 'negotiate', label: 'Negotiate',  emoji: '🤝' },
@@ -829,7 +829,7 @@ export function SalesQuoteForm() {
                     pricingMode === tab.id
                       ? tab.id === 'best'      ? 'bg-orange-500 text-white shadow-sm'
                       : tab.id === 'negotiate' ? 'bg-blue-500 text-white shadow-sm'
-                      : 'bg-white text-gray-800 shadow-sm'
+                      : 'bg-zinc-700 text-zinc-100 shadow-sm'
                       : 'text-gray-500 hover:text-gray-700'
                   )}
                 >
@@ -1008,12 +1008,12 @@ export function SalesQuoteForm() {
               </div>
             </div>
             <div className="space-y-2">
-              <div className="bg-gray-50 rounded-xl p-3 text-sm text-gray-600 italic leading-relaxed border border-gray-200">
+              <div className="bg-zinc-800 rounded-xl p-3 text-sm text-zinc-400 italic leading-relaxed border border-zinc-700">
                 &ldquo;{quoteText}&rdquo;
               </div>
               <button type="button" onClick={handleCopyQuote}
                 className={cn('w-full text-center text-sm font-semibold py-3 rounded-xl transition-all active:scale-[0.98]',
-                  quoteCopied ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 active:bg-gray-200')}>
+                  quoteCopied ? 'bg-green-600 text-white' : 'bg-zinc-800 text-zinc-300 active:bg-zinc-700')}>
                 {quoteCopied ? '✓ Copied!' : '📋 Copy Quote Text'}
               </button>
             </div>
@@ -1032,7 +1032,7 @@ export function SalesQuoteForm() {
       <input type="hidden" name="storyMultiplier" value={storyMultiplier.toFixed(2)} />
 
       {/* ─── Save Quote Button (inline) ─── */}
-      <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-4 lg:p-6">
+      <div className="rounded-2xl bg-zinc-900 border border-zinc-800 p-4 lg:p-6">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="text-2xl font-extrabold text-gray-900 tabular-nums">${activePrice.toLocaleString()}</p>
