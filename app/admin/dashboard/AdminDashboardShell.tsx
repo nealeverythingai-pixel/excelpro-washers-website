@@ -17,11 +17,11 @@ export function AdminDashboardShell({
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden text-gray-900">
+    <div className="flex h-screen bg-zinc-950 overflow-hidden text-zinc-100">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -43,27 +43,27 @@ export function AdminDashboardShell({
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden min-w-0">
         {/* Top header */}
-        <header className="flex h-16 flex-shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-6 shadow-sm">
+        <header className="flex h-16 flex-shrink-0 items-center justify-between border-b border-zinc-800 bg-zinc-900/95 backdrop-blur-xl px-4 sm:px-6">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors lg:hidden"
+              className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 transition-colors lg:hidden"
               aria-label="Open sidebar"
             >
               <Menu className="h-5 w-5" />
             </button>
-            {/* Brand mark visible on mobile only */}
+            {/* Brand mark — mobile only */}
             <div className="flex items-center gap-2 lg:hidden">
               <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-green-400 to-green-600 shadow">
                 <span className="text-[10px] font-black text-white">EP</span>
               </div>
-              <span className="text-sm font-bold text-gray-800">Admin</span>
+              <span className="text-sm font-bold text-zinc-100">Admin</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <button
-              className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors relative"
+              className="rounded-lg p-2 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300 transition-colors"
               aria-label="Notifications"
             >
               <Bell className="h-5 w-5" />
@@ -72,33 +72,33 @@ export function AdminDashboardShell({
             <Link
               href="/sales/login"
               target="_blank"
-              className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 hover:border-green-400 hover:text-green-700 transition-all"
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:border-green-500/50 hover:text-green-400 transition-all"
             >
               <ExternalLink className="h-3 w-3" />
               Sales Portal
             </Link>
 
-            <div className="flex items-center gap-2.5 rounded-lg border border-gray-200 bg-white py-1.5 pl-2 pr-3 shadow-sm">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-green-600 shadow-sm text-white font-bold text-xs">
+            <div className="flex items-center gap-2.5 rounded-lg border border-zinc-700 bg-zinc-800 py-1.5 pl-2 pr-3">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-green-600 shadow text-white font-bold text-xs">
                 {adminInitials}
               </div>
-              <span className="hidden sm:block text-xs font-medium text-gray-600 max-w-[150px] truncate">
+              <span className="hidden sm:block text-xs font-medium text-zinc-300 max-w-[150px] truncate">
                 {adminEmail}
               </span>
             </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto bg-slate-50">
+        <main className="flex-1 overflow-auto bg-zinc-950">
           {children}
         </main>
 
-        <footer className="flex-shrink-0 border-t border-gray-200 bg-white px-4 sm:px-6 py-2.5 flex items-center justify-between">
-          <p className="text-xs text-gray-400">ExcelPro Washers &middot; Admin OS</p>
+        <footer className="flex-shrink-0 border-t border-zinc-800 bg-zinc-900 px-4 sm:px-6 py-2.5 flex items-center justify-between">
+          <p className="text-xs text-zinc-600">ExcelPro Washers &middot; Admin OS</p>
           <Link
             href="/sales/login"
             target="_blank"
-            className="sm:hidden inline-flex items-center gap-1.5 text-xs font-medium text-green-700 hover:text-green-900 transition-colors"
+            className="sm:hidden inline-flex items-center gap-1.5 text-xs font-medium text-green-500 hover:text-green-400 transition-colors"
           >
             <ExternalLink className="w-3 h-3" />
             Sales Portal

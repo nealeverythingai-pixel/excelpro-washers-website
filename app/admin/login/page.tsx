@@ -57,28 +57,28 @@ export default function LoginPage() {
       </div>
 
       {/* Right form panel */}
-      <div className="flex w-full lg:w-1/2 flex-col items-center justify-center bg-white px-6 py-12">
+      <div className="flex w-full lg:w-1/2 flex-col items-center justify-center bg-zinc-950 px-6 py-12">
         <div className="w-full max-w-sm space-y-8">
           {/* Mobile logo */}
           <div className="flex flex-col items-center gap-3 lg:hidden">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-green-400 to-green-600 shadow-lg shadow-green-500/25">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-green-400 to-green-600 shadow-lg shadow-green-900/50">
               <Shield className="h-7 w-7 text-white" />
             </div>
             <div className="text-center">
-              <p className="text-lg font-bold text-gray-900">ExcelPro Washers</p>
-              <p className="text-sm text-gray-400">Admin Portal</p>
+              <p className="text-lg font-bold text-zinc-100">ExcelPro Washers</p>
+              <p className="text-sm text-zinc-500">Admin Portal</p>
             </div>
           </div>
 
           {/* Desktop heading */}
           <div className="hidden lg:block space-y-1">
-            <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
-            <p className="text-sm text-gray-500">Sign in to your admin account</p>
+            <h2 className="text-2xl font-bold text-zinc-100">Welcome back</h2>
+            <p className="text-sm text-zinc-500">Sign in to your admin account</p>
           </div>
 
           <form action={formAction} className="space-y-4">
             <div className="space-y-1">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-zinc-400">
                 Email address
               </label>
               <input
@@ -88,12 +88,12 @@ export default function LoginPage() {
                 required
                 autoComplete="email"
                 placeholder="admin@excelpro.ca"
-                className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm placeholder:text-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all outline-none"
+                className="block w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all outline-none"
               />
             </div>
 
             <div className="space-y-1">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-zinc-400">
                 Password
               </label>
               <input
@@ -103,12 +103,12 @@ export default function LoginPage() {
                 required
                 autoComplete="current-password"
                 placeholder="Enter password"
-                className="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm placeholder:text-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all outline-none"
+                className="block w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all outline-none"
               />
             </div>
 
             {state?.message && (
-              <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
                 <Shield className="h-4 w-4 flex-shrink-0" />
                 {state.message}
               </div>
@@ -116,13 +116,13 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full rounded-xl bg-gradient-to-r from-green-600 to-green-500 py-3 text-sm font-semibold text-white shadow-md shadow-green-500/20 hover:from-green-700 hover:to-green-600 active:scale-[0.98] transition-all"
+              className="w-full rounded-xl bg-gradient-to-r from-green-600 to-green-500 py-3 text-sm font-semibold text-white shadow-lg shadow-green-900/40 hover:from-green-700 hover:to-green-600 active:scale-[0.98] transition-all"
             >
               Sign In
             </button>
           </form>
 
-          <p className="text-center text-xs text-gray-400">
+          <p className="text-center text-xs text-zinc-600">
             ExcelPro Washers &middot; Secure Admin Access
           </p>
         </div>

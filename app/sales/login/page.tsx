@@ -56,23 +56,23 @@ export default function SalesLoginPage() {
       </div>
 
       {/* Right form panel */}
-      <div className="flex w-full lg:w-1/2 flex-col items-center justify-center bg-white px-6 py-12">
+      <div className="flex w-full lg:w-1/2 flex-col items-center justify-center bg-zinc-950 px-6 py-12">
         <div className="w-full max-w-sm space-y-8">
           {/* Mobile logo */}
           <div className="flex flex-col items-center gap-3 lg:hidden">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-green-400 to-green-600 shadow-xl shadow-green-500/30">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-green-400 to-green-600 shadow-xl shadow-green-900/50">
               <span className="text-2xl font-black text-white">EP</span>
             </div>
             <div className="text-center">
-              <p className="text-lg font-bold text-gray-900">ExcelPro Sales</p>
-              <p className="text-sm text-gray-400">Sign in with your team credentials</p>
+              <p className="text-lg font-bold text-zinc-100">ExcelPro Sales</p>
+              <p className="text-sm text-zinc-500">Sign in with your team credentials</p>
             </div>
           </div>
 
           {/* Desktop heading */}
           <div className="hidden lg:block space-y-1">
-            <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
-            <p className="text-sm text-gray-500">Sign in with your team credentials</p>
+            <h2 className="text-2xl font-bold text-zinc-100">Welcome back</h2>
+            <p className="text-sm text-zinc-500">Sign in with your team credentials</p>
           </div>
 
           <form action={formAction} className="space-y-4">
@@ -82,7 +82,7 @@ export default function SalesLoginPage() {
               autoComplete="email"
               required
               placeholder="Email"
-              className="block w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 text-base placeholder:text-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all outline-none"
+              className="block w-full rounded-2xl border border-zinc-700 bg-zinc-800 px-4 py-4 text-base text-zinc-100 placeholder:text-zinc-600 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all outline-none"
             />
             <input
               name="password"
@@ -91,24 +91,24 @@ export default function SalesLoginPage() {
               required
               placeholder="Access Code"
               inputMode="numeric"
-              className="block w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 text-base placeholder:text-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all outline-none tracking-[0.3em] text-center font-mono"
+              className="block w-full rounded-2xl border border-zinc-700 bg-zinc-800 px-4 py-4 text-base text-zinc-100 placeholder:text-zinc-600 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all outline-none tracking-[0.3em] text-center font-mono"
             />
 
             {state?.message && (
-              <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 font-medium text-center">
+              <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400 font-medium text-center">
                 {state.message}
               </div>
             )}
 
             <button
               type="submit"
-              className="w-full rounded-2xl bg-gradient-to-r from-green-600 to-green-500 py-4 text-base font-bold text-white shadow-lg shadow-green-500/25 hover:from-green-700 hover:to-green-600 active:scale-[0.98] transition-all cursor-pointer"
+              className="w-full rounded-2xl bg-gradient-to-r from-green-600 to-green-500 py-4 text-base font-bold text-white shadow-lg shadow-green-900/40 hover:from-green-700 hover:to-green-600 active:scale-[0.98] transition-all cursor-pointer"
             >
               Sign In
             </button>
           </form>
 
-          <p className="text-center text-xs text-gray-400">
+          <p className="text-center text-xs text-zinc-600">
             ExcelPro Washers &middot; Ottawa
           </p>
         </div>

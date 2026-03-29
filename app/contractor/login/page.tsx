@@ -56,28 +56,28 @@ export default function ContractorLoginPage() {
       </div>
 
       {/* Right form panel */}
-      <div className="flex w-full lg:w-1/2 flex-col items-center justify-center bg-white px-6 py-12">
+      <div className="flex w-full lg:w-1/2 flex-col items-center justify-center bg-zinc-950 px-6 py-12">
         <div className="w-full max-w-sm space-y-8">
           {/* Mobile logo */}
           <div className="flex flex-col items-center gap-3 lg:hidden">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 shadow-xl shadow-orange-500/30">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 shadow-xl shadow-orange-900/50">
               <HardHat className="h-8 w-8 text-white" />
             </div>
             <div className="text-center">
-              <p className="text-lg font-bold text-gray-900">Contractor Portal</p>
-              <p className="text-sm text-gray-400">Access available jobs and update status</p>
+              <p className="text-lg font-bold text-zinc-100">Contractor Portal</p>
+              <p className="text-sm text-zinc-500">Access available jobs and update status</p>
             </div>
           </div>
 
           {/* Desktop heading */}
           <div className="hidden lg:block space-y-1">
-            <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
-            <p className="text-sm text-gray-500">Sign in to your contractor account</p>
+            <h2 className="text-2xl font-bold text-zinc-100">Welcome back</h2>
+            <p className="text-sm text-zinc-500">Sign in to your contractor account</p>
           </div>
 
           <form action={formAction} className="space-y-4">
             <div className="space-y-1">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-zinc-400">
                 Email address
               </label>
               <input
@@ -87,12 +87,12 @@ export default function ContractorLoginPage() {
                 autoComplete="email"
                 required
                 placeholder="you@example.com"
-                className="block w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-base placeholder:text-gray-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:bg-white transition-all outline-none"
+                className="block w-full rounded-2xl border border-zinc-700 bg-zinc-800 px-4 py-3.5 text-base text-zinc-100 placeholder:text-zinc-600 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all outline-none"
               />
             </div>
 
             <div className="space-y-1">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-zinc-400">
                 Access Code
               </label>
               <input
@@ -102,32 +102,32 @@ export default function ContractorLoginPage() {
                 autoComplete="current-password"
                 required
                 placeholder="Enter your access code"
-                className="block w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-base placeholder:text-gray-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:bg-white transition-all outline-none"
+                className="block w-full rounded-2xl border border-zinc-700 bg-zinc-800 px-4 py-3.5 text-base text-zinc-100 placeholder:text-zinc-600 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all outline-none"
               />
             </div>
 
             {state?.message && (
-              <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 font-medium text-center">
+              <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400 font-medium text-center">
                 {state.message}
               </div>
             )}
 
             <button
               type="submit"
-              className="w-full rounded-2xl bg-gradient-to-r from-orange-600 to-orange-500 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/25 hover:from-orange-700 hover:to-orange-600 active:scale-[0.98] transition-all cursor-pointer"
+              className="w-full rounded-2xl bg-gradient-to-r from-orange-600 to-orange-500 py-4 text-base font-bold text-white shadow-lg shadow-orange-900/40 hover:from-orange-700 hover:to-orange-600 active:scale-[0.98] transition-all cursor-pointer"
             >
               Enter Portal
             </button>
           </form>
 
           <div className="text-center space-y-2">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-zinc-500">
               Want to join the team?{' '}
-              <Link href="/contractor/register" className="font-semibold text-orange-600 hover:text-orange-700 transition-colors">
+              <Link href="/contractor/register" className="font-semibold text-orange-500 hover:text-orange-400 transition-colors">
                 Apply here
               </Link>
             </p>
-            <p className="text-xs text-gray-400">ExcelPro Washers &middot; Ottawa</p>
+            <p className="text-xs text-zinc-600">ExcelPro Washers &middot; Ottawa</p>
           </div>
         </div>
       </div>
