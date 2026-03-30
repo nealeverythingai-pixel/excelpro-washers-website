@@ -474,12 +474,21 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
                     </button>
                   )}
                   {quote.status === 'Sent' && (
-                    <button
-                      onClick={() => handleApproveQuote(quote.id)}
-                      className="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors text-sm font-medium"
-                    >
-                      Approve
-                    </button>
+                    <>
+                      <button
+                        onClick={() => handleSendQuote(quote.id)}
+                        className="px-3 py-2 border border-zinc-700 text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors text-sm font-medium"
+                        title="Resend email to client"
+                      >
+                        Resend
+                      </button>
+                      <button
+                        onClick={() => handleApproveQuote(quote.id)}
+                        className="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors text-sm font-medium"
+                      >
+                        Approve
+                      </button>
+                    </>
                   )}
                   {quote.status === 'Approved' && (
                     <button
