@@ -8,7 +8,7 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://excelprowashers.com';
-const PHYSICAL_ADDRESS = '123 Main St, Ottawa, ON K1A 0B1, Canada';
+const PHYSICAL_ADDRESS = '93 Dun Skipper Drive, Ottawa, ON K1X 0E8, Canada';
 
 export interface EmailOptions {
   to: string;
@@ -29,7 +29,7 @@ export class EmailService {
     return `
       <hr style="margin: 32px 0; border: none; border-top: 1px solid #e5e7eb;" />
       <div style="text-align: center; color: #9ca3af; font-size: 12px; line-height: 1.8; padding: 0 20px;">
-        <p style="margin: 0;">ExcelPro Washers &bull; ${PHYSICAL_ADDRESS}</p>
+        <p style="margin: 0;">ExcelPro Washers &bull; ${PHYSICAL_ADDRESS} &bull; <a href="tel:3435740300" style="color:#9ca3af;text-decoration:none;">(343) 574-0300</a></p>
         <p style="margin: 4px 0 0 0;">
           ${isTransactional 
             ? 'This is a transactional email related to your service request.' 
@@ -636,7 +636,7 @@ export class EmailService {
                     </table>
 
                     <p style="margin:0 0 4px;font-size:15px;color:#52525b;line-height:1.6;">If you have any questions in the meantime, please don't hesitate to reach out — we're happy to help.</p>
-                    <p style="margin:8px 0 16px;font-size:15px;color:#52525b;line-height:1.6;">You can contact us at <a href="tel:${process.env.OWNER_PHONE_NUMBER}" style="color:#0284c7;text-decoration:none;font-weight:600;">${process.env.OWNER_PHONE_NUMBER}</a>.</p>
+                    <p style="margin:8px 0 16px;font-size:15px;color:#52525b;line-height:1.6;">You can contact us at <a href="tel:3435740300" style="color:#0284c7;text-decoration:none;font-weight:600;">(343) 574-0300</a>.</p>
                     <p style="margin:0;font-size:15px;color:#18181b;">Warm regards,<br><strong>The ExcelPro Washers Team</strong></p>
 
                   </td>
