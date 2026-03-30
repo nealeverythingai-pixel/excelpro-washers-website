@@ -344,7 +344,7 @@ export default function ContactForm() {
             <p className="mt-1 text-xs text-red-600 dark:text-red-400">Please enter a valid 10-digit phone number</p>
           )}
           <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-            By providing your phone number, you agree to receive appointment confirmations and other transactional text messages (SMS) from ExcelPro Washers. You can unsubscribe at any time by replying STOP. Message and data rates may apply. Message frequency varies. Reply HELP for help or STOP to cancel.
+            By providing your phone number, you agree to receive Visit Reminders and other transactional text messages (SMS) from ExcelPro Washers. You can unsubscribe at anytime by replying STOP. Message and data rates may apply. Message frequency varies. Reply HELP for help or STOP to cancel.
           </p>
           <div className="mt-2 flex items-start gap-2.5">
             <input
