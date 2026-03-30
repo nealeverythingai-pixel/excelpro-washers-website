@@ -533,7 +533,7 @@ export class EmailService {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 100%);padding:36px 32px;text-align:center;">
-                    <div style="background:rgba(255,255,255,0.15);display:inline-block;border-radius:50%;width:60px;height:60px;line-height:60px;font-size:28px;margin-bottom:12px;">&#10003;</div>
+                    <div style="background:#22c55e;display:inline-block;border-radius:50%;width:60px;height:60px;line-height:60px;font-size:28px;margin-bottom:12px;">&#10003;</div>
                     <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;letter-spacing:-0.3px;">Request Received!</h1>
                     <p style="margin:8px 0 0;color:rgba(255,255,255,0.85);font-size:15px;">We'll be in touch shortly.</p>
                   </td>
