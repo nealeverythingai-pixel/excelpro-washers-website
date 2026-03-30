@@ -38,7 +38,7 @@ export async function POST(
       title: quote.title,
       description: `Booked via client quote approval. Client: ${clientName}. Services: ${quote.items.map(i => i.description).join(', ')}.`,
       status: 'Scheduled',
-      startDate: startDate.toISOString(),
+      startDate: startDate,
       total: quote.total,
       availableToContractors: true,
     })
