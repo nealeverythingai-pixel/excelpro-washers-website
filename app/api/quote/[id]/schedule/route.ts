@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { sendTelegram } from '@/lib/telegram'
 
 export async function POST(
   request: NextRequest,
@@ -46,24 +47,11 @@ export async function POST(
     // Mark quote as converted
     await db.quotes.updateStatus(id, 'Converted')
 
-    // SMS owner with booking details
-    const smsMessage = `📅 Job Booked!\n${clientName} selected ${new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at ${time} for "${quote.title}" ($${quote.total.toFixed(2)}).\n\nJob is live on the contractor board.`
-
-    const accountSid = process.env.TWILIO_ACCOUNT_SID
-    const authToken = process.env.TWILIO_AUTH_TOKEN
-    const toPhone = process.env.NOTIFICATION_PHONE || process.env.OWNER_PHONE_NUMBER
-    const fromPhone = process.env.TWILIO_PHONE_NUMBER
-
-    if (accountSid && authToken && toPhone && fromPhone) {
-      await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64'),
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({ To: toPhone, From: fromPhone, Body: smsMessage }),
-      })
-    }
+    // Notify owner via Telegram
+    const formattedDate = new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+    await sendTelegram(
+      `📅 <b>Job Booked!</b>\n\n<b>${clientName}</b> selected <b>${formattedDate} at ${time}</b> for "<b>${quote.title}</b>" ($${quote.total.toFixed(2)}).\n\nJob is live on the contractor board.`
+    )
 
     return NextResponse.json({ success: true, jobId: job.id })
   } catch (error) {

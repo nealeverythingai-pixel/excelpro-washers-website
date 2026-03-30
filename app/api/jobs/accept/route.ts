@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { Resend } from 'resend'
 import twilio from 'twilio'
+import { sendTelegram } from '@/lib/telegram'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const twilioClient = twilio(
@@ -134,21 +135,10 @@ export async function POST(request: Request) {
       }
     }
 
-    // Notify admin that job was assigned
-    const adminUsers = allUsers.filter(u => u.role === 'ADMIN')
-    for (const admin of adminUsers) {
-      if (admin.phone && process.env.TWILIO_PHONE_NUMBER) {
-        try {
-          await twilioClient.messages.create({
-            body: `✅ Job Assigned!\n\n${job.title}\nContractor: ${contractor.name}\nClient: ${client?.firstName} ${client?.lastName}\nDate: ${new Date(job.startDate).toLocaleDateString()}`,
-            from: process.env.TWILIO_PHONE_NUMBER,
-            to: admin.phone,
-          })
-        } catch (error) {
-          console.error('Admin notification failed:', error)
-        }
-      }
-    }
+    // Notify owner via Telegram
+    await sendTelegram(
+      `✅ <b>Job Assigned!</b>\n\n<b>${job.title}</b>\nContractor: ${contractor.name}\nClient: ${client?.firstName} ${client?.lastName}\nDate: ${job.startDate.split('T')[0]}`
+    )
 
     return NextResponse.json({
       success: true,

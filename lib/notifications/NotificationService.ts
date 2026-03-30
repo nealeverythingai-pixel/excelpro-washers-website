@@ -48,9 +48,9 @@ export class NotificationService {
       await this.sendResendNotification(data);
     }
 
-    // Send SMS notification for hot and warm leads
-    if (data.aiCategory !== 'cold' && (process.env.NOTIFICATION_PHONE || process.env.OWNER_PHONE_NUMBER)) {
-      await this.sendSMSNotification(data);
+    // Send Telegram notification for hot and warm leads
+    if (data.aiCategory !== 'cold' && process.env.TELEGRAM_BOT_TOKEN) {
+      await this.sendTelegramNotification(data);
     }
 
     // Send Slack notification
@@ -207,52 +207,21 @@ export class NotificationService {
   /**
    * Send SMS notification for hot leads
    */
-  private static async sendSMSNotification(data: NotificationData): Promise<void> {
-    try {
-      const isHot = data.aiCategory === 'hot';
-      const leadEmoji = isHot ? '🔥' : '🌡️';
-      const action = isHot ? 'Call immediately.' : 'Follow up within the hour.';
-      const message = `${leadEmoji} New ${data.aiCategory.charAt(0).toUpperCase() + data.aiCategory.slice(1)} Lead — $${data.estimatedValue} est.\n\n` +
-                     `${data.leadName} · ${data.phone}\n` +
-                     `AI Score: ${data.aiScore}/100\n\n` +
-                     `${action}`;
-
-      console.log('📱 Sending SMS notification...');
-      console.log(`   To: ${process.env.NOTIFICATION_PHONE || process.env.OWNER_PHONE_NUMBER}`);
-
-      const accountSid = process.env.TWILIO_ACCOUNT_SID;
-      const authToken = process.env.TWILIO_AUTH_TOKEN;
-      const toPhone = process.env.NOTIFICATION_PHONE || process.env.OWNER_PHONE_NUMBER;
-      const fromPhone = process.env.TWILIO_PHONE_NUMBER;
-
-      if (!accountSid || !authToken || !toPhone || !fromPhone) {
-        console.warn('⚠️ Twilio not fully configured for SMS');
-        return;
-      }
-
-      const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64'),
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          To: toPhone,
-          From: fromPhone,
-          Body: message,
-        }),
-      });
-
-      if (!response.ok) {
-        console.error('❌ SMS failed:', await response.text());
-        return;
-      }
-
-      console.log('✅ SMS notification sent successfully!');
-
-    } catch (error) {
-      console.error('Failed to send SMS notification:', error);
-    }
+  private static async sendTelegramNotification(data: NotificationData): Promise<void> {
+    const { sendTelegram } = await import('@/lib/telegram');
+    const isHot = data.aiCategory === 'hot';
+    const leadEmoji = isHot ? '🔥' : '🌡️';
+    const action = isHot ? 'Call immediately.' : 'Follow up within the hour.';
+    const message =
+      `${leadEmoji} <b>New ${data.aiCategory.charAt(0).toUpperCase() + data.aiCategory.slice(1)} Lead</b> — $${data.estimatedValue} est.\n\n` +
+      `<b>${data.leadName}</b>\n` +
+      `📞 ${data.phone}\n` +
+      `📧 ${data.email}\n` +
+      (data.address ? `📍 ${data.address}\n` : '') +
+      `\nService: ${data.service}\n` +
+      `AI Score: ${data.aiScore}/100\n\n` +
+      `${action}`;
+    await sendTelegram(message);
   }
 
   /**
