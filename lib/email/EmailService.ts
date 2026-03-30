@@ -544,7 +544,7 @@ export class EmailService {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding:24px 32px 0;">
-                    <img src="${SITE_URL}/logo-horizontal.svg" alt="ExcelPro Washers" width="130" style="display:block;height:auto;" />
+                    <img src="${SITE_URL}/logo-horizontal.svg" alt="ExcelPro Washers" width="200" style="display:block;height:auto;" />
                   </td>
                 </tr>
               </table>
