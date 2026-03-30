@@ -188,13 +188,11 @@ export async function cancelJob(formData: FormData) {
 
   // Put the job back on the board, clear assignment
   await db.jobs.update(jobId, {
-    ...job,
     assignedContractorId: undefined,
     assignedContractorName: undefined,
     assignedAt: undefined,
     availableToContractors: true,
     status: 'Scheduled',
-    cancelReason: reason,
   })
 
   // Notify owner

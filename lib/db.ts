@@ -91,7 +91,6 @@ function jobToRow(job: Partial<Job>) {
   if (job.clientSignoffName !== undefined) row.client_signoff_name = job.clientSignoffName;
   if (job.clientSignoffAt !== undefined) row.client_signoff_at = job.clientSignoffAt;
   if (job.clientSignoffNotes !== undefined) row.client_signoff_notes = job.clientSignoffNotes;
-  if (job.cancelReason !== undefined) row.cancel_reason = job.cancelReason;
   return row;
 }
 
