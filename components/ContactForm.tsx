@@ -43,7 +43,8 @@ export default function ContactForm() {
     services: [] as string[],
     address: '',
     details: '',
-    marketingConsent: false
+    marketingConsent: false,
+    smsConsent: false,
   });
   
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -106,7 +107,8 @@ export default function ContactForm() {
           services: [],
           address: '',
           details: '',
-          marketingConsent: false
+          marketingConsent: false,
+          smsConsent: false,
         });
         setTouched({});
         
@@ -341,6 +343,21 @@ export default function ContactForm() {
           {touched.phone && !isPhoneValid(formData.phone) && formData.phone && (
             <p className="mt-1 text-xs text-red-600 dark:text-red-400">Please enter a valid 10-digit phone number</p>
           )}
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            By providing your phone number, you agree to receive appointment confirmations and other transactional text messages (SMS) from ExcelPro Washers. You can unsubscribe at any time by replying STOP. Message and data rates may apply. Message frequency varies. Reply HELP for help or STOP to cancel.
+          </p>
+          <div className="mt-2 flex items-start gap-2.5">
+            <input
+              type="checkbox"
+              id="smsConsent"
+              checked={formData.smsConsent}
+              onChange={(e) => setFormData(prev => ({ ...prev, smsConsent: e.target.checked }))}
+              className="mt-0.5 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded flex-shrink-0"
+            />
+            <label htmlFor="smsConsent" className="text-xs text-gray-600 dark:text-gray-400">
+              I also agree to receive marketing SMS from ExcelPro Washers (promotions, seasonal offers). Reply STOP MKT to opt out of marketing SMS.
+            </label>
+          </div>
         </div>
       </div>
 
