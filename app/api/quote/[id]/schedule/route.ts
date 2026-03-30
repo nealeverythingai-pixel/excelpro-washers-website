@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { sendTelegram } from '@/lib/telegram'
+import { sendSMS } from '@/lib/sms'
 
 export async function POST(
   request: NextRequest,
@@ -46,6 +47,14 @@ export async function POST(
 
     // Mark quote as converted
     await db.quotes.updateStatus(id, 'Converted')
+
+    // Send booking confirmation SMS to client
+    if (client.phone) {
+      await sendSMS(
+        client.phone,
+        `Hi ${client.firstName}! ✅ Your booking with ExcelPro Washers is confirmed.\n\nService: ${quote.title}\nDate: ${new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}\nTime: ${time}\nAddress: ${client.address}\n\nQuestions? Call us at (343) 574-0300. Reply STOP to unsubscribe.`
+      )
+    }
 
     // Notify owner via Telegram
     const formattedDate = new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
