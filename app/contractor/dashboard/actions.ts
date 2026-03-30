@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 
 import { cookies } from 'next/headers'
 import { verifyPortalSession } from '@/lib/session'
+import { sendTelegram } from '@/lib/telegram'
 
 function getContractorId(cookieStore: any): string | undefined {
   const raw = cookieStore.get('contractor_session')?.value
@@ -171,6 +172,36 @@ export async function removeBlock(formData: FormData) {
   } else if (blockDate && contractorId) {
     await db.contractorBlocks.deleteByDate(contractorId, blockDate)
   }
+  revalidatePath('/contractor/dashboard')
+}
+
+export async function cancelJob(formData: FormData) {
+  const jobId = formData.get('jobId') as string
+  const reason = (formData.get('reason') as string)?.trim()
+
+  if (!jobId || !reason) return
+
+  const job = await db.jobs.findById(jobId)
+  if (!job) return
+
+  const contractorName = job.assignedContractorName || 'Contractor'
+
+  // Put the job back on the board, clear assignment
+  await db.jobs.update(jobId, {
+    ...job,
+    assignedContractorId: undefined,
+    assignedContractorName: undefined,
+    assignedAt: undefined,
+    availableToContractors: true,
+    status: 'Scheduled',
+    cancelReason: reason,
+  })
+
+  // Notify owner
+  await sendTelegram(
+    `⚠️ <b>Job Cancelled by Contractor</b>\n\n<b>${job.title}</b>\nContractor: ${contractorName}\nReason: ${reason}\n\nJob is back on the contractor board.`
+  )
+
   revalidatePath('/contractor/dashboard')
 }
 

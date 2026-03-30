@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { Job, ContractorAvailability, ContractorBlock } from '@/lib/types'
-import { acceptJob, completeJob, uploadBeforePhotos, uploadAfterPhotos, submitClientSignoff, setAvailabilityDay, saveBlock, removeBlock } from './actions'
+import { acceptJob, completeJob, cancelJob, uploadBeforePhotos, uploadAfterPhotos, submitClientSignoff, setAvailabilityDay, saveBlock, removeBlock } from './actions'
 import { CheckCircle, Clock, MapPin, User, Upload, Camera, Briefcase, AlertTriangle, Shield, ChevronDown, ChevronUp, CalendarDays, ChevronLeft, ChevronRight, X } from 'lucide-react'
 
 type JobWithClient = Job & {
@@ -663,8 +663,22 @@ function ClientSignoffForm({ jobId }: { jobId: string }) {
 
 function JobCard({ job, type }: { job: JobWithClient, type: 'available' | 'active' | 'completed' }) {
     const [completing, setCompleting] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [cancelReason, setCancelReason] = useState('');
+    const [cancelling, setCancelling] = useState(false);
 
     const currentStep = type === 'active' ? getJobStep(job) : null;
+
+    const handleCancel = async () => {
+      if (!cancelReason.trim()) return;
+      setCancelling(true);
+      const fd = new FormData();
+      fd.set('jobId', job.id);
+      fd.set('reason', cancelReason.trim());
+      await cancelJob(fd);
+      setCancelling(false);
+      setShowCancelModal(false);
+    };
 
     const handleBeforePhotos = async (photos: string[]) => {
       const formData = new FormData();
@@ -743,6 +757,37 @@ function JobCard({ job, type }: { job: JobWithClient, type: 'available' | 'activ
                     </form>
                 )}
                 
+                {type === 'active' && showCancelModal && (
+                    <div className="mb-4 rounded-xl border border-red-500/40 bg-red-500/10 p-4 space-y-3">
+                      <p className="text-sm font-semibold text-red-400">Cancel this job?</p>
+                      <p className="text-xs text-zinc-400">The job will go back on the board for another contractor. This cannot be undone.</p>
+                      <textarea
+                        value={cancelReason}
+                        onChange={e => setCancelReason(e.target.value)}
+                        placeholder="Reason for cancelling (required)..."
+                        rows={3}
+                        className="w-full rounded-xl border border-red-500/40 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => { setShowCancelModal(false); setCancelReason(''); }}
+                          className="flex-1 rounded-xl border border-zinc-600 px-3 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-700"
+                        >
+                          Keep Job
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleCancel}
+                          disabled={cancelling || !cancelReason.trim()}
+                          className="flex-1 rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                        >
+                          {cancelling ? 'Cancelling...' : 'Confirm Cancel'}
+                        </button>
+                      </div>
+                    </div>
+                )}
+
                 {type === 'active' && (
                     <div className="space-y-4">
                       {/* Step 1: Before Photos */}
@@ -807,6 +852,17 @@ function JobCard({ job, type }: { job: JobWithClient, type: 'available' | 'activ
                             {completing ? 'Completing...' : '✅ Mark Job Complete'}
                           </button>
                         </div>
+                      )}
+
+                      {/* Cancel job — always available on active jobs */}
+                      {!showCancelModal && (
+                        <button
+                          type="button"
+                          onClick={() => setShowCancelModal(true)}
+                          className="w-full rounded-xl border border-red-500/30 px-3 py-2 text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
+                        >
+                          Cancel Job
+                        </button>
                       )}
                     </div>
                 )}
