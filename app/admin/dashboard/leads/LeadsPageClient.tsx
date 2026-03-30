@@ -428,6 +428,12 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
                       {request.phone}
                     </a>
                   </div>
+                  {request.address && (
+                    <div className="flex items-center gap-2 text-sm text-zinc-400 md:col-span-2">
+                      <MapPin size={16} />
+                      <span>{request.address}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Service */}

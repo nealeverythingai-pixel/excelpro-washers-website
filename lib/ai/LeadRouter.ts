@@ -61,6 +61,7 @@ export class LeadRouter {
         leadName: lead.name,
         email: lead.email,
         phone: lead.phone,
+        address: lead.address,
         service: lead.service,
         message: lead.message || lead.details || '',
         aiScore: lead.score,
