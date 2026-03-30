@@ -616,6 +616,10 @@ export const db = {
       if (error || !data) { console.error('db.contractorApplications.update:', error?.message); return null; }
       return contractorAppFromRow(data);
     },
+    delete: async (id: string): Promise<void> => {
+      const { error } = await supabase.from('contractor_applications').delete().eq('id', id);
+      if (error) console.error('db.contractorApplications.delete:', error.message);
+    },
     findByEmail: async (email: string): Promise<ContractorApplication | undefined> => {
       const { data, error } = await supabase.from('contractor_applications').select('*').eq('email', email).single();
       if (error || !data) return undefined;

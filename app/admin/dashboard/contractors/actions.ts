@@ -75,6 +75,19 @@ export async function rejectApplication(applicationId: string, reason: string): 
   }
 }
 
+export async function deleteApplication(applicationId: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const application = await db.contractorApplications.findById(applicationId);
+    if (!application) return { success: false, error: 'Application not found' };
+    if (application.status === 'approved') return { success: false, error: 'Cannot delete an approved application' };
+    await db.contractorApplications.delete(applicationId);
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting application:', error);
+    return { success: false, error: 'Failed to delete application' };
+  }
+}
+
 export async function toggleContractorActive(userId: string): Promise<{ success: boolean; error?: string }> {
   try {
     const user = await db.users.findById(userId);

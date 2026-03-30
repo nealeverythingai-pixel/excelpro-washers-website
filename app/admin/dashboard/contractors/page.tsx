@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { HardHat, CheckCircle2, XCircle, Clock, Eye, ChevronDown, ChevronUp, UserCheck, UserX, Shield, FileText, Download } from 'lucide-react';
+import { HardHat, CheckCircle2, XCircle, Clock, Eye, ChevronDown, ChevronUp, UserCheck, UserX, Shield, FileText, Download, Trash2 } from 'lucide-react';
 import { ContractorApplication } from '@/lib/types';
 import {
   getContractorApplications,
   getContractors,
   approveApplication,
   rejectApplication,
+  deleteApplication,
   toggleContractorActive,
 } from './actions';
 
@@ -83,6 +84,15 @@ export default function ContractorsPage() {
   const handleToggleActive = async (id: string) => {
     setActionLoading(id);
     await toggleContractorActive(id);
+    await fetchData();
+    setActionLoading(null);
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Remove application for ${name}? This cannot be undone.`)) return;
+    setActionLoading(id);
+    const result = await deleteApplication(id);
+    if (!result.success) alert(result.error || 'Failed to delete');
     await fetchData();
     setActionLoading(null);
   };
@@ -245,10 +255,22 @@ export default function ContractorsPage() {
                       <p>✍️ Signed as: <strong className="font-serif italic">{app.signature}</strong></p>
                     </div>
 
-                    {/* Rejection reason if rejected */}
-                    {app.status === 'rejected' && app.rejectionReason && (
-                      <div className="rounded-md border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
-                        <strong>Rejection Reason:</strong> {app.rejectionReason}
+                    {/* Rejection reason + delete if rejected */}
+                    {app.status === 'rejected' && (
+                      <div className="space-y-2">
+                        {app.rejectionReason && (
+                          <div className="rounded-md border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
+                            <strong>Rejection Reason:</strong> {app.rejectionReason}
+                          </div>
+                        )}
+                        <button
+                          onClick={() => handleDelete(app.id, `${app.firstName} ${app.lastName}`)}
+                          disabled={actionLoading === app.id}
+                          className="flex items-center gap-1.5 rounded-md border border-red-500/30 px-3 py-1.5 text-sm font-medium text-red-400 hover:bg-red-500/10 disabled:opacity-50"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          {actionLoading === app.id ? 'Removing...' : 'Remove Application'}
+                        </button>
                       </div>
                     )}
 
