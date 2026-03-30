@@ -57,6 +57,7 @@ export interface Job {
   clientSignoffName?: string; // Client's typed name
   clientSignoffAt?: string; // Timestamp
   clientSignoffNotes?: string; // Any client feedback
+  cancelReason?: string; // Reason provided when contractor cancels
 }
 
 export interface Quote {
