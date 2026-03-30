@@ -14,7 +14,8 @@ import {
   Send,
   Copy,
   Eye,
-  XCircle
+  XCircle,
+  Trash2
 } from 'lucide-react'
 import { Quote, Client } from '@/lib/types'
 
@@ -168,6 +169,23 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
     } catch (error) {
       console.error('Failed to convert quote:', error)
       alert('Failed to convert quote')
+    }
+  }
+
+  // Delete quote
+  const handleDeleteQuote = async (quoteId: string) => {
+    if (!confirm('Are you sure you want to delete this quote? This cannot be undone.')) return
+    try {
+      const response = await fetch(`/api/admin/quotes/${quoteId}`, { method: 'DELETE' })
+      if (response.ok) {
+        setQuotes(quotes.filter(q => q.id !== quoteId))
+      } else {
+        const data = await response.json()
+        alert(data.error || 'Failed to delete quote')
+      }
+    } catch (error) {
+      console.error('Failed to delete quote:', error)
+      alert('Failed to delete quote')
     }
   }
 
@@ -469,6 +487,15 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
                       className="flex-1 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors text-sm font-medium"
                     >
                       Convert to Job
+                    </button>
+                  )}
+                  {quote.status !== 'Converted' && (
+                    <button
+                      onClick={() => handleDeleteQuote(quote.id)}
+                      className="px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+                      title="Delete quote"
+                    >
+                      <Trash2 size={16} />
                     </button>
                   )}
                 </div>

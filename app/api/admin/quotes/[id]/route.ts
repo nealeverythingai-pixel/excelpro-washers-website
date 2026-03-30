@@ -116,7 +116,7 @@ export async function GET(
   try {
     const { id } = await params
     const quote = await db.quotes.findById(id)
-    
+
     if (!quote) {
       return NextResponse.json(
         { error: 'Quote not found' },
@@ -131,5 +131,29 @@ export async function GET(
       { error: 'Failed to fetch quote' },
       { status: 500 }
     )
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    const quote = await db.quotes.findById(id)
+
+    if (!quote) {
+      return NextResponse.json({ error: 'Quote not found' }, { status: 404 })
+    }
+
+    if (quote.status === 'Converted') {
+      return NextResponse.json({ error: 'Cannot delete a converted quote' }, { status: 400 })
+    }
+
+    await db.quotes.delete(id)
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Failed to delete quote:', error)
+    return NextResponse.json({ error: 'Failed to delete quote' }, { status: 500 })
   }
 }
