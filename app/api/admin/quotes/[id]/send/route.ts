@@ -116,11 +116,13 @@ export async function POST(
           </tr>
         </table>
 
-        <!-- CTA footer -->
+        <!-- Approve CTA -->
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
-            <td style="background:#f9fafb;border-top:1px solid #f4f4f5;padding:20px 32px;text-align:center;">
-              <a href="tel:3435740300" style="display:inline-block;background:#0284c7;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:8px;">Call Us to Confirm</a>
+            <td style="background:#f0f9ff;border-top:2px solid #0ea5e9;padding:24px 32px;text-align:center;">
+              <p style="margin:0 0 4px;font-size:13px;color:#0369a1;font-weight:600;">Happy with this quote?</p>
+              <p style="margin:0 0 16px;font-size:13px;color:#6b7280;">Click below to approve and select your preferred date.</p>
+              <a href="${SITE_URL}/quote/${id}/approve" style="display:inline-block;background:#22c55e;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:10px;">✓ Approve Quote &amp; Book Date</a>
             </td>
           </tr>
         </table>
