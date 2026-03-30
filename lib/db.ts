@@ -78,9 +78,9 @@ function jobToRow(job: Partial<Job>) {
   if (job.proofOfWork !== undefined) row.proof_of_work = job.proofOfWork;
   if (job.contractorNotes !== undefined) row.contractor_notes = job.contractorNotes;
   if (job.contractorId !== undefined) row.contractor_id = job.contractorId;
-  if (job.assignedContractorId !== undefined) row.assigned_contractor_id = job.assignedContractorId;
-  if (job.assignedContractorName !== undefined) row.assigned_contractor_name = job.assignedContractorName;
-  if (job.assignedAt !== undefined) row.assigned_at = job.assignedAt;
+  if ('assignedContractorId' in job) row.assigned_contractor_id = job.assignedContractorId ?? null;
+  if ('assignedContractorName' in job) row.assigned_contractor_name = job.assignedContractorName ?? null;
+  if ('assignedAt' in job) row.assigned_at = job.assignedAt ?? null;
   if (job.contractorEarnings !== undefined) row.contractor_earnings = job.contractorEarnings;
   if (job.availableToContractors !== undefined) row.available_to_contractors = job.availableToContractors;
   if (job.beforePhotos !== undefined) row.before_photos = job.beforePhotos;
@@ -91,6 +91,7 @@ function jobToRow(job: Partial<Job>) {
   if (job.clientSignoffName !== undefined) row.client_signoff_name = job.clientSignoffName;
   if (job.clientSignoffAt !== undefined) row.client_signoff_at = job.clientSignoffAt;
   if (job.clientSignoffNotes !== undefined) row.client_signoff_notes = job.clientSignoffNotes;
+  if (job.cancelReason !== undefined) row.cancel_reason = job.cancelReason;
   return row;
 }
 
