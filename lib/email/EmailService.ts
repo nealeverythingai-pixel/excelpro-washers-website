@@ -635,8 +635,9 @@ export class EmailService {
                       <tr><td style="border-top:1px solid #f4f4f5;"></td></tr>
                     </table>
 
-                    <p style="margin:0 0 4px;font-size:15px;color:#52525b;line-height:1.6;">Have a question in the meantime? Just reply to this email — we're happy to help.</p>
-                    <p style="margin:16px 0 0;font-size:15px;color:#18181b;">Talk soon,<br><strong>The ExcelPro Washers Team</strong></p>
+                    <p style="margin:0 0 4px;font-size:15px;color:#52525b;line-height:1.6;">If you have any questions in the meantime, please don't hesitate to reach out — we're happy to help.</p>
+                    <p style="margin:8px 0 16px;font-size:15px;color:#52525b;line-height:1.6;">You can contact us at <a href="tel:${process.env.OWNER_PHONE_NUMBER}" style="color:#0284c7;text-decoration:none;font-weight:600;">${process.env.OWNER_PHONE_NUMBER}</a>.</p>
+                    <p style="margin:0;font-size:15px;color:#18181b;">Warm regards,<br><strong>The ExcelPro Washers Team</strong></p>
 
                   </td>
                 </tr>
