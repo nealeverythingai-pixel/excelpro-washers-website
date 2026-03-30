@@ -172,14 +172,13 @@ export class NotificationService {
    */
   private static async sendSMSNotification(data: NotificationData): Promise<void> {
     try {
-      const leadEmoji = data.aiCategory === 'hot' ? '🔥' : '🌡️';
-      const urgency = data.aiCategory === 'hot' ? 'CALL NOW!' : 'Follow up soon.';
-      const message = `${leadEmoji} ${data.aiCategory.toUpperCase()} LEAD!\n\n` +
-                     `${data.leadName}\n` +
-                     `${data.phone}\n` +
-                     `Score: ${data.aiScore}/100\n` +
-                     `Value: $${data.estimatedValue}\n\n` +
-                     `${urgency}`;
+      const isHot = data.aiCategory === 'hot';
+      const leadEmoji = isHot ? '🔥' : '🌡️';
+      const action = isHot ? 'Call immediately.' : 'Follow up within the hour.';
+      const message = `${leadEmoji} New ${data.aiCategory.charAt(0).toUpperCase() + data.aiCategory.slice(1)} Lead — $${data.estimatedValue} est.\n\n` +
+                     `${data.leadName} · ${data.phone}\n` +
+                     `AI Score: ${data.aiScore}/100\n\n` +
+                     `${action}`;
 
       console.log('📱 Sending SMS notification...');
       console.log(`   To: ${process.env.NOTIFICATION_PHONE || process.env.OWNER_PHONE_NUMBER}`);
