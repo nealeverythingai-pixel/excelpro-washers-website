@@ -719,7 +719,14 @@ function JobCard({ job, type }: { job: JobWithClient, type: 'available' | 'activ
                     </div>
                     <div className="flex items-center text-sm text-zinc-500">
                         <Clock className="mr-2 h-4 w-4 text-zinc-600" />
-                        {new Date(job.startDate).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                        {(() => {
+                          // Parse without timezone conversion (stored as local time)
+                          const [datePart, timePart] = job.startDate.split('T')
+                          const [y, m, d] = datePart.split('-').map(Number)
+                          const [h, min] = (timePart || '00:00').split(':').map(Number)
+                          const dt = new Date(y, m - 1, d, h, min)
+                          return dt.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })
+                        })()}
                     </div>
                 </div>
             </div>

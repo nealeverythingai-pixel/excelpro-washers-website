@@ -25,12 +25,12 @@ export async function POST(
 
     const clientName = `${client.firstName} ${client.lastName}`
 
-    // Build ISO start date string from date + time slot
+    // Build local date+time string — stored as-is, no UTC conversion
     const [hourStr, period] = time.split(' ')
     let [hour, minute] = hourStr.split(':').map(Number)
     if (period === 'PM' && hour !== 12) hour += 12
     if (period === 'AM' && hour === 12) hour = 0
-    const startDate = new Date(`${date}T${String(hour).padStart(2, '0')}:${String(minute || 0).padStart(2, '0')}:00`)
+    const startDate = `${date}T${String(hour).padStart(2, '0')}:${String(minute || 0).padStart(2, '0')}:00`
 
     // Create job — visible in admin and open to contractors
     const job = await db.jobs.create({

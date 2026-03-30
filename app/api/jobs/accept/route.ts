@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     if (contractor.phone && process.env.TWILIO_PHONE_NUMBER) {
       try {
         await twilioClient.messages.create({
-          body: `✅ JOB CONFIRMED!\n\nYou got it! ${job.title} is now yours.\n\nClient: ${client?.firstName} ${client?.lastName}\nLocation: ${client?.address}\nDate: ${new Date(job.startDate).toLocaleDateString()}\nYour Pay: $${contractorEarnings}\n\nCheck your dashboard for details.`,
+          body: `✅ JOB CONFIRMED!\n\nYou got it! ${job.title} is now yours.\n\nClient: ${client?.firstName} ${client?.lastName}\nLocation: ${client?.address}\nDate: ${job.startDate.split('T')[0]}\nYour Pay: $${contractorEarnings}\n\nCheck your dashboard for details.`,
           from: process.env.TWILIO_PHONE_NUMBER,
           to: contractor.phone,
         })

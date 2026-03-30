@@ -54,7 +54,7 @@ export async function acceptJob(formData: FormData) {
 
   // Call the /api/jobs/accept endpoint which handles race conditions
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/jobs/accept`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/jobs/accept`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ jobId, contractorId }),
