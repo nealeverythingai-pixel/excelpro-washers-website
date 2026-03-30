@@ -528,7 +528,7 @@ export class EmailService {
           <!-- Logo / Brand bar -->
           <tr>
             <td align="center" style="padding-bottom:20px;">
-              <img src="${SITE_URL}/navbar-logo.jpg" alt="ExcelPro Washers" width="180" style="display:block;height:auto;border-radius:8px;" />
+              <img src="${SITE_URL}/logo-horizontal.svg" alt="ExcelPro Washers" width="140" style="display:block;height:auto;" />
             </td>
           </tr>
 
