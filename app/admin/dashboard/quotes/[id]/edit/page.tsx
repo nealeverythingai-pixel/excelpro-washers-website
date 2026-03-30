@@ -2,8 +2,9 @@ import { db } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import EditQuoteForm from './EditQuoteForm'
 
-export default async function EditQuotePage({ params }: { params: { id: string } }) {
-  const quote = await db.quotes.findById(params.id)
+export default async function EditQuotePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const quote = await db.quotes.findById(id)
   
   if (!quote) {
     notFound()

@@ -425,8 +425,9 @@ export default function QuotesPageClient({ initialQuotes, initialClients }: Quot
                     <p className="text-xs font-medium text-zinc-500 uppercase mb-2">Items</p>
                     <div className="space-y-1">
                       {quote.items.slice(0, 2).map((item, idx) => (
-                        <div key={idx} className="text-sm text-zinc-200">
-                          {item.description} - ${item.unitPrice.toFixed(2)}
+                        <div key={idx} className="flex justify-between text-sm text-zinc-200">
+                          <span>{item.description}{item.quantity > 1 ? ` ×${item.quantity}` : ''}</span>
+                          <span className="text-zinc-400">${(item.unitPrice * item.quantity).toFixed(2)}</span>
                         </div>
                       ))}
                       {quote.items.length > 2 && (
