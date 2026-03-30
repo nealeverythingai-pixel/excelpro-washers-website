@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         address,
         service,
         message,
-        status: 'new',
+        status: 'New',
         aiScore: result.score.overall,
         aiCategory: result.score.category,
         aiReasoning: result.score.reasoning,
