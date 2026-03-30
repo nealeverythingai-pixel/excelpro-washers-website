@@ -532,19 +532,19 @@ export class EmailService {
               <!-- Blue header -->
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 100%);padding:28px 32px;">
-                    <table width="100%" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td style="vertical-align:middle;">
-                          <img src="${SITE_URL}/logo-horizontal.svg" alt="ExcelPro Washers" width="130" style="display:block;height:auto;" />
-                        </td>
-                        <td style="vertical-align:middle;text-align:right;">
-                          <div style="background:rgba(255,255,255,0.15);display:inline-block;border-radius:50%;width:44px;height:44px;line-height:44px;font-size:22px;margin-bottom:6px;">&#10003;</div>
-                          <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.3px;">Request Received!</h1>
-                          <p style="margin:4px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">We'll be in touch shortly.</p>
-                        </td>
-                      </tr>
-                    </table>
+                  <td style="background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 100%);padding:36px 32px;text-align:center;">
+                    <div style="background:rgba(255,255,255,0.15);display:inline-block;border-radius:50%;width:60px;height:60px;line-height:60px;font-size:28px;margin-bottom:12px;">&#10003;</div>
+                    <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;letter-spacing:-0.3px;">Request Received!</h1>
+                    <p style="margin:8px 0 0;color:rgba(255,255,255,0.85);font-size:15px;">We'll be in touch shortly.</p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Logo divider -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding:24px 32px 0;">
+                    <img src="${SITE_URL}/logo-horizontal.svg" alt="ExcelPro Washers" width="130" style="display:block;height:auto;" />
                   </td>
                 </tr>
               </table>
