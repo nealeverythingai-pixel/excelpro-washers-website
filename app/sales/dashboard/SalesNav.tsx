@@ -2,13 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, PlusCircle, LogOut } from 'lucide-react'
+import { LayoutDashboard, PlusCircle, LogOut, MapPin } from 'lucide-react'
 import { logout } from '../actions'
 import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
   { name: 'Home', href: '/sales/dashboard', icon: LayoutDashboard },
   { name: 'New Quote', href: '/sales/dashboard/quote', icon: PlusCircle, accent: true },
+  { name: 'Door Tracker', href: '/sales/dashboard/canvassing', icon: MapPin },
 ]
 
 export function SalesNav() {
