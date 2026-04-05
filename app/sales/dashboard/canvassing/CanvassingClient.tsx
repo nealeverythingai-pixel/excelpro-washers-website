@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useTransition, useRef } from 'react'
-import { MapPin, Plus, ChevronRight, X, Clock, Star, RotateCcw, CheckCircle2, Home, ArrowLeft, Trash2, Navigation } from 'lucide-react'
+import { useState, useTransition } from 'react'
+import { MapPin, Plus, ChevronRight, X, Clock, Star, Home, ArrowLeft, Trash2, Navigation } from 'lucide-react'
 import { createSession, logDoor, getSessionKnocks, updateKnockStatus, deleteKnock } from './actions'
 import Link from 'next/link'
 
@@ -25,7 +25,7 @@ export default function CanvassingClient({
 }) {
   const [tab, setTab] = useState<'today' | 'followups' | 'history'>('today')
   const [sessions, setSessions] = useState<Session[]>(initialSessions)
-  const [followUps, setFollowUps] = useState<Knock[]>(initialFollowUps)
+  const [followUps] = useState<Knock[]>(initialFollowUps)
   const [activeSession, setActiveSession] = useState<Session | null>(null)
   const [sessionKnocks, setSessionKnocks] = useState<Knock[]>([])
   const [showNewSession, setShowNewSession] = useState(false)
@@ -33,14 +33,12 @@ export default function CanvassingClient({
   const [area, setArea] = useState('')
   const [address, setAddress] = useState('')
   const [notes, setNotes] = useState('')
-  const [pendingStatus, setPendingStatus] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
   const todayStr = new Date().toISOString().split('T')[0]
   const todaySessions = sessions.filter(s => s.date === todayStr)
 
   // Stats for today
-  const todayKnocksTotal = sessionKnocks.length
   const todayMaybes = sessionKnocks.filter(k => k.status === 'maybe').length
   const todayComeBack = sessionKnocks.filter(k => k.status === 'come_back').length
   const todaySold = sessionKnocks.filter(k => k.status === 'sold').length
@@ -81,7 +79,6 @@ export default function CanvassingClient({
       setAddress('')
       setNotes('')
       setShowLogDoor(false)
-      setPendingStatus(null)
     })
   }
 
@@ -113,7 +110,7 @@ export default function CanvassingClient({
         <div className="flex items-center gap-3">
           <button onClick={() => { setActiveSession(null); setSessionKnocks([]) }}
             className="w-9 h-9 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white">
-            <ArrowLeft className="w-4 w-4" />
+            <ArrowLeft className="w-4 h-4" />
           </button>
           <div className="flex-1 min-w-0">
             <p className="font-bold text-zinc-100 truncate">{activeSession.area}</p>
@@ -346,7 +343,7 @@ export default function CanvassingClient({
                       </div>
                       <div className="flex flex-col gap-1.5">
                         <Link
-                          href={`/sales/dashboard/quote?address=${encodeURIComponent(knock.address)}`}
+                          href={`/sales/dashboard/quote?address=${encodeURIComponent(knock.address)}&knockId=${knock.id}`}
                           className="text-[10px] bg-green-500/20 border border-green-500/30 text-green-300 rounded-lg px-2.5 py-1.5 font-bold hover:bg-green-500/30 text-center whitespace-nowrap"
                         >
                           → Quote

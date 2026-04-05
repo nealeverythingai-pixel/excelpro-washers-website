@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { useFormState } from 'react-dom'
+import { useSearchParams } from 'next/navigation'
 import { createQuote } from './actions'
 import { Save, Ruler, Building2, Eye, ChevronDown, ChevronUp, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -247,6 +248,10 @@ export function SalesQuoteForm() {
   // @ts-ignore — Next.js 16 formAction compat
   const [state, formAction] = useFormState(createQuote, initialState)
 
+  const searchParams = useSearchParams()
+  const prefillAddress = searchParams.get('address') || ''
+  const prefillKnockId = searchParams.get('knockId') || ''
+
   const [activeStep, setActiveStep] = useState(0) // which step is expanded on mobile
   const [houseDiag, setHouseDiag] = useState<string>('')
   const [drivewayDiag, setDrivewayDiag] = useState<string>('')
@@ -449,7 +454,14 @@ export function SalesQuoteForm() {
               className="w-full rounded-xl border border-zinc-700 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-zinc-800 text-zinc-100 placeholder:text-zinc-600" />
           </div>
           <input name="address" placeholder="Street Address *" required autoComplete="street-address"
+            defaultValue={prefillAddress}
             className="w-full rounded-xl border border-zinc-700 px-4 py-3.5 lg:py-2.5 text-base lg:text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-zinc-800 text-zinc-100 placeholder:text-zinc-600" />
+          {prefillKnockId && <input type="hidden" name="knockId" value={prefillKnockId} />}
+          {prefillAddress && (
+            <p className="text-xs text-amber-400 font-medium flex items-center gap-1.5">
+              🔄 Pre-filled from Door Tracker — {prefillAddress}
+            </p>
+          )}
 
           {/* Lead Source */}
           <div className="space-y-2">
