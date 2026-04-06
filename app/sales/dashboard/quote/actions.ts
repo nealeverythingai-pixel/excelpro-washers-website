@@ -8,7 +8,8 @@ import { LeadRouter } from '@/lib/ai/LeadRouter'
 import { updateKnockStatus } from '../canvassing/actions'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
+// Lazy getter — avoids module-level env var access during Next.js build
+const getSupabase = () => createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )

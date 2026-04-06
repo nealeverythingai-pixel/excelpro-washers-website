@@ -3,13 +3,13 @@
 import { createClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 
-const supabase = createClient(
+const getSupabase = () => createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
 export async function getSessions(repId: string) {
-  const { data } = await supabase
+  const { data } = await getSupabase()
     .from('canvassing_sessions')
     .select('*')
     .eq('rep_id', repId)
@@ -18,7 +18,7 @@ export async function getSessions(repId: string) {
 }
 
 export async function getSessionKnocks(sessionId: string) {
-  const { data } = await supabase
+  const { data } = await getSupabase()
     .from('door_knocks')
     .select('*')
     .eq('session_id', sessionId)
@@ -28,7 +28,7 @@ export async function getSessionKnocks(sessionId: string) {
 
 export async function getAllFollowUps(repId: string) {
   // Get all maybes and come-backs across all sessions for this rep
-  const { data: sessions } = await supabase
+  const { data: sessions } = await getSupabase()
     .from('canvassing_sessions')
     .select('id, area, date')
     .eq('rep_id', repId)
@@ -36,7 +36,7 @@ export async function getAllFollowUps(repId: string) {
   if (!sessions?.length) return []
 
   const sessionIds = sessions.map(s => s.id)
-  const { data: knocks } = await supabase
+  const { data: knocks } = await getSupabase()
     .from('door_knocks')
     .select('*')
     .in('session_id', sessionIds)
@@ -55,7 +55,7 @@ export async function createSession(formData: FormData) {
   const area = formData.get('area') as string
   const date = new Date().toISOString().split('T')[0]
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('canvassing_sessions')
     .insert({ rep_id: repId, rep_name: repName, area, date })
     .select()
@@ -72,7 +72,7 @@ export async function logDoor(formData: FormData) {
   const status = formData.get('status') as string
   const notes = formData.get('notes') as string
 
-  await supabase.from('door_knocks').insert({
+  await getSupabase().from('door_knocks').insert({
     session_id: sessionId,
     address,
     status,
@@ -83,7 +83,7 @@ export async function logDoor(formData: FormData) {
 }
 
 export async function updateKnockStatus(knockId: string, status: string, notes?: string) {
-  await supabase
+  await getSupabase()
     .from('door_knocks')
     .update({ status, notes: notes || null })
     .eq('id', knockId)
@@ -92,6 +92,6 @@ export async function updateKnockStatus(knockId: string, status: string, notes?:
 }
 
 export async function deleteKnock(knockId: string) {
-  await supabase.from('door_knocks').delete().eq('id', knockId)
+  await getSupabase().from('door_knocks').delete().eq('id', knockId)
   revalidatePath('/sales/dashboard/canvassing')
 }
