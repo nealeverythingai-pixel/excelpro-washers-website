@@ -57,6 +57,7 @@ export default function CanvassingClient({
       fd.set('repName', repName)
       fd.set('area', area)
       const newSession = await createSession(fd)
+      if (!newSession) return
       setSessions(prev => [newSession as Session, ...prev])
       setShowNewSession(false)
       setArea('')
