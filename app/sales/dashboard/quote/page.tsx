@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { SalesQuoteForm } from './SalesQuoteForm'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
@@ -11,7 +12,9 @@ export default function NewQuotePage() {
         <ArrowLeft className="w-4 h-4" /> Back
       </Link>
 
-      <SalesQuoteForm />
+      <Suspense fallback={null}>
+        <SalesQuoteForm />
+      </Suspense>
     </div>
   )
 }
