@@ -34,6 +34,8 @@ export default function CanvassingClient({
   const [address, setAddress] = useState('')
   const [notes, setNotes] = useState('')
   const [isPending, startTransition] = useTransition()
+  const [sessionError, setSessionError] = useState<string | null>(null)
+
 
   const todayStr = new Date().toISOString().split('T')[0]
   const todaySessions = sessions.filter(s => s.date === todayStr)
@@ -51,17 +53,22 @@ export default function CanvassingClient({
   }
 
   const handleNewSession = () => {
+    setSessionError(null)
     startTransition(async () => {
       const fd = new FormData()
       fd.set('repId', repId)
       fd.set('repName', repName)
       fd.set('area', area)
-      const newSession = await createSession(fd)
-      if (!newSession) return
-      setSessions(prev => [newSession as Session, ...prev])
+      const result = await createSession(fd)
+      if (!result || 'error' in result) {
+        setSessionError(result?.error ?? 'Failed to start session')
+        return
+      }
+      const newSession = result.data as Session
+      setSessions(prev => [newSession, ...prev])
       setShowNewSession(false)
       setArea('')
-      setActiveSession(newSession as Session)
+      setActiveSession(newSession)
       setSessionKnocks([])
     })
   }
@@ -275,6 +282,9 @@ export default function CanvassingClient({
             onKeyDown={e => e.key === 'Enter' && area.trim() && handleNewSession()}
             className="w-full rounded-xl border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none"
           />
+          {sessionError && (
+            <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{sessionError}</p>
+          )}
           <button onClick={handleNewSession} disabled={!area.trim() || isPending}
             className="w-full rounded-xl bg-green-600 py-2.5 text-sm font-bold text-white hover:bg-green-500 disabled:opacity-50">
             {isPending ? 'Starting...' : 'Start Session'}

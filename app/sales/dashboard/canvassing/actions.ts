@@ -56,18 +56,31 @@ export async function createSession(formData: FormData) {
   const area = formData.get('area') as string
   const date = new Date().toISOString().split('T')[0]
 
-  const { data, error } = await getSupabase()
+  console.log('[createSession] called with repId:', repId, 'area:', area)
+
+  let client
+  try {
+    client = getSupabase()
+    console.log('[createSession] supabase client created OK')
+  } catch (e) {
+    console.error('[createSession] failed to create supabase client:', e)
+    return { error: 'Failed to connect to database' }
+  }
+
+  const { data, error } = await client
     .from('canvassing_sessions')
     .insert({ rep_id: repId, rep_name: repName, area, date })
     .select()
     .single()
 
   if (error) {
-    console.error('createSession error code:', error.code, 'message:', error.message, 'details:', error.details, 'hint:', error.hint)
-    return null
+    console.error('[createSession] DB error code:', error.code, 'message:', error.message, 'details:', error.details, 'hint:', error.hint)
+    return { error: `${error.code}: ${error.message}` }
   }
+
+  console.log('[createSession] success, id:', data?.id)
   revalidatePath('/sales/dashboard/canvassing')
-  return data
+  return { data }
 }
 
 export async function logDoor(formData: FormData) {
