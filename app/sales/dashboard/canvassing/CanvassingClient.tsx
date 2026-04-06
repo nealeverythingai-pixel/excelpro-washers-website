@@ -143,7 +143,7 @@ export default function CanvassingClient({
           <div className="rounded-2xl bg-zinc-900 border border-zinc-700 p-4 space-y-4">
             <div className="flex items-center justify-between">
               <p className="font-semibold text-zinc-100">Log a Door</p>
-              <button onClick={() => { setShowLogDoor(false); setPendingStatus(null) }}>
+              <button onClick={() => setShowLogDoor(false)}>
                 <X className="w-4 h-4 text-zinc-500" />
               </button>
             </div>
