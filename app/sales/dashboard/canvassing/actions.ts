@@ -62,7 +62,7 @@ export async function createSession(formData: FormData) {
     .single()
 
   if (error) {
-    console.error('createSession error:', error)
+    console.error('createSession error code:', error.code, 'message:', error.message, 'details:', error.details, 'hint:', error.hint)
     return null
   }
   revalidatePath('/sales/dashboard/canvassing')
