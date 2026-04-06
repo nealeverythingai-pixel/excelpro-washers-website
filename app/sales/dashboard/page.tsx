@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
 import Link from 'next/link'
-import { Plus, DollarSign, TrendingUp, FileText, ChevronRight, Users, Calendar } from 'lucide-react'
+import { Plus, DollarSign, TrendingUp, FileText, Users, Calendar, MapPin } from 'lucide-react'
 
 const TIER_BADGES: Record<string, { label: string; bg: string; text: string }> = {
   basic: { label: 'Basic', bg: 'bg-blue-500/15',   text: 'text-blue-400' },
@@ -58,18 +58,29 @@ export default async function SalesDashboard() {
         <div className="hidden lg:block absolute -top-10 right-40 w-40 h-40 rounded-full bg-white/5" />
       </div>
 
-      {/* Mobile: New Quote CTA */}
-      <Link href="/sales/dashboard/quote"
-        className="lg:hidden flex items-center gap-4 rounded-2xl bg-zinc-900 border border-zinc-800 p-4 active:scale-[0.98] transition-all hover:border-zinc-700">
-        <div className="w-12 h-12 rounded-xl bg-green-500/15 flex items-center justify-center flex-shrink-0">
-          <Plus className="w-6 h-6 text-green-400" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-zinc-100">Create New Quote</p>
-          <p className="text-sm text-zinc-500">Start a property assessment</p>
-        </div>
-        <ChevronRight className="w-5 h-5 text-zinc-600 flex-shrink-0" />
-      </Link>
+      {/* Mobile: Quick Action Cards */}
+      <div className="lg:hidden grid grid-cols-2 gap-3">
+        <Link href="/sales/dashboard/quote"
+          className="flex items-center gap-3 rounded-2xl bg-zinc-900 border border-zinc-800 p-4 active:scale-[0.98] transition-all hover:border-zinc-700">
+          <div className="w-10 h-10 rounded-xl bg-green-500/15 flex items-center justify-center flex-shrink-0">
+            <Plus className="w-5 h-5 text-green-400" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-zinc-100 text-sm">New Quote</p>
+            <p className="text-xs text-zinc-500">Property assessment</p>
+          </div>
+        </Link>
+        <Link href="/sales/dashboard/canvassing"
+          className="flex items-center gap-3 rounded-2xl bg-zinc-900 border border-zinc-800 p-4 active:scale-[0.98] transition-all hover:border-zinc-700">
+          <div className="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center flex-shrink-0">
+            <MapPin className="w-5 h-5 text-blue-400" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-zinc-100 text-sm">Door Tracker</p>
+            <p className="text-xs text-zinc-500">Track canvassing</p>
+          </div>
+        </Link>
+      </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
