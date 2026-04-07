@@ -2,8 +2,9 @@ import { db } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import EditInvoiceForm from './EditInvoiceForm'
 
-export default async function EditInvoicePage({ params }: { params: { id: string } }) {
-  const invoice = await db.invoices.findById(params.id)
+export default async function EditInvoicePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const invoice = await db.invoices.findById(id)
   
   if (!invoice) {
     notFound()

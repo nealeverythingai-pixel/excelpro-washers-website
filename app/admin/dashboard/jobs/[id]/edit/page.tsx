@@ -2,8 +2,9 @@ import { db } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import EditJobForm from './EditJobForm'
 
-export default async function EditJobPage({ params }: { params: { id: string } }) {
-  const job = await db.jobs.findById(params.id)
+export default async function EditJobPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const job = await db.jobs.findById(id)
   
   if (!job) {
     notFound()
