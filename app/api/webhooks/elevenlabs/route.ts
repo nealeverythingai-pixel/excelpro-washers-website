@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     console.log(`📊 Score: ${result.score.overall}/100 (${result.score.category.toUpperCase()})`)
 
     // 6. Store in Supabase requests table
-    const requestId = `req_call_${Date.now()}`
+    const requestId = `req_call_${body.data.conversation_id}`
     const nameParts = callerName.split(' ')
     try {
       await db.requests.create({
