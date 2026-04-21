@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createHmac } from 'crypto'
 import { AILeadQualifier } from '@/lib/ai/LeadQualifier'
 import { LeadRouter } from '@/lib/ai/LeadRouter'
 import { NotificationService } from '@/lib/notifications/NotificationService'
@@ -14,18 +15,35 @@ import { leadQuotes } from '@/lib/db/leads'
  */
 export async function POST(request: NextRequest) {
   try {
-    // 1. Validate webhook secret
+    // 1. Validate HMAC signature
+    // ElevenLabs sends: ElevenLabs-Signature: t=<timestamp>,v1=<hmac-sha256>
+    // Signed message: "<timestamp>.<raw_body>"
     const secret = process.env.ELEVENLABS_WEBHOOK_SECRET
     if (!secret) {
       console.error('ELEVENLABS_WEBHOOK_SECRET is not set')
       return NextResponse.json({ error: 'Not configured' }, { status: 500 })
     }
-    if (request.headers.get('xi-webhook-secret') !== secret) {
-      console.warn('ElevenLabs webhook: invalid secret')
+
+    const rawBody = await request.text()
+    const sigHeader = request.headers.get('ElevenLabs-Signature') ?? ''
+    const parts = Object.fromEntries(sigHeader.split(',').map(p => p.split('=')))
+    const timestamp = parts['t']
+    const receivedSig = parts['v1']
+
+    if (timestamp && receivedSig) {
+      const expected = createHmac('sha256', secret)
+        .update(`${timestamp}.${rawBody}`)
+        .digest('hex')
+      if (expected !== receivedSig) {
+        console.warn('ElevenLabs webhook: invalid HMAC signature')
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+    } else {
+      console.warn('ElevenLabs webhook: missing signature header')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await request.json()
+    const body = JSON.parse(rawBody)
     console.log('📞 ElevenLabs webhook:', body.type, body.data?.conversation_id)
 
     // 2. Only process successful completed calls
