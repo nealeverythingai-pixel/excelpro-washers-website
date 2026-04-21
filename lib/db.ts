@@ -450,6 +450,10 @@ export const db = {
       if (error || !data) return null;
       return requestFromRow(data);
     },
+    delete: async (id: string): Promise<void> => {
+      const { error } = await supabase.from('requests').delete().eq('id', id);
+      if (error) console.error('db.requests.delete:', error.message);
+    },
   },
 
   // ── USERS ───────────────────────────────────────────────────────

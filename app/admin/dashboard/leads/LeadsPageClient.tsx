@@ -16,7 +16,8 @@ import {
   UserPlus,
   CheckCircle,
   XCircle,
-  MessageSquare
+  MessageSquare,
+  Trash2
 } from 'lucide-react'
 import { Request } from '@/lib/types'
 
@@ -108,6 +109,22 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
     } catch (error) {
       console.error('Failed to convert lead:', error)
       alert('Failed to convert lead')
+    }
+  }
+
+  // Delete lead
+  const handleDelete = async (requestId: string, name: string) => {
+    if (!confirm(`Delete lead from ${name}? This cannot be undone.`)) return
+    try {
+      const response = await fetch(`/api/admin/leads/${requestId}`, { method: 'DELETE' })
+      if (response.ok) {
+        setRequests(requests.filter(r => r.id !== requestId))
+      } else {
+        alert('Failed to delete lead')
+      }
+    } catch (error) {
+      console.error('Failed to delete lead:', error)
+      alert('Failed to delete lead')
     }
   }
 
@@ -515,6 +532,13 @@ export default function LeadsPageClient({ initialRequests }: LeadsPageClientProp
                       View in Clients
                     </Link>
                   )}
+                  <button
+                    onClick={() => handleDelete(request.id, request.name || `${request.firstName} ${request.lastName}`)}
+                    className="flex items-center gap-2 px-4 py-2 border border-zinc-700 text-zinc-500 rounded-lg hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-colors text-sm font-medium ml-auto"
+                  >
+                    <Trash2 size={16} />
+                    Delete
+                  </button>
                 </div>
               </div>
             )
