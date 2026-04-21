@@ -14,7 +14,7 @@
     },
     {
       "path": "/api/cron/sync-elevenlabs-calls",
-      "schedule": "*/10 * * * *"
+      "schedule": "0 * * * *"
     }
   ]
 }
