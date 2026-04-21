@@ -43,8 +43,8 @@ export const siteConfig = {
       postalCode: "K1A 0B1", // Placeholder
       addressCountry: "CA",
     },
-    phone: "+1-343-321-5300",
-    sms: "+1-343-321-5300",
+    phone: "+1-438-900-6384",
+    sms: "+1-438-900-6384",
     email: "info@excelprowashers.com",
     hours: "Mon–Sat 8am–6pm",
     areaServed: "Ottawa, ON",

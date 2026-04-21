@@ -46,7 +46,7 @@ export function ServiceAreas() {
               </p>
               <div className="mt-6">
                 <a
-                  href="tel:+13433215300"
+                  href="tel:+14389006384"
                   className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700"
                 >
                   <MapPin className="h-5 w-5 mr-2" />
@@ -74,8 +74,8 @@ export function ServiceAreas() {
             <div className="mt-6 p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
               <p className="text-sm text-gray-700 dark:text-gray-300">
                 <strong>Don't see your area?</strong> We're expanding! Call us at{" "}
-                <a href="tel:+13433215300" className="text-primary-600 dark:text-primary-400 font-semibold hover:underline">
-                  (343) 321-5300
+                <a href="tel:+14389006384" className="text-primary-600 dark:text-primary-400 font-semibold hover:underline">
+                  (438) 900-6384
                 </a>{" "}
                 to check availability.
               </p>

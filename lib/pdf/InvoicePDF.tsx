@@ -218,7 +218,7 @@ export default function InvoicePDF({ invoice, client, job }: InvoicePDFProps) {
             <Text style={styles.companyName}>ExcelPro Washers</Text>
             <Text style={styles.companyTagline}>Professional Pressure Washing Services</Text>
             <View style={styles.contactInfo}>
-              <Text>(613) 555-WASH</Text>
+              <Text>(438) 900-6384</Text>
               <Text>info@excelprowashers.com</Text>
               <Text>Ottawa, ON</Text>
             </View>
@@ -343,7 +343,7 @@ export default function InvoicePDF({ invoice, client, job }: InvoicePDFProps) {
         <View style={styles.footer}>
           <Text style={styles.footerText}>Thank you for choosing ExcelPro Washers!</Text>
           <Text style={styles.footerText}>
-            Questions about this invoice? Contact us at info@excelprowashers.com or (613) 555-WASH
+            Questions about this invoice? Contact us at info@excelprowashers.com or (438) 900-6384
           </Text>
         </View>
       </Page>

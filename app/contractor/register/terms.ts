@@ -246,5 +246,5 @@ BY ACCEPTING THIS AGREEMENT THROUGH THE CONTRACTOR PORTAL, THE CONTRACTOR CONFIR
 ✓ I acknowledge that I am entering this Agreement as an independent contractor, not an employee.
 
 ────────────────────────────────────────────────────────────
-ExcelPro Washers | Ottawa, ON | info@excelprowashers.com | +1 (343) 321-5300
+ExcelPro Washers | Ottawa, ON | info@excelprowashers.com | +1 (438) 900-6384
 `;

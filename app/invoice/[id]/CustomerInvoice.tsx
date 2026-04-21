@@ -168,7 +168,7 @@ export default function CustomerInvoice({ invoice, client, job }: CustomerInvoic
                   <div className="mt-4 space-y-1 text-sky-50">
                     <p className="flex items-center gap-2">
                       <Phone className="w-4 h-4" />
-                      (613) 555-WASH
+                      (438) 900-6384
                     </p>
                     <p className="flex items-center gap-2">
                       <Mail className="w-4 h-4" />
@@ -345,7 +345,7 @@ export default function CustomerInvoice({ invoice, client, job }: CustomerInvoic
               <div className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-700 text-center text-sm text-gray-500 dark:text-gray-400">
                 <p>Thank you for choosing ExcelPro Washers!</p>
                 <p className="mt-2">
-                  Questions about this invoice? Contact us at info@excelprowashers.com or (613) 555-WASH
+                  Questions about this invoice? Contact us at info@excelprowashers.com or (438) 900-6384
                 </p>
               </div>
             </div>
