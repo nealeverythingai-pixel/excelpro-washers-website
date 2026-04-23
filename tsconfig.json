@@ -38,6 +38,7 @@
   ],
   "exclude": [
     "node_modules",
-    "voice-service"
+    "voice-service",
+    "magic-mcp"
   ]
 }
