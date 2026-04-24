@@ -1,52 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createHmac } from 'crypto'
 import { AILeadQualifier } from '@/lib/ai/LeadQualifier'
 import { LeadRouter } from '@/lib/ai/LeadRouter'
 import { NotificationService } from '@/lib/notifications/NotificationService'
 import { db } from '@/lib/db'
 import { leadQuotes } from '@/lib/db/leads'
 
-/**
- * POST /api/webhooks/elevenlabs
- *
- * Receives ElevenLabs post-call webhook, extracts caller info from
- * data_collection, qualifies the lead, and pushes it into the CRM
- * pipeline (same as /api/contact).
- */
 export async function POST(request: NextRequest) {
   try {
-    // 1. Validate HMAC signature
-    // ElevenLabs sends: ElevenLabs-Signature: t=<timestamp>,v1=<hmac-sha256>
-    // Signed message: "<timestamp>.<raw_body>"
-    const secret = process.env.ELEVENLABS_WEBHOOK_SECRET
-    if (!secret) {
-      console.error('ELEVENLABS_WEBHOOK_SECRET is not set')
-      return NextResponse.json({ error: 'Not configured' }, { status: 500 })
-    }
-
-    const rawBody = await request.text()
-    const sigHeader = request.headers.get('ElevenLabs-Signature') ?? ''
-    const parts = Object.fromEntries(sigHeader.split(',').map(p => p.split('=')))
-    const timestamp = parts['t']
-    const receivedSig = parts['v1']
-
-    if (timestamp && receivedSig) {
-      const expected = createHmac('sha256', secret)
-        .update(`${timestamp}.${rawBody}`)
-        .digest('hex')
-      if (expected !== receivedSig) {
-        console.warn('ElevenLabs webhook: invalid HMAC signature')
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
-    } else {
-      console.warn('ElevenLabs webhook: missing signature header')
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const body = JSON.parse(rawBody)
+    const body = await request.json()
     console.log('📞 ElevenLabs webhook:', body.type, body.data?.conversation_id)
 
-    // 2. Only process successful completed calls
+    // Only process successful completed calls
     if (body.type !== 'call.ended') {
       return NextResponse.json({ received: true, skipped: 'not call.ended' })
     }
