@@ -11,9 +11,9 @@ import { getElevenLabs } from '../lib/clients';
 const VoiceResponse = twilio.twiml.VoiceResponse;
 
 function getBaseUrl(): string {
-  return process.env.VOICE_SERVICE_URL || process.env.RAILWAY_PUBLIC_DOMAIN
-    ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
-    : `http://localhost:${process.env.PORT || 3001}`;
+  if (process.env.VOICE_SERVICE_URL) return process.env.VOICE_SERVICE_URL;
+  if (process.env.RAILWAY_PUBLIC_DOMAIN) return `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
+  return `http://localhost:${process.env.PORT || 3001}`;
 }
 
 /** Speak text via ElevenLabs (if available) or Twilio Polly TTS */
