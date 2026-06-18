@@ -25,6 +25,27 @@ export const metadata: Metadata = {
 
 const blogs = [
   {
+    slug: 'spring-cleaning-checklist-ottawa',
+    title: 'The Ultimate Spring Exterior Cleaning Checklist for Ottawa Homeowners',
+    excerpt: 'After a long Ottawa winter, your home needs a full exterior reset. Use this room-by-room checklist to tackle salt, grime, and winter damage this spring.',
+    date: '2026-02-09',
+    category: 'Home Maintenance'
+  },
+  {
+    slug: 'roof-soft-wash-ottawa',
+    title: 'Roof Cleaning Ottawa: How Soft Washing Removes Black Streaks & Moss',
+    excerpt: 'Those black streaks on your roof are algae, not dirt. Learn how professional soft washing removes them safely and extends your shingles\' lifespan.',
+    date: '2025-11-18',
+    category: 'Soft Wash'
+  },
+  {
+    slug: 'gutter-cleaning-ottawa',
+    title: 'Gutter Cleaning Ottawa: Why It Matters and What It Costs',
+    excerpt: 'Clogged gutters cause foundation damage, ice dams, and roof leaks. Learn why Ottawa homeowners need professional gutter cleaning twice a year.',
+    date: '2025-10-14',
+    category: 'Gutter Cleaning'
+  },
+  {
     slug: 'best-window-cleaners-ottawa',
     title: 'Why We Are The Best Window Cleaners in Ottawa (And Near You!)',
     excerpt: 'Looking for "window cleaners near me"? Discover why Ottawa homeowners trust ExcelPro Washers for sparkling, streak-free windows year-round.',
