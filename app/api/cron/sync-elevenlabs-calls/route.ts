@@ -40,8 +40,8 @@ export async function GET(request: NextRequest) {
   let processed = 0, skipped = 0
 
   for (const conv of conversations) {
-    // Only process successful completed calls
-    if (!conv.call_successful || conv.status !== 'done') { skipped++; continue }
+    // Only process successful completed calls (call_successful is "success"|"failure"|"unknown")
+    if (conv.call_successful !== 'success' || conv.status !== 'done') { skipped++; continue }
 
     const requestId = `req_call_${conv.conversation_id}`
 
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
     const detail = await detailRes.json()
 
     // Extract data collection values (ElevenLabs nests these under analysis)
-    const dc = detail.analysis?.data_collection ?? detail.data_collection ?? {}
+    const dc = detail.analysis?.data_collection_results ?? detail.data_collection_results ?? {}
     const callerName  = dc.caller_name?.value       ?? 'Unknown Caller'
     const callerPhone = dc.caller_phone?.value      ?? ''
     const serviceRaw  = dc.service_requested?.value ?? 'window-cleaning'

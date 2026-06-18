@@ -11,18 +11,19 @@ export async function POST(request: NextRequest) {
     console.log('📞 ElevenLabs webhook:', body.type, body.data?.conversation_id)
 
     // ElevenLabs sends "post_call_transcription" (not "call.ended") when a call finishes,
-    // and nests call_successful/data_collection under data.analysis.
+    // and nests call_successful/data_collection_results under data.analysis.
+    // call_successful is the string "success" | "failure" | "unknown", not a boolean.
     if (body.type !== 'post_call_transcription') {
       return NextResponse.json({ received: true, skipped: 'not post_call_transcription' })
     }
     const callSuccessful = body.data?.analysis?.call_successful ?? body.data?.call_successful
-    if (!callSuccessful) {
+    if (callSuccessful !== 'success' && callSuccessful !== true) {
       console.log('Call not successful — skipping lead creation:', body.data?.conversation_id)
       return NextResponse.json({ received: true, skipped: 'call_not_successful' })
     }
 
-    // 3. Extract data_collection variables
-    const dc = body.data?.analysis?.data_collection ?? body.data?.data_collection ?? {}
+    // 3. Extract data_collection_results variables
+    const dc = body.data?.analysis?.data_collection_results ?? body.data?.data_collection_results ?? {}
     const callerName  = dc.caller_name?.value       ?? 'Unknown Caller'
     const callerPhone = dc.caller_phone?.value      ?? ''
     const serviceRaw  = dc.service_requested?.value ?? 'window-cleaning'
