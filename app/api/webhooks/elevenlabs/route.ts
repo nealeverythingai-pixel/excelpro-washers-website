@@ -10,17 +10,19 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     console.log('📞 ElevenLabs webhook:', body.type, body.data?.conversation_id)
 
-    // Only process successful completed calls
-    if (body.type !== 'call.ended') {
-      return NextResponse.json({ received: true, skipped: 'not call.ended' })
+    // ElevenLabs sends "post_call_transcription" (not "call.ended") when a call finishes,
+    // and nests call_successful/data_collection under data.analysis.
+    if (body.type !== 'post_call_transcription') {
+      return NextResponse.json({ received: true, skipped: 'not post_call_transcription' })
     }
-    if (!body.data?.call_successful) {
+    const callSuccessful = body.data?.analysis?.call_successful ?? body.data?.call_successful
+    if (!callSuccessful) {
       console.log('Call not successful — skipping lead creation:', body.data?.conversation_id)
       return NextResponse.json({ received: true, skipped: 'call_not_successful' })
     }
 
     // 3. Extract data_collection variables
-    const dc = body.data?.data_collection ?? {}
+    const dc = body.data?.analysis?.data_collection ?? body.data?.data_collection ?? {}
     const callerName  = dc.caller_name?.value       ?? 'Unknown Caller'
     const callerPhone = dc.caller_phone?.value      ?? ''
     const serviceRaw  = dc.service_requested?.value ?? 'window-cleaning'
