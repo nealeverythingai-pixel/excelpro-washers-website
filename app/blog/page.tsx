@@ -25,6 +25,34 @@ export const metadata: Metadata = {
 
 const blogs = [
   {
+    slug: 'window-cleaning-kanata',
+    title: 'Window Cleaning in Kanata: A Local Guide for Homeowners',
+    excerpt: 'Looking for reliable window cleaners in Kanata? Here\'s what Kanata homeowners should know about scheduling, pricing, and what to expect.',
+    date: '2026-05-20',
+    category: 'Window Cleaning'
+  },
+  {
+    slug: 'post-construction-cleaning-ottawa',
+    title: 'Post-Construction Window Cleaning in Ottawa: What to Expect',
+    excerpt: 'New windows are often covered in stickers, paint overspray, and construction dust. Here\'s how professional post-construction window cleaning gets them move-in ready.',
+    date: '2026-04-25',
+    category: 'Window Cleaning'
+  },
+  {
+    slug: 'commercial-window-cleaning-ottawa',
+    title: 'Commercial Window Cleaning in Ottawa: What Business Owners Should Know',
+    excerpt: 'Clean storefronts and office windows make a real first impression. Here\'s what Ottawa business owners should expect from a commercial window cleaning service.',
+    date: '2026-04-02',
+    category: 'Window Cleaning'
+  },
+  {
+    slug: 'deck-cleaning-ottawa',
+    title: 'Deck Cleaning Ottawa: How to Prep Wood Decks for Staining',
+    excerpt: 'Grey, weathered decks need more than a quick rinse before staining. Learn how professional deck cleaning restores wood and helps stain last longer.',
+    date: '2026-03-12',
+    category: 'Pressure Washing'
+  },
+  {
     slug: 'spring-cleaning-checklist-ottawa',
     title: 'The Ultimate Spring Exterior Cleaning Checklist for Ottawa Homeowners',
     excerpt: 'After a long Ottawa winter, your home needs a full exterior reset. Use this room-by-room checklist to tackle salt, grime, and winter damage this spring.',

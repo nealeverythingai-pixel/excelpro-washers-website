@@ -529,6 +529,303 @@ const posts: Record<string, {
       { question: 'Do I need to do all of this every spring?', answer: 'Gutters and windows benefit from a spring cleaning every year. Roof and siding soft washing typically only need attention every 2-4 years unless you have heavy tree cover.' },
     ],
   },
+  'deck-cleaning-ottawa': {
+    title: 'Deck Cleaning Ottawa: How to Prep Wood Decks for Staining',
+    date: '2026-03-12',
+    category: 'Pressure Washing',
+    keywords: ['Deck Cleaning Ottawa', 'Deck Staining Prep', 'Wood Deck Cleaning', 'Deck Restoration Ottawa'],
+    description: 'Grey, weathered decks need more than a quick rinse before staining. Learn how professional deck cleaning restores wood and helps stain last longer.',
+    content: (
+      <>
+        <p className="lead text-xl text-gray-700 dark:text-gray-300 mb-8">
+            A grey, weathered deck isn't just an eyesore—it's a sign that UV rays and Ottawa's freeze-thaw cycles have broken down the wood's surface fibers. If you're planning to stain or seal your deck this season, proper cleaning is the single biggest factor in how long that finish will last.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Why a Garden Hose Isn't Enough</h2>
+        <p className="mb-4">
+            Weathered wood develops a fuzzy, oxidized "grey" layer of dead fibers on the surface. A hose rinse only moves surface dirt around—it doesn't remove this layer, which means stain applied on top won't bond properly and will peel or flake within a season.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Our Deck Cleaning Process</h2>
+        <ul className="list-disc pl-6 mb-6 space-y-3">
+            <li><strong>Debris & Furniture Clearing:</strong> We clear the deck surface so every board gets even treatment.</li>
+            <li><strong>Wood-Safe Cleaning Solution:</strong> A specialized cleaner lifts mildew, algae, and grey oxidation without the splintering risk of high PSI.</li>
+            <li><strong>Controlled-Pressure Rinse:</strong> We use low-pressure, wide-fan tips calibrated for wood—not the narrow, damaging tips used on concrete.</li>
+            <li><strong>Brightening Treatment:</strong> For older decks, a wood brightener neutralizes the cleaner and restores the wood's natural color before staining.</li>
+        </ul>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Composite vs. Wood Decks</h2>
+        <p className="mb-4">
+            Composite decking doesn't need staining, but it still collects mold, pollen, and grime in its textured surface. We adjust pressure and cleaning solution specifically for composite materials to avoid damaging the cap layer.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">When to Clean Before Staining</h2>
+        <p className="mb-4">
+            Clean your deck and let it dry for <strong>48 hours</strong> minimum before applying stain or sealant. Rushing this step is the most common reason DIY staining jobs fail. Spring and early fall—when humidity is lower—are the best windows for deck staining in Ottawa.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Pricing & Service Areas</h2>
+        <p className="mb-4">
+            Deck cleaning starts at <strong>$199</strong> for a standard residential deck. We serve Ottawa, Kanata, Orleans, Barrhaven, Nepean, and Stittsville. Ask about combining deck cleaning with your spring driveway and patio pressure washing.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Frequently Asked Questions</h2>
+        <div className="space-y-4 mb-8">
+            <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Will pressure washing damage my deck boards?</h3>
+                <p>Not with the right equipment. We use low-pressure, wide-fan tips and wood-safe solutions specifically calibrated for wood to avoid splintering or gouging.</p>
+            </div>
+            <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Do you also stain or seal decks?</h3>
+                <p>We focus on cleaning and prep work, which is the most important step for a long-lasting finish. We're happy to recommend trusted local staining contractors.</p>
+            </div>
+            <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">How often should I clean my deck?</h3>
+                <p>Once a year is typical for most Ottawa decks, ideally in spring before the staining season or before heavy summer use begins.</p>
+            </div>
+        </div>
+
+        <p className="mb-4">
+            Tackling your whole property this season? See our <Link href="/blog/spring-cleaning-checklist-ottawa" className="text-primary-600 font-semibold hover:underline">spring exterior cleaning checklist</Link> or our <Link href="/blog/pressure-washing-ottawa-guide" className="text-primary-600 font-semibold hover:underline">pressure washing guide</Link> for driveways and patios.
+        </p>
+
+        <div className="bg-green-50 dark:bg-green-900 p-6 rounded-xl border border-green-200 dark:border-green-700 my-8">
+            <h3 className="text-xl font-bold text-green-800 dark:text-green-300 mb-2">Get Your Deck Stain-Ready</h3>
+            <p className="text-green-700 dark:text-green-400 mb-4">Restore your deck's natural color and prep it properly before your next coat of stain.</p>
+            <Link href="/contact" className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                Book Deck Cleaning Now
+            </Link>
+        </div>
+      </>
+    ),
+    faqs: [
+      { question: 'Will pressure washing damage my deck boards?', answer: 'Not with the right equipment. Low-pressure, wide-fan tips and wood-safe solutions are used specifically to avoid splintering or gouging.' },
+      { question: 'Do you also stain or seal decks?', answer: 'We focus on cleaning and prep work, the most important step for a long-lasting finish, and can recommend trusted local staining contractors.' },
+      { question: 'How often should I clean my deck?', answer: 'Once a year is typical for most Ottawa decks, ideally in spring before the staining season or before heavy summer use begins.' },
+    ],
+  },
+  'commercial-window-cleaning-ottawa': {
+    title: 'Commercial Window Cleaning in Ottawa: What Business Owners Should Know',
+    date: '2026-04-02',
+    category: 'Window Cleaning',
+    keywords: ['Commercial Window Cleaning Ottawa', 'Storefront Window Cleaning', 'Office Window Cleaning', 'Business Window Washing'],
+    description: 'Clean storefronts and office windows make a real first impression. Here\'s what Ottawa business owners should expect from a commercial window cleaning service.',
+    content: (
+      <>
+        <p className="lead text-xl text-gray-700 dark:text-gray-300 mb-8">
+            For retail storefronts, offices, and commercial properties, your windows are part of your brand. Streaky or grimy glass sends the wrong message before a customer even walks through the door. Here's what to expect from professional commercial window cleaning in Ottawa.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">How Commercial Window Cleaning Differs from Residential</h2>
+        <ul className="list-disc pl-6 mb-6 space-y-3">
+            <li><strong>Scheduling Around Business Hours:</strong> We work early mornings or after-hours to avoid disrupting customers and staff.</li>
+            <li><strong>Frequency:</strong> Storefronts in high-traffic areas often need weekly or bi-weekly cleaning, while office buildings typically do monthly or quarterly.</li>
+            <li><strong>Multi-Story Access:</strong> We use specialized equipment and extension poles to safely reach up to 3 stories without scaffolding or lifts.</li>
+            <li><strong>Consistent Contracts:</strong> Most commercial clients set up a recurring service agreement so cleanliness is never inconsistent.</li>
+        </ul>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Why Clean Windows Matter for Business</h2>
+        <p className="mb-4">
+            Studies on retail consumer behavior consistently show that storefront cleanliness directly impacts whether a customer chooses to walk in. Clean, streak-free glass signals professionalism and attention to detail—qualities customers project onto your products and service before they've even spoken to you.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">What's Included in Commercial Service</h2>
+        <ul className="list-disc pl-6 mb-6 space-y-2">
+            <li>Exterior storefront and display window cleaning</li>
+            <li>Interior glass cleaning for office partitions and entryways</li>
+            <li>Door glass and frame detailing</li>
+            <li>Frame and sill wipe-downs</li>
+            <li>Post-construction window cleanup for new commercial builds</li>
+        </ul>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Pricing & Service Areas</h2>
+        <p className="mb-4">
+            Commercial pricing is quoted individually based on window count, height, and frequency, with a free on-site estimate. We serve businesses across Ottawa, Kanata, Orleans, Barrhaven, and Nepean—from single storefronts to multi-tenant office buildings.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Frequently Asked Questions</h2>
+        <div className="space-y-4 mb-8">
+            <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">How often should a storefront get its windows cleaned?</h3>
+                <p>High-traffic retail storefronts typically benefit from weekly or bi-weekly cleaning, while lower-traffic offices can often go monthly or quarterly.</p>
+            </div>
+            <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Are you insured for commercial work?</h3>
+                <p>Yes, we carry $2M liability coverage for all residential and commercial jobs, with documentation available for property managers on request.</p>
+            </div>
+            <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Can you work outside business hours?</h3>
+                <p>Yes, we regularly schedule commercial cleaning before opening or after closing to avoid disrupting customers and staff.</p>
+            </div>
+        </div>
+
+        <p className="mb-4">
+            Just finished a commercial build-out? See our <Link href="/blog/post-construction-cleaning-ottawa" className="text-primary-600 font-semibold hover:underline">post-construction cleaning guide</Link> for what to expect before opening day.
+        </p>
+
+        <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-xl border border-green-100 dark:border-green-700 my-8">
+            <h3 className="text-xl font-bold text-green-800 dark:text-green-300 mb-2">Make a Better First Impression</h3>
+            <p className="text-green-700 dark:text-green-400 mb-4">Get a free on-site quote for recurring commercial window cleaning service.</p>
+            <Link href="/contact" className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                Request a Commercial Quote
+            </Link>
+        </div>
+      </>
+    ),
+    faqs: [
+      { question: 'How often should a storefront get its windows cleaned?', answer: 'High-traffic retail storefronts typically benefit from weekly or bi-weekly cleaning, while lower-traffic offices can often go monthly or quarterly.' },
+      { question: 'Are you insured for commercial work?', answer: 'Yes, $2M liability coverage is carried for all residential and commercial jobs, with documentation available for property managers on request.' },
+      { question: 'Can you work outside business hours?', answer: 'Yes, commercial cleaning is regularly scheduled before opening or after closing to avoid disrupting customers and staff.' },
+    ],
+  },
+  'post-construction-cleaning-ottawa': {
+    title: 'Post-Construction Window Cleaning in Ottawa: What to Expect',
+    date: '2026-04-25',
+    category: 'Window Cleaning',
+    keywords: ['Post-Construction Cleaning Ottawa', 'New Build Window Cleaning', 'Renovation Cleanup', 'Construction Window Film Removal'],
+    description: 'New windows are often covered in stickers, paint overspray, and construction dust. Here\'s how professional post-construction window cleaning gets them move-in ready.',
+    content: (
+      <>
+        <p className="lead text-xl text-gray-700 dark:text-gray-300 mb-8">
+            Whether you've just finished a renovation or a brand-new build, the final step before move-in is getting the dust, film, and debris off your windows. Post-construction cleaning is a different job entirely from routine window washing—and it requires different tools and techniques.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">What Makes Post-Construction Cleaning Different</h2>
+        <p className="mb-4">
+            New windows often arrive with manufacturer stickers, protective film, paint overspray, drywall dust, caulking residue, and construction adhesive—none of which come off with standard glass cleaner. Using the wrong tools (or scraping too aggressively) can scratch new glass permanently.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Our Post-Construction Window Process</h2>
+        <ul className="list-disc pl-6 mb-6 space-y-3">
+            <li><strong>Sticker & Film Removal:</strong> We safely remove manufacturer labels and protective film without leaving adhesive residue.</li>
+            <li><strong>Paint & Caulk Spot Removal:</strong> Specialized blades and solvents lift dried paint overspray and caulking without scratching glass.</li>
+            <li><strong>Deep Dust Cleaning:</strong> Construction dust settles in tracks and sills—we clean frames, tracks, and screens thoroughly.</li>
+            <li><strong>Final Detail Pass:</strong> A streak-free finish on both interior and exterior glass, ready for move-in or grand opening.</li>
+        </ul>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Who Needs This Service</h2>
+        <ul className="list-disc pl-6 mb-6 space-y-2">
+            <li>New home builds before move-in</li>
+            <li>Home renovations with new window installations</li>
+            <li>Commercial build-outs and storefronts before opening day</li>
+            <li>Window replacement projects</li>
+        </ul>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Timing It Right</h2>
+        <p className="mb-4">
+            We recommend scheduling post-construction cleaning <strong>after</strong> flooring, painting, and drywall work are complete, but before furniture or fixtures are moved in. This avoids re-contaminating freshly cleaned glass with ongoing dust.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Pricing & Service Areas</h2>
+        <p className="mb-4">
+            Post-construction window cleaning is quoted based on window count and condition, with most residential jobs starting around <strong>$249</strong>. We serve Ottawa, Kanata, Orleans, Barrhaven, and Nepean for both residential and commercial projects.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Frequently Asked Questions</h2>
+        <div className="space-y-4 mb-8">
+            <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Can you remove paint overspray from windows?</h3>
+                <p>Yes, specialized blades and solvents are used to lift dried paint and caulking residue without scratching the glass.</p>
+            </div>
+            <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">When should I book post-construction cleaning?</h3>
+                <p>After flooring, painting, and drywall work are finished, but before move-in or furniture delivery, to avoid re-soiling clean glass.</p>
+            </div>
+            <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Do you clean more than just windows after construction?</h3>
+                <p>Our post-construction service focuses on windows, frames, tracks, and screens. For full-property cleanup, ask us about bundling with our other exterior services.</p>
+            </div>
+        </div>
+
+        <p className="mb-4">
+            Running a commercial space? Check our <Link href="/blog/commercial-window-cleaning-ottawa" className="text-primary-600 font-semibold hover:underline">commercial window cleaning guide</Link> for ongoing maintenance after your grand opening.
+        </p>
+
+        <div className="bg-green-50 dark:bg-green-900 p-6 rounded-xl border border-green-200 dark:border-green-700 my-8">
+            <h3 className="text-xl font-bold text-green-800 dark:text-green-300 mb-2">Get Your New Space Move-In Ready</h3>
+            <p className="text-green-700 dark:text-green-400 mb-4">From sticker removal to a final streak-free shine, we'll handle the last step of your build.</p>
+            <Link href="/contact" className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                Book Post-Construction Cleaning
+            </Link>
+        </div>
+      </>
+    ),
+    faqs: [
+      { question: 'Can you remove paint overspray from windows?', answer: 'Yes, specialized blades and solvents are used to lift dried paint and caulking residue without scratching the glass.' },
+      { question: 'When should I book post-construction cleaning?', answer: 'After flooring, painting, and drywall work are finished, but before move-in or furniture delivery, to avoid re-soiling clean glass.' },
+      { question: 'Do you clean more than just windows after construction?', answer: 'The post-construction service focuses on windows, frames, tracks, and screens. Ask about bundling with other exterior services for full-property cleanup.' },
+    ],
+  },
+  'window-cleaning-kanata': {
+    title: 'Window Cleaning in Kanata: A Local Guide for Homeowners',
+    date: '2026-05-20',
+    category: 'Window Cleaning',
+    keywords: ['Window Cleaning Kanata', 'Kanata Window Cleaners', 'Window Washing near me Kanata', 'Kanata Lakes Window Cleaning'],
+    description: 'Looking for reliable window cleaners in Kanata? Here\'s what Kanata homeowners should know about scheduling, pricing, and what to expect.',
+    content: (
+      <>
+        <p className="lead text-xl text-gray-700 dark:text-gray-300 mb-8">
+            Kanata's mix of established neighborhoods like Beaverbrook and Glen Cairn alongside newer developments in Kanata Lakes and Bridlewood means a wide range of window styles and home sizes—and we've cleaned them all. Here's what to expect when booking window cleaning in Kanata.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Why Kanata Homes Need Regular Window Cleaning</h2>
+        <p className="mb-4">
+            Kanata's tree-lined streets and proximity to the Greenbelt mean more pollen and sap buildup on windows compared to denser parts of Ottawa. Combined with winter road salt spray along Terry Fox Drive and Eagleson Road, Kanata windows tend to need attention twice a year to stay streak-free.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Common Window Styles We Service in Kanata</h2>
+        <ul className="list-disc pl-6 mb-6 space-y-2">
+            <li><strong>Kanata Lakes & Beaverbrook:</strong> Larger two-story homes with picture windows and bay windows</li>
+            <li><strong>Bridlewood & Glen Cairn:</strong> Standard townhouses and single-family homes with double-hung windows</li>
+            <li><strong>Katimavik-Hazeldean:</strong> Mix of bungalows and split-levels with mid-size window counts</li>
+            <li><strong>Condos near Kanata Centrum:</strong> Interior-only cleaning for upper-floor units</li>
+        </ul>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">What's Included</h2>
+        <p className="mb-4">
+            Every Kanata window cleaning visit includes interior and exterior glass cleaning, screen removal and wiping, sill and track cleaning, and a final quality inspection. We bring our own water and supplies—no setup needed on your end.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Pricing & Booking</h2>
+        <p className="mb-4">
+            Window cleaning in Kanata starts at <strong>$199</strong> for a standard home, with free quotes available by phone or our online form. We typically can schedule within a few days, and same-week appointments are often available.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">Frequently Asked Questions</h2>
+        <div className="space-y-4 mb-8">
+            <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Do you service all of Kanata, including Kanata Lakes and Bridlewood?</h3>
+                <p>Yes, we cover all Kanata neighborhoods including Kanata Lakes, Beaverbrook, Bridlewood, Glen Cairn, and Katimavik-Hazeldean.</p>
+            </div>
+            <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">How quickly can I book a window cleaning in Kanata?</h3>
+                <p>We typically have availability within the same week, depending on the season—spring and fall are our busiest booking periods.</p>
+            </div>
+            <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Do you offer interior-only cleaning for condos?</h3>
+                <p>Yes, for condo and apartment units where exterior access isn't available, we offer interior-only window cleaning packages.</p>
+            </div>
+        </div>
+
+        <p className="mb-4">
+            Want the full picture on why local expertise matters? Read our guide on <Link href="/blog/best-window-cleaners-ottawa" className="text-primary-600 font-semibold hover:underline">why we're Ottawa's top-rated window cleaners</Link>.
+        </p>
+
+        <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-xl border border-green-100 dark:border-green-700 my-8">
+            <h3 className="text-xl font-bold text-green-800 dark:text-green-300 mb-2">Get Streak-Free Windows in Kanata</h3>
+            <p className="text-green-700 dark:text-green-400 mb-4">Book your free quote today and see why Kanata homeowners trust ExcelPro Washers.</p>
+            <Link href="/contact" className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                Book Kanata Window Cleaning
+            </Link>
+        </div>
+      </>
+    ),
+    faqs: [
+      { question: 'Do you service all of Kanata, including Kanata Lakes and Bridlewood?', answer: 'Yes, all Kanata neighborhoods are covered, including Kanata Lakes, Beaverbrook, Bridlewood, Glen Cairn, and Katimavik-Hazeldean.' },
+      { question: 'How quickly can I book a window cleaning in Kanata?', answer: 'Availability is typically within the same week, depending on the season—spring and fall are the busiest booking periods.' },
+      { question: 'Do you offer interior-only cleaning for condos?', answer: 'Yes, for condo and apartment units where exterior access isn\'t available, interior-only window cleaning packages are offered.' },
+    ],
+  },
 }
 
 // Generate static paths for all blog posts
